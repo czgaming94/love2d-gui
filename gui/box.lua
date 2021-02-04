@@ -17,9 +17,9 @@ function box:new(n, id)
 	b.border = false
 	b.borderColor = {1,1,1,1}
 	b.color = {1,1,1,1}
-	b.font = love.graphics.getFont()
 	b.hovered = false
 	b.clicked = false
+	b.image = nil
 	
 	function b:setBorderColor(bC)
 		assert(bC, "FAILURE: box:setBorderColor() :: Missing param[color]")
@@ -39,10 +39,13 @@ function box:new(n, id)
 		assert(t, "FAILURE: box:setData() :: Missing param[data]")
 		assert(type(t) == "table", "FAILURE: box:setData() :: Incorrect param[data] - expecting table and got " .. type(t))
 		assert(t.w or t.width, "FAILURE: box:setData() :: Missing param[data['width']")
-		assert(type(t.w) == "number" or type(t.width) == "number", "Incorrect param[data['width']] - expecting number and got " .. (type(t.w) or type(t.width)))
-		assert(t.h or t["height"], "FAILURE: box:setData() :: Missing param[data['height']")
+		assert(type(t.w) == "number" or type(t.width) == "number", "FAILURE: box:SetData() :: Incorrect param[data['width']] - expecting number and got " .. (type(t.w) or type(t.width)))
+		assert(t.h or t.height, "FAILURE: box:setData() :: Missing param[data['height']")
+		assert(type(t.h) == "number" or type(t.height) == "number", "FAILURE: box:SetData() :: Incorrect param[data['height']] - expecting number and got " .. (type(t.h) or type(t.height)))
 		assert(t.x, "FAILURE: box:setData() :: Missing param[data['x']")
+		assert(type(t.x) == "number", "FAILURE: box:setData() :: Incorrect param[x] - expecting number and got " .. type(t.x))
 		assert(t.y, "FAILURE: box:setData() :: Missing param[data['y']")
+		assert(type(t.y) == "number", "FAILURE: box:setData() :: Incorrect param[y] - expecting number and got " .. type(t.y))
 		self.w = t.w or t.width or self.w
 		self.h = t.h or t.height or self.h
 		self.x = t.x or self.x
@@ -50,8 +53,8 @@ function box:new(n, id)
 		self.z = t.z or self.z
 		self.border = t.useBorder and t.useBorder or self.border
 		self.borderColor = t.borderColor or self.borderColor
-		self.font = t.font or self.font
 		self.color = t.color or self.color
+		self.image = t.image or self.image
 	end
 	
 	function b:draw()
@@ -63,18 +66,13 @@ function box:new(n, id)
 		end
 		
 		lg.setColor(self.color)
-		lg.rectangle("fill", self.x, self.y, self.w, self.h)
+		if self.image then 
+			assert(type(self.image) == "userdata", "FAILURE: box:update() :: Incorrect param[color] - expecting userdata and got " .. type(self.image))
+			lg.draw(self.image, self.x, self.y)
+		else
+			lg.rectangle("fill", self.x, self.y, self.w, self.h)
+		end
 		lg.pop()
-	end
-	
-	function b:setFont(f)
-		assert(f, "FAILURE: box:setFont() :: Missing param[font]")
-		assert(type(f) == "userdata", "FAILURE: box:setFont() :: Incorrect param[font] - expecting userdata and got " .. type(f))
-		self.font = f
-	end
-	
-	function b:getFont()
-		return self.font
 	end
 	
 	function b:setHeight(h)
