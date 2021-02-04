@@ -32,9 +32,27 @@ function box:new(n, id)
 		self.color = c
 	end
 	
+	function b:setData(t)
+		assert(t, "FAILURE: box:setData() :: Missing param[data]")
+		assert(type(t) == "table", "FAILURE: box:setData() :: Incorrect param[data] - expecting table and got " .. type(t))
+		assert(t.w or t.width, "FAILURE: box:setData() :: Missing param[data['width']")
+		assert(type(t.w) == "number" or type(t.width) == "number", "Incorrect param[data['width']] - expecting number and got " .. (type(t.w) or type(t.width)))
+		assert(t.h or t["height"], "FAILURE: box:setData() :: Missing param[data['height']")
+		assert(t.x, "FAILURE: box:setData() :: Missing param[data['x']")
+		assert(t.y, "FAILURE: box:setData() :: Missing param[data['y']")
+		self.w = t.w or t.width or self.w
+		self.h = t.h or t.height or self.h
+		self.x = t.x or self.x
+		self.y = t.y or self.y
+		self.z = t.z or self.z
+		self.border = t.useBorder and t.useBorder or self.border
+		self.borderColor = t.borderColor or self.borderColor
+		self.font = t.font or self.font
+		self.color = t.color or self.color
+	end
+	
 	function b:draw()
 		lg.push()
-		
 		
 		if self.border then
 			lg.setColor(self.borderColor)
