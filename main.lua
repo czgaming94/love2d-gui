@@ -1,7 +1,15 @@
-local gui = require("gui")
-local myBox = gui:addBox("myBox")
-local myBox2 = gui:addBox("myBox2")
-local colors = gui.colors
+local GUI = require("gui")
+
+local myGui = GUI:new(GUI)
+local myGui2 = GUI:new(GUI)
+
+local myBox = myGui:addBox("myBox")
+local myBox2 = myGui:addBox("myBox2")
+
+local myBox3 = myGui2:addBox("myBox3")
+local myBox4 = myGui2:addBox("myBox4")
+
+local colors = GUI.colors
 
 function love.load()
 	-- w | width
@@ -17,6 +25,10 @@ function love.load()
 	
 	
 	myBox2:setData({w = 250, h = 50, x = 105, y = 10, color = colors.green, useBorder = true, borderColor = colors.yellow})
+	myBox3:setData({w = 100, h = 50, x = 105, y = 10, color = colors.yellow, useBorder = true, borderColor = colors.green})
+	myBox4:setData({w = 50, h = 250, x = 105, y = 200, color = colors.green, useBorder = true, borderColor = colors.yellow})
+	
+	myGui2:setZ(1)
 	
 	-- You can define onClick callbacks for your GUI elements
 	function myBox2:onClick(button)
@@ -46,13 +58,16 @@ function love.load()
 end
 
 function love.update(dt)
-	gui:update(dt)
+	-- Use global source for callbacks
+	GUI:update(dt)
 end
 
 function love.draw()
-	gui:draw()
+	-- Use global source for callbacks
+	GUI:draw()
 end
 
 function love.mousepressed(button)
-	gui:mousepressed(button)
+	-- Use global source for callbacks
+	GUI:mousepressed(button)
 end

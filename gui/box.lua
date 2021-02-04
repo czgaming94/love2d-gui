@@ -13,6 +13,7 @@ function box:new(n, id)
 	b.h = 0
 	b.x = 0
 	b.y = 0
+	b.z = 0
 	b.border = false
 	b.borderColor = {1,1,1,1}
 	b.color = {1,1,1,1}
