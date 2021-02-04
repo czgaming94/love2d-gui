@@ -17,6 +17,8 @@ function box:new(n, id)
 	b.borderColor = {1,1,1,1}
 	b.color = {1,1,1,1}
 	b.font = love.graphics.getFont()
+	b.hovered = false
+	b.clicked = false
 	
 	function b:setBorderColor(bC)
 		assert(bC, "FAILURE: box:setBorderColor() :: Missing param[color]")
@@ -84,8 +86,23 @@ function box:new(n, id)
 		return self.h
 	end
 	
-	function b:update(dt)
+	function b:isHovered()
+		return self.hovered
+	end
 	
+	function b:update(dt)
+		local x,y = love.mouse.getPosition()
+		if (x >= self.x and x <= self.x + self.w) and (y >= self.y and y <= self.y + self.h) then
+			if not self.hovered then
+				if self.onHoverEnter then self:onHoverEnter() end
+				self.hovered = true 
+			end
+		else
+			if self.hovered then 
+				if self.onHoverExit then self:onHoverExit() end
+				self.hovered = false 
+			end
+		end
 	end
 	
 	function b:setUseBorder(uB)
