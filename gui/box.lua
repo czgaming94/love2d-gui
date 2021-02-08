@@ -128,8 +128,8 @@ function box:new(n, id)
 	end
 	
 	function b:setUseBorder(uB)
-		assert(uB, "FAILURE: box:setBorder() :: Missing param[useBorder]")
-		assert(type(uB) == "boolean", "FAILURE: box:setBorder() :: Incorrect param[useBorder] - expecting boolean and got " .. type(uB))
+		assert(uB, "FAILURE: box:setUseBorder() :: Missing param[useBorder]")
+		assert(type(uB) == "boolean", "FAILURE: box:setUseBorder() :: Incorrect param[useBorder] - expecting boolean and got " .. type(uB))
 		self.border = uB
 	end
 	

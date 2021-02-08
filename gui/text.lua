@@ -12,6 +12,8 @@ function text:new(n, id)
 	t.id = #self.items + 1
 	t.parent = id
 	t.text = ""
+	t.w = 0
+	t.h = 0
 	t.x = 0
 	t.y = 0
 	t.z = 0
@@ -19,7 +21,9 @@ function text:new(n, id)
 	t.borderColor = {1,1,1,1}
 	t.background = false
 	t.backgroundColor = {1,1,1,1}
+	t.backgroundData = {}
 	t.color = {1,1,1,1}
+	t.font = love.graphics.getFont()
 	t.hovered = false
 	t.clicked = false
 	t.typewriter = false
@@ -59,6 +63,8 @@ function text:new(n, id)
 		assert(type(d.x) == "number", "FAILURE: text:setData() :: Incorrect param[x] - expecting number and got " .. type(d.x))
 		assert(d.y, "FAILURE: text:setData() :: Missing param[data['y']")
 		assert(type(d.y) == "number", "FAILURE: text:setData() :: Incorrect param[y] - expecting number and got " .. type(d.y))
+		self.w = d.w or self.w
+		self.h = d.h or self.h
 		self.x = d.x or self.x
 		self.y = d.y or self.y
 		self.z = d.z or self.z
@@ -67,6 +73,47 @@ function text:new(n, id)
 		self.backgroundColor = d.backgroundColor or self.backgroundColor
 		self.borderColor = d.borderColor or self.borderColor
 		self.color = d.color or self.color
+		self.font = d.font or self.font
+	end
+	
+	function t:draw()
+		lg.push()
+		
+		if self.typewriter then
+			if self.backgroundData[1] then
+				local color, xPad, yPad, round = unpack(self.backgroundData)
+				color = color or {1,1,1,1}
+				xPad = xPad or 0
+				yPad = yPad or 0
+				round = round and round or false
+				
+				lg.setColor(color)
+				if round then
+					lg.rectangle("fill", self.x - (xPad / 2), self.y - (yPad / 2), self.font:getWidth(self.text) + xPad, self.font:getHeight(self.text) + yPad, 5, 5)
+				else
+					lg.rectangle("fill", self.x - (xPad / 2), self.y - (yPad / 2), self.font:getWidth(self.text) + xPad, self.font:getHeight(self.text) + yPad)
+				end
+				if self.border then
+					lg.setColor(self.borderColor)
+					if round then
+						lg.rectangle("line", self.x - (xPad / 2), self.y - (yPad / 2), self.font:getWidth(self.text) + xPad, self.font:getHeight(self.text) + yPad, 5, 5)
+					else
+						lg.rectangle("line", self.x - (xPad / 2), self.y - (yPad / 2), self.font:getWidth(self.text) + xPad, self.font:getHeight(self.text) + yPad)
+					end
+				end
+			end
+			
+			lg.print({self.color, self.typewriterPrint}, self.font, self.x, self.y)
+		else
+		
+		end
+		
+		lg.setColor(1,1,1,1)
+		lg.pop()
+	end
+	
+	function t:isHovered()
+		return self.hovered
 	end
 	
 	function t:update(dt)
@@ -85,12 +132,12 @@ function text:new(n, id)
 		
 		if self.typewriter then
 			self.typewriterWaited = self.typewriterWaited + dt
-			while self.typewriterWaited >= self.typewriterSpeed and self.typewriterPrint <= #self.text do
+			while self.typewriterWaited >= self.typewriterSpeed and self.typewriterPrint <= #self.typewriterText do
 				self.typewriterWaited = self.typewriterWaited - self.typewriterSpeed
-				self.typewriterPrint = self.typewriterPrint .. self.text[self.typewriterPos]
+				self.typewriterPrint = self.typewriterPrint .. self.typewriterText[self.typewriterPos]
 				self.typewriterPos = self.typewriterPos + 1
 			end
-			if self.typewriterPos >= #self.text and not self.typewriterFinished then
+			if self.typewriterPos >= #self.typewriterText and not self.typewriterFinished then
 				if not self.typewriterRepeat then self.typewriterFinished = true else self:typewriterCycle() end
 				self.typewriterRunCount = self.typewriterRunCount + 1
 			end
@@ -107,13 +154,23 @@ function text:new(n, id)
 	end
 	
 	function t:setUseBorder(uB)
-		assert(uB, "FAILURE: box:setBorder() :: Missing param[useBorder]")
-		assert(type(uB) == "boolean", "FAILURE: box:setBorder() :: Incorrect param[useBorder] - expecting boolean and got " .. type(uB))
+		assert(uB, "FAILURE: box:setUseBorder() :: Missing param[useBorder]")
+		assert(type(uB) == "boolean", "FAILURE: box:setUseBorder() :: Incorrect param[useBorder] - expecting boolean and got " .. type(uB))
 		self.border = uB
 	end
 	
 	function t:getUseBorder()
 		return self.border
+	end
+	
+	function t:setAsTypewriter(aT)
+		assert(aT, "FAILURE: box:setAsTypewriter() :: Missing param[useBorder]")
+		assert(type(aT) == "boolean", "FAILURE: box:setAsTypewriter() :: Incorrect param[useBorder] - expecting boolean and got " .. type(aT))
+		self.typewriter = aT
+	end
+	
+	function t:isTypewriter()
+		return self.typewriter
 	end
 	
 	function t:setWidth(w)

@@ -1,6 +1,9 @@
-local button = require("gui.button")
 local box = require("gui.box")
+local checkbox = require("gui.checkbox")
+local dropdown = require("gui.dropdown")
 local text = require("gui.text")
+local textfield = require("gui.textfield")
+local toggle = require("gui.toggle")
 local timer = require("gui.timer")
 
 local gui = {}
@@ -65,15 +68,51 @@ function gui:removeBox(n)
 	
 end
 
-function gui:addButton(n)
-	assert(n, "FAILURE: gui:addButton() :: Missing param[name]")
-	assert(type(n) == "string", "FAILURE: gui:addButton() :: Incorrect param[name] - expecting string and got " .. type(n))
+function gui:addCheckbox(n)
+	assert(n, "FAILURE: gui:addCheckbox() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:addCheckbox() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
-	self.items[id] = button:new(n, id)
+	self.items[id] = checkbox:new(n, id)
 	return self.items[id]
 end
 
-function gui:removeButton(n)
+function gui:removeCheckbox(n)
+
+end
+
+function gui:addDropdown(n)
+	assert(n, "FAILURE: gui:addDropdown() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:addDropdown() :: Incorrect param[name] - expecting string and got " .. type(n))
+	local id = #self.items + 1
+	self.items[id] = dropdown:new(n, id)
+	return self.items[id]
+end
+
+function gui:removeDropdown(n)
+
+end
+
+function gui:addTextfield(n)
+	assert(n, "FAILURE: gui:addTextfield() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:addTextfield() :: Incorrect param[name] - expecting string and got " .. type(n))
+	local id = #self.items + 1
+	self.items[id] = textfield:new(n, id)
+	return self.items[id]
+end
+
+function gui:removeTextfield(n)
+
+end
+
+function gui:addToggle(n)
+	assert(n, "FAILURE: gui:addToggle() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:addToggle() :: Incorrect param[name] - expecting string and got " .. type(n))
+	local id = #self.items + 1
+	self.items[id] = toggle:new(n, id)
+	return self.items[id]
+end
+
+function gui:addToggle(n)
 
 end
 
