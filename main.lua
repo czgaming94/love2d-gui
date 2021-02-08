@@ -25,7 +25,7 @@ function love.load()
 	-- useBorder
 	-- borderColor
 	myBox:setData({w = 800, h = 600, x = 0, y = 0, z = 0, image = love.graphics.newImage("res/img/background.png")})
-	-- This line can do the same as these 7. Order does not matter. Assosciative table required.
+	-- This line can do the same as these 9. Order does not matter. Assosciative table required.
 
 	--[[
 		myBox:setWidth(50)
@@ -45,7 +45,7 @@ function love.load()
 	
 	myBox2:setData({w = 250, h = 50, x = 105, y = 10, color = colors.green, useBorder = true, borderColor = colors.yellow})
 	myBox3:setData({w = 100, h = 50, x = 105, y = 10, color = colors.yellow, useBorder = false})
-	myBox4:setData({w = 50, h = 250, x = 105, y = 200, color = colors.purple, useBorder = true, borderColor = colors.yellow})
+	myBox4:setData({w = 50, h = 250, x = 105, y = 200, color = colors.purple, useBorder = true, borderColor = colors.blue})
 	
 	myGui2:setZ(1)
 	
@@ -57,7 +57,7 @@ function love.load()
 	-- You can define onHoverEnter callbacks for your GUI elements
 	function myBox3:onHoverEnter()
 		-- You can animate your objects to a new color
-		self:animateToColor(colors.white)
+		myBox3:animateToColor(colors.white)
 	end
 	
 	function myBox4:onHoverEnter()
@@ -67,7 +67,7 @@ function love.load()
 	
 	-- You can define onHoverExit callbacks for your GUI elements
 	function myBox3:onHoverExit()
-		self:animateToColor(colors.red)
+		myBox3:animateToColor(colors.red)
 	end
 end
 

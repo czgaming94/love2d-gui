@@ -136,7 +136,7 @@ function box:new(n, id)
 	
 	function b:setImage(i)
 		assert(i, "FAILURE: box:setImage() :: Missing param[img]")
-		assert(type(i) == "userdata", "FAILURE: box:setImage() :: Incorrect param[img] - expecting image userdata and got " .. type(i))\
+		assert(type(i) == "userdata", "FAILURE: box:setImage() :: Incorrect param[img] - expecting image userdata and got " .. type(i))
 		self.image = i
 	end
 	
