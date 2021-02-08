@@ -1,6 +1,7 @@
 local button = require("gui.button")
 local box = require("gui.box")
 local text = require("gui.text")
+local timer = require("gui.timer")
 
 local gui = {}
 
@@ -94,6 +95,7 @@ function gui:update(dt)
 			i:update(dt) 
 		end 
 	end
+	timer.update(dt)
 end
 
 function gui:draw()

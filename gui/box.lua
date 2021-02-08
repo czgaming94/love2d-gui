@@ -1,4 +1,6 @@
+local timer = require("gui.timer")
 local lg = love.graphics
+local min, max = math.min, math.max
 local box = {}
 
 box.items = {}
@@ -20,6 +22,27 @@ function box:new(n, id)
 	b.hovered = false
 	b.clicked = false
 	b.image = nil
+	
+	function b:animateToColor(c, s)
+		assert(c, "FAILURE: box:animateToColor() :: Missing param[color]")
+		assert(type(c) == "table", "FAILURE: box:animateToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
+		assert(#c == 4, "FAILURE: box:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
+		s = s or 2
+		assert(s, "FAILURE: box:animateToColor() :: Missing param[speed]")
+		assert(type(s) == "number", "FAILURE: box:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		timer.tween(s, self.color, c, 'out-quint')
+	end
+	
+	function b:animateToPosition(x, y, s)
+		assert(x, "FAILURE: box:animateToPosition() :: Missing param[x]")
+		assert(type(x) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[x] - expecting number and got " .. type(x))
+		assert(y, "FAILURE: box:animateToPosition() :: Missing param[y]")
+		assert(type(y) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
+		s = s or 2
+		assert(s, "FAILURE: box:animateToPosition() :: Missing param[speed]")
+		assert(type(s) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		timer.tween(s, {self.x, self.y}, {x,y}, 'out-quint')
+	end
 	
 	function b:setBorderColor(bC)
 		assert(bC, "FAILURE: box:setBorderColor() :: Missing param[color]")
@@ -111,7 +134,7 @@ function box:new(n, id)
 	end
 	
 	function b:getUseBorder()
-		return b.border
+		return self.border
 	end
 	
 	function b:setWidth(w)

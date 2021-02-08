@@ -50,9 +50,12 @@ function love.load()
 	
 	-- You can define onHoverEnter callbacks for your GUI elements
 	function myBox:onHoverEnter()
-		myBox:setColor(colors.white)
+		myBox:animateToColor(colors.white)
 	end
 	
+	function myBox4:onHoverEnter()
+		myBox4:animateToPosition(150, 64)
+	end
 	
 	-- You can define onHoverExit callbacks for your GUI elements
 	function myBox:onHoverExit()
