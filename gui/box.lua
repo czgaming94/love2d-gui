@@ -46,7 +46,7 @@ function box:new(n, id)
 		assert(type(x) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[x] - expecting number and got " .. type(x))
 		assert(y, "FAILURE: box:animateToPosition() :: Missing param[y]")
 		assert(type(y) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
-		s = s or 2
+		s = s or 200
 		assert(type(s) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		self.positionToAnimateTo = {x = x, y = y}
 		self.positionAnimateSpeed = s
@@ -101,7 +101,7 @@ function box:new(n, id)
 	end
 	
 	function b:draw()
-		lg.push("all")
+		lg.push()
 		
 		lg.setColor(1,1,1,1)
 		if self.border then
@@ -117,7 +117,7 @@ function box:new(n, id)
 			lg.rectangle("fill", self.pos.x, self.pos.y, self.w, self.h)
 		end
 		lg.setColor(1,1,1,1)
-		lg.pop("all")
+		lg.pop()
 	end
 	
 	function b:setHeight(h)
@@ -159,6 +159,7 @@ function box:new(n, id)
 			end
 		end
 		if self.inAnimation then
+			print(1)
 			local allColorsMatch = true
 			local inProperPosition = true
 			
@@ -173,12 +174,14 @@ function box:new(n, id)
 				end
 			end
 			
-			for k,v in ipairs(self.positionToAnimateTo) do
+			local xDiff = self.pos.x - self.positionToAnimateTo.x
+			local yDiff = self.pos.y - self.positionToAnimateTo.y
+			for k,v in pairs(self.positionToAnimateTo) do
 				if self.pos[k] ~= v then
 					if v > self.pos[k] then
-						self.pos[k] = min(v, self.pos[k] + (self.positionAnimateSpeed * dt))
+						self.pos[k] = min(v, self.pos[k] + (xDiff * dt))
 					else
-						self.pos[k] = max(v, self.pos[k] - (self.positionAnimateSpeed * dt))
+						self.pos[k] = max(v, self.pos[k] - (yDiff * dt))
 					end
 					inProperPosition = false
 				end

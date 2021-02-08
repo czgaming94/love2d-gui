@@ -20,6 +20,12 @@ gui.colors = {
 	purple = {1,0,1,1}
 }
 
+function gui.color(c)
+	assert(c, "FAILURE: gui:color() :: Missing param[name]")
+	assert(type(c) == "string", "FAILURE: gui:color() :: Incorrect param[name] - expecting string and got " .. type(c))
+	return gui:generate(gui.colors[c])
+end
+
 function gui:new(item)
 	local newGUI = self:generate(item)
 	newGUI.id = #items

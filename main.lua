@@ -9,7 +9,7 @@ local myBox2 = myGui:addBox("myBox2")
 local myBox3 = myGui2:addBox("myBox3")
 local myBox4 = myGui2:addBox("myBox4")
 
-local colors = GUI.colors
+local colors = GUI.color
 
 function love.load()
 	-- Add color to global GUI
@@ -24,6 +24,8 @@ function love.load()
 	-- color
 	-- useBorder
 	-- borderColor
+	-- clickable
+	-- image
 	myBox:setData({w = 800, h = 600, x = 0, y = 0, z = 0, image = love.graphics.newImage("res/img/background.png")})
 	-- This line can do the same as these 9. Order does not matter. Assosciative table required.
 
@@ -43,9 +45,9 @@ function love.load()
 	-- Clicks will pass through this object.
 	myBox:setClickable(false)
 	
-	myBox2:setData({w = 250, h = 50, x = 105, y = 10, color = colors.green, useBorder = true, borderColor = colors.yellow})
-	myBox3:setData({w = 100, h = 50, x = 105, y = 10, color = colors.yellow, useBorder = false})
-	myBox4:setData({w = 50, h = 250, x = 105, y = 200, color = colors.purple, useBorder = true, borderColor = colors.blue})
+	myBox2:setData({w = 250, h = 50, x = 105, y = 10, color = colors("green"), useBorder = true, borderColor = colors("yellow")})
+	myBox3:setData({w = 100, h = 50, x = 105, y = 10, color = colors("yellow"), useBorder = false})
+	myBox4:setData({w = 50, h = 250, x = 105, y = 200, color = colors("purple"), useBorder = true, borderColor = colors("blue")})
 	
 	myGui2:setZ(1)
 	
@@ -57,17 +59,17 @@ function love.load()
 	-- You can define onHoverEnter callbacks for your GUI elements
 	function myBox3:onHoverEnter()
 		-- You can animate your objects to a new color
-		myBox3:animateToColor(colors.white)
+		myBox3:animateToColor(colors("white"))
 	end
 	
 	function myBox4:onHoverEnter()
-		-- You can animate your objects to a new position
-		self:animateToPosition(150, 64)
+		-- You can animate your objects to a new position\
+		myBox4:animateToPosition(150, 64)
 	end
 	
 	-- You can define onHoverExit callbacks for your GUI elements
 	function myBox3:onHoverExit()
-		myBox3:animateToColor(colors.red)
+		myBox3:animateToColor(colors("red"))
 	end
 end
 
