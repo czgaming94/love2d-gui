@@ -4,7 +4,6 @@ local dropdown = require("gui.dropdown")
 local text = require("gui.text")
 local textfield = require("gui.textfield")
 local toggle = require("gui.toggle")
-local timer = require("lib.hump.timer")
 
 local gui = {}
 
@@ -134,7 +133,6 @@ function gui:update(dt)
 			i:update(dt) 
 		end 
 	end
-	timer.update(dt)
 end
 
 function gui:draw()

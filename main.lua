@@ -35,6 +35,8 @@ function love.load()
 		myBox:setColor({0,0,1,1})
 		myBox:setUseBorder(true)
 		myBox:setBorderColor({1,0,1,1})
+		myBox:setClickable(false)
+		myBox:setImage(love.graphics.newImage("path/to/image.png"))
 	--]]
 	
 	-- You can disable whether or not a box is read as a clickable object.
@@ -55,7 +57,7 @@ function love.load()
 	-- You can define onHoverEnter callbacks for your GUI elements
 	function myBox3:onHoverEnter()
 		-- You can animate your objects to a new color
-		myBox3:animateToColor(colors.white)
+		self:animateToColor(colors.white)
 	end
 	
 	function myBox4:onHoverEnter()
@@ -65,7 +67,7 @@ function love.load()
 	
 	-- You can define onHoverExit callbacks for your GUI elements
 	function myBox3:onHoverExit()
-		myBox3:animateToColor(colors.red)
+		self:animateToColor(colors.red)
 	end
 end
 

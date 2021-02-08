@@ -97,6 +97,7 @@ function box:new(n, id)
 		self.borderColor = t.borderColor or self.borderColor
 		self.color = t.color or self.color
 		self.image = t.image or self.image
+		self.clickable = t.clickable and t.clickable or self.clickable
 	end
 	
 	function b:draw()
@@ -133,6 +134,16 @@ function box:new(n, id)
 		return self.hovered
 	end
 	
+	function b:setImage(i)
+		assert(i, "FAILURE: box:setImage() :: Missing param[img]")
+		assert(type(i) == "userdata", "FAILURE: box:setImage() :: Incorrect param[img] - expecting image userdata and got " .. type(i))\
+		self.image = i
+	end
+	
+	function b:getImage()
+		return self.image
+	end
+	
 	function b:update(dt)
 		local x,y = love.mouse.getPosition()
 		if (x >= self.pos.x and x <= self.pos.x + self.w) and (y >= self.pos.y and y <= self.pos.y + self.h) then
@@ -140,6 +151,7 @@ function box:new(n, id)
 				if self.onHoverEnter then self:onHoverEnter() end
 				self.hovered = true 
 			end
+			if self.whileHovering then self:whileHovering() end
 		else
 			if self.hovered then 
 				if self.onHoverExit then self:onHoverExit() end
