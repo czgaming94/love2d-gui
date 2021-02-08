@@ -4,7 +4,7 @@ local dropdown = require("gui.dropdown")
 local text = require("gui.text")
 local textfield = require("gui.textfield")
 local toggle = require("gui.toggle")
-local timer = require("gui.timer")
+local timer = require("lib.hump.timer")
 
 local gui = {}
 
@@ -140,7 +140,7 @@ end
 function gui:draw()
 	table.sort(items, function(a, b) return a.z < b.z end)
 	for _,v in ipairs(items) do
-		table.sort(v.items, function(a, b) return a.z < b.z end)
+		table.sort(v.items, function(a, b) return a.pos.z < b.pos.z end)
 		for _,i in ipairs(v.items) do 
 			i:draw(dt) 
 		end
@@ -154,12 +154,14 @@ function gui:mousepressed(button)
 	local hitTarget = false
 	for _,v in ipairs(guis) do
 		for k,i in ipairs(v.items) do
-			if (x >= i.x and x <= i.x + i.w) and (y >= i.y and y <= i.y + i.h) then
+			if (x >= i.pos.x and x <= i.pos.x + i.w) and (y >= i.pos.y and y <= i.pos.y + i.h) then
 				if not hitTarget then 
-					if i.onClick then 
-						i:onClick(button)
+					if i.clickable then
+						if i.onClick then 
+							i:onClick(button)
+						end
+						hitTarget = true
 					end
-					hitTarget = true
 				end
 			end
 		end

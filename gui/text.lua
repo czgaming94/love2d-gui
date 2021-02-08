@@ -1,4 +1,3 @@
-local timer = require("gui.timer")
 local lg = love.graphics
 local min, max = math.min, math.max
 local text = {}
@@ -14,9 +13,13 @@ function text:new(n, id)
 	t.text = ""
 	t.w = 0
 	t.h = 0
-	t.x = 0
-	t.y = 0
-	t.z = 0
+	t.pos = {
+		x = 0,
+		y = 0,
+		z = 0
+	}
+	t.timer = require("lib.hump.timer")
+	t.timerEvent = nil
 	t.border = false
 	t.borderColor = {1,1,1,1}
 	t.background = false
@@ -36,6 +39,11 @@ function text:new(n, id)
 	t.typewriterPaused = false
 	t.typewriterStopped = false
 	t.typewriterRunCount = 0
+	t.inAnimation = false
+	t.colorToAnimateTo = {1,1,1,1}
+	t.colorAnimateSpeed = 0
+	t.positionToAnimateTo = {x = 0, y = 0}
+	t.positionAnimateSpeed = 0
 	
 	function t:animateToColor(c, s)
 		assert(c, "FAILURE: text:animateToColor() :: Missing param[color]")
@@ -44,7 +52,21 @@ function text:new(n, id)
 		s = s or 2
 		assert(s, "FAILURE: text:animateToColor() :: Missing param[speed]")
 		assert(type(s) == "number", "FAILURE: text:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		timer.tween(s, self.color, c, 'out-quint')
+		self.colorToAnimateTo = c
+		self.colorAnimateSpeed = s
+		self.inAnimation = true
+	end
+	
+	function t:animateToPosition(x, y, s)
+		assert(x, "FAILURE: box:animateToPosition() :: Missing param[x]")
+		assert(type(x) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[x] - expecting number and got " .. type(x))
+		assert(y, "FAILURE: box:animateToPosition() :: Missing param[y]")
+		assert(type(y) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
+		s = s or 2
+		assert(type(s) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		self.positionToAnimateTo = {x = x, y = y}
+		self.positionAnimateSpeed = s
+		self.inAnimation = true
 	end
 	
 	function t:setColor(c)
@@ -65,9 +87,9 @@ function text:new(n, id)
 		assert(type(d.y) == "number", "FAILURE: text:setData() :: Incorrect param[y] - expecting number and got " .. type(d.y))
 		self.w = d.w or self.w
 		self.h = d.h or self.h
-		self.x = d.x or self.x
-		self.y = d.y or self.y
-		self.z = d.z or self.z
+		self.pos.x = d.x or self.pos.x
+		self.pos.y = d.y or self.pos.y
+		self.pos.z = d.z or self.pos.z
 		self.background = d.useBackground and d.useBackground or self.background
 		self.border = d.useBorder and d.useBorder or self.border
 		self.backgroundColor = d.backgroundColor or self.backgroundColor
@@ -89,23 +111,23 @@ function text:new(n, id)
 				
 				lg.setColor(color)
 				if round then
-					lg.rectangle("fill", self.x - (xPad / 2), self.y - (yPad / 2), self.font:getWidth(self.text) + xPad, self.font:getHeight(self.text) + yPad, 5, 5)
+					lg.rectangle("fill", self.pos.x - (xPad / 2), self.pos.y - (yPad / 2), self.font:getWidth(self.text) + xPad, self.font:getHeight(self.text) + yPad, 5, 5)
 				else
-					lg.rectangle("fill", self.x - (xPad / 2), self.y - (yPad / 2), self.font:getWidth(self.text) + xPad, self.font:getHeight(self.text) + yPad)
+					lg.rectangle("fill", self.pos.x - (xPad / 2), self.pos.y - (yPad / 2), self.font:getWidth(self.text) + xPad, self.font:getHeight(self.text) + yPad)
 				end
 				if self.border then
 					lg.setColor(self.borderColor)
 					if round then
-						lg.rectangle("line", self.x - (xPad / 2), self.y - (yPad / 2), self.font:getWidth(self.text) + xPad, self.font:getHeight(self.text) + yPad, 5, 5)
+						lg.rectangle("line", self.pos.x - (xPad / 2), self.pos.y - (yPad / 2), self.font:getWidth(self.text) + xPad, self.font:getHeight(self.text) + yPad, 5, 5)
 					else
-						lg.rectangle("line", self.x - (xPad / 2), self.y - (yPad / 2), self.font:getWidth(self.text) + xPad, self.font:getHeight(self.text) + yPad)
+						lg.rectangle("line", self.pos.x - (xPad / 2), self.pos.y - (yPad / 2), self.font:getWidth(self.text) + xPad, self.font:getHeight(self.text) + yPad)
 					end
 				end
 			end
 			
-			lg.print({self.color, self.typewriterPrint}, self.font, self.x, self.y)
+			lg.print({self.color, self.typewriterPrint}, self.font, self.pos.x, self.pos.y)
 		else
-		
+			lg.print({self.color, self.text}, self.font, self.pos.x, self.pos.y)
 		end
 		
 		lg.setColor(1,1,1,1)
@@ -118,7 +140,7 @@ function text:new(n, id)
 	
 	function t:update(dt)
 		local x,y = love.mouse.getPosition()
-		if (x >= self.x and x <= self.x + self.w) and (y >= self.y and y <= self.y + self.h) then
+		if (x >= self.pos.x and x <= self.pos.x + self.w) and (y >= self.pos.y and y <= self.pos.y + self.h) then
 			if not self.hovered then
 				if self.onHoverEnter then self:onHoverEnter() end
 				self.hovered = true 
@@ -140,6 +162,37 @@ function text:new(n, id)
 			if self.typewriterPos >= #self.typewriterText and not self.typewriterFinished then
 				if not self.typewriterRepeat then self.typewriterFinished = true else self:typewriterCycle() end
 				self.typewriterRunCount = self.typewriterRunCount + 1
+			end
+		end
+		
+		if self.inAnimation then
+			local allColorsMatch = true
+			local inProperPosition = true
+			
+			for k,v in ipairs(self.colorToAnimateTo) do
+				if self.color[k] ~= v then
+					if v > self.color[k] then
+						self.color[k] = min(v, self.color[k] + (self.colorAnimateSpeed * dt))
+					else
+						self.color[k] = max(v, self.color[k] - (self.colorAnimateSpeed * dt))
+					end
+					allColorsMatch = false
+				end
+			end
+			
+			for k,v in ipairs(self.positionToAnimateTo) do
+				if self.pos[k] ~= v then
+					if v > self.pos[k] then
+						self.pos[k] = min(v, self.pos[k] + (self.positionAnimateSpeed * dt))
+					else
+						self.pos[k] = max(v, self.pos[k] - (self.positionAnimateSpeed * dt))
+					end
+					inProperPosition = false
+				end
+			end
+			
+			if allColorsMatch and inProperPosition then
+				self.inAnimation = false
 			end
 		end
 	end
@@ -186,31 +239,31 @@ function text:new(n, id)
 	function t:setX(x)
 		assert(x, "FAILURE: text:setX() :: Missing param[x]")
 		assert(type(x) == "number", "FAILURE: text:setX() :: Incorrect param[x] - expecting number and got " .. type(x))
-		self.x = x
+		self.pos.x = x
 	end
 	
 	function t:getX()
-		return self.x
+		return self.pos.x
 	end
 	
 	function t:setY(y)
 		assert(y, "FAILURE: text:setY() :: Missing param[y]")
 		assert(type(y) == "number", "FAILURE: text:setY() :: Incorrect param[y] - expecting number and got " .. type(y))
-		self.y = y
+		self.pos.y = y
 	end
 	
 	function t:getY()
-		return self.y
+		return self.pos.y
 	end
 	
 	function t:setZ(z)
 		assert(z, "FAILURE: text:setZ() :: Missing param[z]")
 		assert(type(z) == "number", "FAILURE: text:setZ() :: Incorrect param[z] - expecting number and got " .. type(z))
-		self.z = z
+		self.pos.z = z
 	end
 	
 	function t:getZ()
-		return self.z
+		return self.pos.z
 	end
 	
 end

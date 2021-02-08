@@ -1,4 +1,3 @@
-local timer = require("gui.timer")
 local lg = love.graphics
 local min, max = math.min, math.max
 local box = {}
@@ -13,24 +12,33 @@ function box:new(n, id)
 	b.parent = id
 	b.w = 0
 	b.h = 0
-	b.x = 0
-	b.y = 0
-	b.z = 0
+	b.pos = {
+		x = 0,
+		y = 0,
+		z = 0
+	}
 	b.border = false
 	b.borderColor = {1,1,1,1}
 	b.color = {1,1,1,1}
 	b.hovered = false
 	b.clicked = false
+	b.clickable = true
 	b.image = nil
+	b.inAnimation = false
+	b.colorToAnimateTo = {1,1,1,1}
+	b.colorAnimateSpeed = 0
+	b.positionToAnimateTo = {x = 0, y = 0}
+	b.positionAnimateSpeed = 0
 	
 	function b:animateToColor(c, s)
 		assert(c, "FAILURE: box:animateToColor() :: Missing param[color]")
 		assert(type(c) == "table", "FAILURE: box:animateToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
 		assert(#c == 4, "FAILURE: box:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
 		s = s or 2
-		assert(s, "FAILURE: box:animateToColor() :: Missing param[speed]")
 		assert(type(s) == "number", "FAILURE: box:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		timer.tween(s, self.color, c, 'out-quint')
+		self.colorToAnimateTo = c
+		self.colorAnimateSpeed = s
+		self.inAnimation = true
 	end
 	
 	function b:animateToPosition(x, y, s)
@@ -39,9 +47,10 @@ function box:new(n, id)
 		assert(y, "FAILURE: box:animateToPosition() :: Missing param[y]")
 		assert(type(y) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
 		s = s or 2
-		assert(s, "FAILURE: box:animateToPosition() :: Missing param[speed]")
 		assert(type(s) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		timer.tween(s, {self.x, self.y}, {x,y}, 'out-quint')
+		self.positionToAnimateTo = {x = x, y = y}
+		self.positionAnimateSpeed = s
+		self.inAnimation = true
 	end
 	
 	function b:setBorderColor(bC)
@@ -49,6 +58,16 @@ function box:new(n, id)
 		assert(type(bC) == "table", "FAILURE: box:setBorderColor() :: Incorrect param[color] - expecting table and got " .. type(bC))
 		assert(#bC == 4, "FAILURE: box:setBorderColor() :: Incorrect param[color] - table length 4 expected and got " .. #bC)
 		self.borderColor = bC
+	end
+	
+	function b:setClickable(c)
+		assert(c ~= nil, "FAILURE: box:setClickable() :: Missing param[clickable]")
+		assert(type(c) == "boolean", "FAILURE: box:setClickable() :: Incorrect param[clickable] - expecting boolean and got " .. type(c))
+		self.clickable = c
+	end
+	
+	function b:isClickable()
+		return self.clickable
 	end
 	
 	function b:setColor(c)
@@ -71,9 +90,9 @@ function box:new(n, id)
 		assert(type(t.y) == "number", "FAILURE: box:setData() :: Incorrect param[y] - expecting number and got " .. type(t.y))
 		self.w = t.w or t.width or self.w
 		self.h = t.h or t.height or self.h
-		self.x = t.x or self.x
-		self.y = t.y or self.y
-		self.z = t.z or self.z
+		self.pos.x = t.x or self.pos.x
+		self.pos.y = t.y or self.pos.y
+		self.pos.z = t.z or self.pos.z
 		self.border = t.useBorder and t.useBorder or self.border
 		self.borderColor = t.borderColor or self.borderColor
 		self.color = t.color or self.color
@@ -81,21 +100,23 @@ function box:new(n, id)
 	end
 	
 	function b:draw()
-		lg.push()
+		lg.push("all")
 		
+		lg.setColor(1,1,1,1)
 		if self.border then
 			lg.setColor(self.borderColor)
-			lg.rectangle("line", self.x - 1, self.y - 1, self.w + 2, self.h + 2)
+			lg.rectangle("line", self.pos.x - 1, self.pos.y - 1, self.w + 2, self.h + 2)
 		end
 		
 		lg.setColor(self.color)
 		if self.image then 
 			assert(type(self.image) == "userdata", "FAILURE: box:update() :: Incorrect param[color] - expecting userdata and got " .. type(self.image))
-			lg.draw(self.image, self.x, self.y)
+			lg.draw(self.image, self.pos.x, self.pos.y)
 		else
-			lg.rectangle("fill", self.x, self.y, self.w, self.h)
+			lg.rectangle("fill", self.pos.x, self.pos.y, self.w, self.h)
 		end
-		lg.pop()
+		lg.setColor(1,1,1,1)
+		lg.pop("all")
 	end
 	
 	function b:setHeight(h)
@@ -114,7 +135,7 @@ function box:new(n, id)
 	
 	function b:update(dt)
 		local x,y = love.mouse.getPosition()
-		if (x >= self.x and x <= self.x + self.w) and (y >= self.y and y <= self.y + self.h) then
+		if (x >= self.pos.x and x <= self.pos.x + self.w) and (y >= self.pos.y and y <= self.pos.y + self.h) then
 			if not self.hovered then
 				if self.onHoverEnter then self:onHoverEnter() end
 				self.hovered = true 
@@ -125,10 +146,40 @@ function box:new(n, id)
 				self.hovered = false 
 			end
 		end
+		if self.inAnimation then
+			local allColorsMatch = true
+			local inProperPosition = true
+			
+			for k,v in ipairs(self.colorToAnimateTo) do
+				if self.color[k] ~= v then
+					if v > self.color[k] then
+						self.color[k] = min(v, self.color[k] + (self.colorAnimateSpeed * dt))
+					else
+						self.color[k] = max(v, self.color[k] - (self.colorAnimateSpeed * dt))
+					end
+					allColorsMatch = false
+				end
+			end
+			
+			for k,v in ipairs(self.positionToAnimateTo) do
+				if self.pos[k] ~= v then
+					if v > self.pos[k] then
+						self.pos[k] = min(v, self.pos[k] + (self.positionAnimateSpeed * dt))
+					else
+						self.pos[k] = max(v, self.pos[k] - (self.positionAnimateSpeed * dt))
+					end
+					inProperPosition = false
+				end
+			end
+			
+			if allColorsMatch and inProperPosition then
+				self.inAnimation = false
+			end
+		end
 	end
 	
 	function b:setUseBorder(uB)
-		assert(uB, "FAILURE: box:setUseBorder() :: Missing param[useBorder]")
+		assert(uB ~= nil, "FAILURE: box:setUseBorder() :: Missing param[useBorder]")
 		assert(type(uB) == "boolean", "FAILURE: box:setUseBorder() :: Incorrect param[useBorder] - expecting boolean and got " .. type(uB))
 		self.border = uB
 	end
@@ -150,31 +201,31 @@ function box:new(n, id)
 	function b:setX(x)
 		assert(x, "FAILURE: box:setX() :: Missing param[x]")
 		assert(type(x) == "number", "FAILURE: box:setX() :: Incorrect param[x] - expecting number and got " .. type(x))
-		self.x = x
+		self.pos.x = x
 	end
 	
 	function b:getX()
-		return self.x
+		return self.pos.x
 	end
 	
 	function b:setY(y)
 		assert(y, "FAILURE: box:setY() :: Missing param[y]")
 		assert(type(y) == "number", "FAILURE: box:setY() :: Incorrect param[y] - expecting number and got " .. type(y))
-		self.y = y
+		self.pos.y = y
 	end
 	
 	function b:getY()
-		return self.y
+		return self.pos.y
 	end
 	
 	function b:setZ(z)
 		assert(z, "FAILURE: box:setZ() :: Missing param[z]")
 		assert(type(z) == "number", "FAILURE: box:setZ() :: Incorrect param[z] - expecting number and got " .. type(z))
-		self.z = z
+		self.pos.z = z
 	end
 	
 	function b:getZ()
-		return self.z
+		return self.pos.z
 	end
 	
 	self.items[b.id] = b

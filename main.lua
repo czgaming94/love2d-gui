@@ -24,7 +24,7 @@ function love.load()
 	-- color
 	-- useBorder
 	-- borderColor
-	myBox:setData({w = 50, h = 50, x = 5, y = 10, color = colors.red, useBorder = true, borderColor = colors.purple})
+	myBox:setData({w = 800, h = 600, x = 0, y = 0, z = 0, image = love.graphics.newImage("res/img/background.png")})
 	-- This line can do the same as these 7. Order does not matter. Assosciative table required.
 
 	--[[
@@ -36,6 +36,10 @@ function love.load()
 		myBox:setUseBorder(true)
 		myBox:setBorderColor({1,0,1,1})
 	--]]
+	
+	-- You can disable whether or not a box is read as a clickable object.
+	-- Clicks will pass through this object.
+	myBox:setClickable(false)
 	
 	myBox2:setData({w = 250, h = 50, x = 105, y = 10, color = colors.green, useBorder = true, borderColor = colors.yellow})
 	myBox3:setData({w = 100, h = 50, x = 105, y = 10, color = colors.yellow, useBorder = false})
@@ -49,17 +53,19 @@ function love.load()
 	end
 	
 	-- You can define onHoverEnter callbacks for your GUI elements
-	function myBox:onHoverEnter()
-		myBox:animateToColor(colors.white)
+	function myBox3:onHoverEnter()
+		-- You can animate your objects to a new color
+		myBox3:animateToColor(colors.white)
 	end
 	
 	function myBox4:onHoverEnter()
-		myBox4:animateToPosition(150, 64)
+		-- You can animate your objects to a new position
+		self:animateToPosition(150, 64)
 	end
 	
 	-- You can define onHoverExit callbacks for your GUI elements
-	function myBox:onHoverExit()
-		myBox:setColor(colors.red)
+	function myBox3:onHoverExit()
+		myBox3:animateToColor(colors.red)
 	end
 end
 
