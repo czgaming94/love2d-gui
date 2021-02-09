@@ -1,4 +1,4 @@
-local lg = love.graphics
+local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
 local text = {}
 
@@ -29,6 +29,7 @@ function text:new(n, id)
 	t.font = love.graphics.getFont()
 	t.hovered = false
 	t.clicked = false
+	t.clickable = true
 	t.typewriter = false
 	t.typewriterPrint = ""
 	t.typewriterText = self:split(t.text)
@@ -40,10 +41,15 @@ function text:new(n, id)
 	t.typewriterStopped = false
 	t.typewriterRunCount = 0
 	t.inAnimation = false
+	t.animateColor = false
 	t.colorToAnimateTo = {1,1,1,1}
 	t.colorAnimateSpeed = 0
+	t.colorAnimateTime = lt.getTime()
+	t.animatePosition = false
 	t.positionToAnimateTo = {x = 0, y = 0}
-	t.positionAnimateSpeed = 0
+	b.positionToAnimateFrom = {x = 0, y = 0}
+	t.positionAnimateDrag = 0
+	t.positionAnimationTimer = lt.getTime()
 	
 	function t:animateToColor(c, s)
 		assert(c, "FAILURE: text:animateToColor() :: Missing param[color]")
@@ -54,19 +60,34 @@ function text:new(n, id)
 		assert(type(s) == "number", "FAILURE: text:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		self.colorToAnimateTo = c
 		self.colorAnimateSpeed = s
+		self.colorAnimateTime = lt.getTime()
 		self.inAnimation = true
+		self.animateColor = true
 	end
 	
 	function t:animateToPosition(x, y, s)
-		assert(x, "FAILURE: box:animateToPosition() :: Missing param[x]")
-		assert(type(x) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[x] - expecting number and got " .. type(x))
-		assert(y, "FAILURE: box:animateToPosition() :: Missing param[y]")
-		assert(type(y) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
+		assert(x, "FAILURE: text:animateToPosition() :: Missing param[x]")
+		assert(type(x) == "number", "FAILURE: text:animateToPosition() :: Incorrect param[x] - expecting number and got " .. type(x))
+		assert(y, "FAILURE: text:animateToPosition() :: Missing param[y]")
+		assert(type(y) == "number", "FAILURE: text:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
 		s = s or 2
-		assert(type(s) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		assert(type(s) == "number", "FAILURE: text:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
 		self.positionToAnimateTo = {x = x, y = y}
-		self.positionAnimateSpeed = s
+		self.positionAnimateDrag = s
+		self.positionAnimateTime = lt.getTime()
 		self.inAnimation = true
+		self.animatePosition = true
+	end
+	
+	function t:setClickable(c)
+		assert(c ~= nil, "FAILURE: text:setClickable() :: Missing param[clickable]")
+		assert(type(c) == "boolean", "FAILURE: text:setClickable() :: Incorrect param[clickable] - expecting boolean and got " .. type(c))
+		self.clickable = c
+	end
+	
+	function t:isClickable()
+		return self.clickable
 	end
 	
 	function t:setColor(c)
@@ -169,30 +190,33 @@ function text:new(n, id)
 			local allColorsMatch = true
 			local inProperPosition = true
 			
-			for k,v in ipairs(self.colorToAnimateTo) do
-				if self.color[k] ~= v then
-					if v > self.color[k] then
-						self.color[k] = min(v, self.color[k] + (self.colorAnimateSpeed * dt))
-					else
-						self.color[k] = max(v, self.color[k] - (self.colorAnimateSpeed * dt))
+			if self.animateColor then
+				for k,v in ipairs(self.colorToAnimateTo) do
+					if self.color[k] ~= v then
+						if v > self.color[k] then
+							self.color[k] = min(v, self.color[k] + (self.colorAnimateSpeed * dt))
+						else
+							self.color[k] = max(v, self.color[k] - (self.colorAnimateSpeed * dt))
+						end
+						allColorsMatch = false
 					end
-					allColorsMatch = false
 				end
 			end
 			
-			for k,v in ipairs(self.positionToAnimateTo) do
-				if self.pos[k] ~= v then
-					if v > self.pos[k] then
-						self.pos[k] = min(v, self.pos[k] + (self.positionAnimateSpeed * dt))
-					else
-						self.pos[k] = max(v, self.pos[k] - (self.positionAnimateSpeed * dt))
-					end
+			if self.animatePosition then
+				local t = math.min((lt.getTime() - self.positionAnimateTime) / (self.positionAnimateDrag / 2), 1.0)
+				if self.pos.x ~= self.positionToAnimateTo.x or self.pos.y ~= self.positionToAnimateTo.y then
+					self.pos.x = self.lerp(self.positionToAnimateFrom.x, self.positionToAnimateTo.x, t)
+					self.pos.y = self.lerp(self.positionToAnimateFrom.y, self.positionToAnimateTo.y, t)
 					inProperPosition = false
 				end
 			end
 			
+			
 			if allColorsMatch and inProperPosition then
 				self.inAnimation = false
+				self.animateColor = false
+				self.animatePosition = false
 			end
 		end
 	end
@@ -207,8 +231,8 @@ function text:new(n, id)
 	end
 	
 	function t:setUseBorder(uB)
-		assert(uB, "FAILURE: box:setUseBorder() :: Missing param[useBorder]")
-		assert(type(uB) == "boolean", "FAILURE: box:setUseBorder() :: Incorrect param[useBorder] - expecting boolean and got " .. type(uB))
+		assert(uB ~= nil, "FAILURE: text:setUseBorder() :: Missing param[useBorder]")
+		assert(type(uB) == "boolean", "FAILURE: text:setUseBorder() :: Incorrect param[useBorder] - expecting boolean and got " .. type(uB))
 		self.border = uB
 	end
 	
@@ -217,8 +241,8 @@ function text:new(n, id)
 	end
 	
 	function t:setAsTypewriter(aT)
-		assert(aT, "FAILURE: box:setAsTypewriter() :: Missing param[useBorder]")
-		assert(type(aT) == "boolean", "FAILURE: box:setAsTypewriter() :: Incorrect param[useBorder] - expecting boolean and got " .. type(aT))
+		assert(aT ~= nil, "FAILURE: text:setAsTypewriter() :: Missing param[useBorder]")
+		assert(type(aT) == "boolean", "FAILURE: text:setAsTypewriter() :: Incorrect param[useBorder] - expecting boolean and got " .. type(aT))
 		self.typewriter = aT
 	end
 	

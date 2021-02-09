@@ -14,6 +14,7 @@ local colors = GUI.color
 function love.load()
 	-- Add color to global GUI
 	GUI:addColor({1,1,1,1}, "white")
+	GUI:addColor({0,0,0,0}, "black")
 	
 	
 	-- w | width
@@ -49,6 +50,8 @@ function love.load()
 	myBox3:setData({w = 100, h = 50, x = 105, y = 10, color = colors("yellow"), useBorder = false})
 	myBox4:setData({w = 50, h = 250, x = 105, y = 200, color = colors("purple"), useBorder = true, borderColor = colors("blue")})
 	
+	
+	-- You can change the Z index of an entire GUI container, or just a single object
 	myGui2:setZ(1)
 	
 	-- You can define onClick callbacks for your GUI elements
@@ -63,8 +66,11 @@ function love.load()
 	end
 	
 	function myBox4:onHoverEnter()
-		-- You can animate your objects to a new position\
-		myBox4:animateToPosition(150, 64)
+		-- You can animate your objects to a new position
+		-- x
+		-- y
+		-- drag 
+		myBox4:animateToPosition(150, 64, 3)
 	end
 	
 	-- You can define onHoverExit callbacks for your GUI elements

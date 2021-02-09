@@ -1,4 +1,4 @@
-local lg = love.graphics
+local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
 local box = {}
 
@@ -25,10 +25,15 @@ function box:new(n, id)
 	b.clickable = true
 	b.image = nil
 	b.inAnimation = false
+	b.animateColor = false
 	b.colorToAnimateTo = {1,1,1,1}
 	b.colorAnimateSpeed = 0
+	b.colorAnimateTime = lt.getTime()
+	b.animatePosition = false
 	b.positionToAnimateTo = {x = 0, y = 0}
-	b.positionAnimateSpeed = 0
+	b.positionToAnimateFrom = {x = 0, y = 0}
+	b.positionAnimateDrag = 0
+	b.positionAnimateTime = lt.getTime()
 	
 	function b:animateToColor(c, s)
 		assert(c, "FAILURE: box:animateToColor() :: Missing param[color]")
@@ -38,7 +43,9 @@ function box:new(n, id)
 		assert(type(s) == "number", "FAILURE: box:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		self.colorToAnimateTo = c
 		self.colorAnimateSpeed = s
+		self.colorAnimateTime = lt.getTime()
 		self.inAnimation = true
+		self.animateColor = true
 	end
 	
 	function b:animateToPosition(x, y, s)
@@ -46,11 +53,14 @@ function box:new(n, id)
 		assert(type(x) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[x] - expecting number and got " .. type(x))
 		assert(y, "FAILURE: box:animateToPosition() :: Missing param[y]")
 		assert(type(y) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
-		s = s or 200
+		s = s or 2
 		assert(type(s) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
 		self.positionToAnimateTo = {x = x, y = y}
-		self.positionAnimateSpeed = s
+		self.positionAnimateDrag = s
+		self.positionAnimateTime = lt.getTime()
 		self.inAnimation = true
+		self.animatePosition = true
 	end
 	
 	function b:setBorderColor(bC)
@@ -111,7 +121,7 @@ function box:new(n, id)
 		
 		lg.setColor(self.color)
 		if self.image then 
-			assert(type(self.image) == "userdata", "FAILURE: box:update() :: Incorrect param[color] - expecting userdata and got " .. type(self.image))
+			assert(type(self.image) == "userdata", "FAILURE: box:update() :: Incorrect param[image] - expecting userdata and got " .. type(self.image))
 			lg.draw(self.image, self.pos.x, self.pos.y)
 		else
 			lg.rectangle("fill", self.pos.x, self.pos.y, self.w, self.h)
@@ -159,36 +169,35 @@ function box:new(n, id)
 			end
 		end
 		if self.inAnimation then
-			print(1)
 			local allColorsMatch = true
 			local inProperPosition = true
 			
-			for k,v in ipairs(self.colorToAnimateTo) do
-				if self.color[k] ~= v then
-					if v > self.color[k] then
-						self.color[k] = min(v, self.color[k] + (self.colorAnimateSpeed * dt))
-					else
-						self.color[k] = max(v, self.color[k] - (self.colorAnimateSpeed * dt))
+			if self.animateColor then
+				for k,v in ipairs(self.colorToAnimateTo) do
+					if self.color[k] ~= v then
+						if v > self.color[k] then
+							self.color[k] = min(v, self.color[k] + (self.colorAnimateSpeed * dt))
+						else
+							self.color[k] = max(v, self.color[k] - (self.colorAnimateSpeed * dt))
+						end
+						allColorsMatch = false
 					end
-					allColorsMatch = false
 				end
 			end
 			
-			local xDiff = self.pos.x - self.positionToAnimateTo.x
-			local yDiff = self.pos.y - self.positionToAnimateTo.y
-			for k,v in pairs(self.positionToAnimateTo) do
-				if self.pos[k] ~= v then
-					if v > self.pos[k] then
-						self.pos[k] = min(v, self.pos[k] + (xDiff * dt))
-					else
-						self.pos[k] = max(v, self.pos[k] - (yDiff * dt))
-					end
+			if self.animatePosition then
+				local t = math.min((lt.getTime() - self.positionAnimateTime) / (self.positionAnimateDrag / 2), 1.0)
+				if self.pos.x ~= self.positionToAnimateTo.x or self.pos.y ~= self.positionToAnimateTo.y then
+					self.pos.x = self.lerp(self.positionToAnimateFrom.x, self.positionToAnimateTo.x, t)
+					self.pos.y = self.lerp(self.positionToAnimateFrom.y, self.positionToAnimateTo.y, t)
 					inProperPosition = false
 				end
 			end
 			
 			if allColorsMatch and inProperPosition then
 				self.inAnimation = false
+				self.animateColor = false
+				self.animatePosition = false
 			end
 		end
 	end
@@ -241,6 +250,10 @@ function box:new(n, id)
 	
 	function b:getZ()
 		return self.pos.z
+	end
+	
+	function b.lerp(t1,t2,t)
+		return (1 - t) * t1 + t * t2
 	end
 	
 	self.items[b.id] = b
