@@ -23,6 +23,8 @@ function box:new(n, id)
 	b.hovered = false
 	b.clicked = false
 	b.clickable = true
+	b.faded = false
+	b.hidden = false
 	b.image = nil
 	b.inAnimation = false
 	b.animateColor = false
@@ -34,6 +36,10 @@ function box:new(n, id)
 	b.positionToAnimateFrom = {x = 0, y = 0}
 	b.positionAnimateDrag = 0
 	b.positionAnimateTime = lt.getTime()
+	b.animateOpacity = false
+	b.opacityToAnimateTo = 0
+	b.opacityAnimateTime = lt.getTime()
+	b.opacityAnimateSpeed = 0
 	
 	function b:animateToColor(c, s)
 		assert(c, "FAILURE: box:animateToColor() :: Missing param[color]")
@@ -61,6 +67,19 @@ function box:new(n, id)
 		self.positionAnimateTime = lt.getTime()
 		self.inAnimation = true
 		self.animatePosition = true
+	end
+	
+	function b:animateToOpacity(o, s)
+		assert(o, "FAILURE: box:animateToOpacity() :: Missing param[o]")
+		assert(type(o) == "number", "FAILURE: box:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
+		s = s or 1
+		assert(s, "FAILURE: box:animateToOpacity() :: Missing param[s]")
+		assert(type(s) == "number", "FAILURE: box:animateToOpacity() :: Incorrect param[s] - expecting number and got " .. type(s))
+		self.opacityToAnimateTo = o
+		self.opacityAnimateTime = lt.getTime()
+		self.opacityAnimateSpeed = s
+		self.inAnimation = true
+		self.animateOpacity = true
 	end
 	
 	function b:setBorderColor(bC)
@@ -130,6 +149,19 @@ function box:new(n, id)
 		lg.pop()
 	end
 	
+	function b:fadeIn()
+		self:animateToOpacity(1)
+		self.hidden = false
+		self.faded = false
+		if self.onFadeIn then self:onFadeIn() end
+	end
+	
+	function b:fadeOut(p)
+		if p then self.faded = true end
+		self:animateToOpacity(0)
+		if self.onFadeOut then self:onFadeOut() end
+	end
+	
 	function b:setHeight(h)
 		assert(h, "FAILURE: box:setHeight() :: Missing param[height]")
 		assert(type(h) == "number", "FAILURE: box:setHeight() :: Incorrect param[height] - expecting number and got " .. type(h))
@@ -171,6 +203,7 @@ function box:new(n, id)
 		if self.inAnimation then
 			local allColorsMatch = true
 			local inProperPosition = true
+			local atProperOpacity = true
 			
 			if self.animateColor then
 				for k,v in ipairs(self.colorToAnimateTo) do
@@ -194,12 +227,35 @@ function box:new(n, id)
 				end
 			end
 			
-			if allColorsMatch and inProperPosition then
+			if self.animateOpacity then
+				if self.color[4] ~= self.opacityToAnimateTo then
+					if self.color[4] < self.opacityToAnimateTo then
+						self.color[4] = min(self.opacityToAnimateTo, self.color[4] + (self.opacityAnimateSpeed * dt))
+					else
+						self.color[4] = max(self.opacityToAnimateTo, self.color[4] - (self.opacityAnimateSpeed * dt))
+					end
+					atProperOpacity = false
+				end
+			end
+			
+			if allColorsMatch and inProperPosition and atProperOpacity then
 				self.inAnimation = false
 				self.animateColor = false
 				self.animatePosition = false
+				if self.animateOpacity and self.faded then self.hidden = true end
+				self.animateOpacity = false
 			end
 		end
+	end
+	
+	function b:setOpacity(o)
+		assert(o, "FAILURE: box:setUseBorder() :: Missing param[opacity]")
+		assert(type(o) == "number", "FAILURE: box:setUseBorder() :: Incorrect param[opacity] - expecting number and got " .. type(o))
+		self.color[4] = o
+	end
+	
+	function b:getOpacity()
+		return self.color[4]
 	end
 	
 	function b:setUseBorder(uB)

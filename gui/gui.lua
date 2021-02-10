@@ -136,7 +136,7 @@ end
 function gui:update(dt)
 	for _,v in ipairs(items) do 
 		for _,i in ipairs(v.items) do 
-			i:update(dt) 
+			if not i.hidden then i:update(dt) end
 		end 
 	end
 end

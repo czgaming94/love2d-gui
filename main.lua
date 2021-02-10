@@ -77,6 +77,22 @@ function love.load()
 	function myBox3:onHoverExit()
 		myBox3:animateToColor(colors("red"))
 	end
+	
+	function myBox3:onClick()
+		-- You can make an object fade in or out, and also disable the object by using (true)
+		-- :fadeIn() will automatically restore an object to update status
+		myBox3:fadeOut(true)
+	end
+	
+	-- You can define onFadeOut callbacks for your GUI elements
+	function myBox3:onFadeOut()
+		print(1)
+	end
+	
+	-- You can define onFadeIn callbacks for your GUI elements
+	function myBox3:onFadeIn()
+		print(2)
+	end
 end
 
 function love.update(dt)

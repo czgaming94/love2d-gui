@@ -290,6 +290,9 @@ function text:new(n, id)
 		return self.pos.z
 	end
 	
+	function t.lerp(t1,t2,t)
+		return (1 - t) * t1 + t * t2
+	end
 end
 
 function text:update(dt)
