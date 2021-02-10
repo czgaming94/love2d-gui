@@ -1,5 +1,7 @@
 local GUI = require("gui")
 
+-- Create GUI instances
+-- Doing this allows you to change settings between the two GUI's
 local myGui = GUI:new(GUI)
 local myGui2 = GUI:new(GUI)
 
@@ -18,29 +20,33 @@ function love.load()
 	GUI:addColor({0,0,0,0}, "empty")
 	
 	
-	-- w | width
+	-- [PARAMS]
+	-- borderColor
+	-- clickable
+	-- color
 	-- h | height
+	-- image
+	-- opacity
+	-- useBorder
+	-- w | width
 	-- x
 	-- y
 	-- z
-	-- color
-	-- useBorder
-	-- borderColor
-	-- clickable
-	-- image
 	myBox:setData({w = 800, h = 600, x = 0, y = 0, z = 0, image = love.graphics.newImage("res/img/background.png")})
-	-- This line can do the same as these 9. Order does not matter. Assosciative table required.
+	-- This line can do the same as these 11. Order does not matter. Assosciative table required.
 
 	--[[
-		myBox:setWidth(50)
-		myBox:setHeight(50)
-		myBox:setX(5)
-		myBox:setY(10)
-		myBox:setColor({0,0,1,1})
-		myBox:setUseBorder(true)
 		myBox:setBorderColor({1,0,1,1})
 		myBox:setClickable(false)
+		myBox:setColor({0,0,1,1})
+		myBox:setHeight(50)
 		myBox:setImage(love.graphics.newImage("path/to/image.png"))
+		myBox:setOpacity(0.5)
+		myBox:setUseBorder(true)
+		myBox:setWidth(50)
+		myBox:setX(5)
+		myBox:setY(10)
+		myBox:setZ(2)
 	--]]
 	
 	-- You can disable whether or not a box is read as a clickable object.

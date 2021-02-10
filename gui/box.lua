@@ -133,6 +133,10 @@ function box:new(n, id)
 		self.clickable = t.clickable and t.clickable or self.clickable
 	end
 	
+	function b:disable()
+		self.hidden = true
+	end
+	
 	function b:draw()
 		lg.push()
 		
@@ -151,6 +155,10 @@ function box:new(n, id)
 		end
 		lg.setColor(1,1,1,1)
 		lg.pop()
+	end
+	
+	function b:enable()
+		self.hidden = false
 	end
 	
 	function b:fadeIn()
