@@ -34,7 +34,7 @@ function box:new(n, id)
 	b.animatePosition = false
 	b.positionToAnimateTo = {x = 0, y = 0}
 	b.positionToAnimateFrom = {x = 0, y = 0}
-	b.positionAnimateDrag = 0
+	b.positionAnimateSpeed = 0
 	b.positionAnimateTime = lt.getTime()
 	b.animateOpacity = false
 	b.opacityToAnimateTo = 0
@@ -63,7 +63,7 @@ function box:new(n, id)
 		assert(type(s) == "number", "FAILURE: box:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
 		self.positionToAnimateTo = {x = x, y = y}
-		self.positionAnimateDrag = s
+		self.positionAnimateSpeed = s
 		self.positionAnimateTime = lt.getTime()
 		self.inAnimation = true
 		self.animatePosition = true
@@ -80,6 +80,10 @@ function box:new(n, id)
 		self.opacityAnimateSpeed = s
 		self.inAnimation = true
 		self.animateOpacity = true
+	end
+	
+	function b:isAnimating()
+		return self.inAnimation
 	end
 	
 	function b:setBorderColor(bC)
@@ -186,6 +190,14 @@ function box:new(n, id)
 		return self.image
 	end
 	
+	function b:startAnimation()
+		self.inAnimation = true
+	end
+	
+	function b:stopAnimation()
+		self.inAnimation = false
+	end
+	
 	function b:update(dt)
 		local x,y = love.mouse.getPosition()
 		if (x >= self.pos.x and x <= self.pos.x + self.w) and (y >= self.pos.y and y <= self.pos.y + self.h) then
@@ -219,7 +231,7 @@ function box:new(n, id)
 			end
 			
 			if self.animatePosition then
-				local t = math.min((lt.getTime() - self.positionAnimateTime) / (self.positionAnimateDrag / 2), 1.0)
+				local t = math.min((lt.getTime() - self.positionAnimateTime) * (self.positionAnimateSpeed / 2), 1.0)
 				if self.pos.x ~= self.positionToAnimateTo.x or self.pos.y ~= self.positionToAnimateTo.y then
 					self.pos.x = self.lerp(self.positionToAnimateFrom.x, self.positionToAnimateTo.x, t)
 					self.pos.y = self.lerp(self.positionToAnimateFrom.y, self.positionToAnimateTo.y, t)

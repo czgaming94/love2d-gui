@@ -14,7 +14,8 @@ local colors = GUI.color
 function love.load()
 	-- Add color to global GUI
 	GUI:addColor({1,1,1,1}, "white")
-	GUI:addColor({0,0,0,0}, "black")
+	GUI:addColor({0,0,0,1}, "black")
+	GUI:addColor({0,0,0,0}, "empty")
 	
 	
 	-- w | width
@@ -69,8 +70,12 @@ function love.load()
 		-- You can animate your objects to a new position
 		-- x
 		-- y
-		-- drag 
-		myBox4:animateToPosition(150, 64, 3)
+		-- speed
+		myBox4:animateToPosition(150, 64, 1)
+	end
+	
+	function myBox4:onHoverExit()
+		myBox4:stopAnimation()
 	end
 	
 	-- You can define onHoverExit callbacks for your GUI elements
