@@ -53,6 +53,52 @@ function gui:generate(item)
     return copy
 end
 
+function gui:animateToColor(o, c, s)
+	assert(o, "FAILURE: gui:animateToColor() :: Missing param[object]")
+	assert(type(o) == "table", "FAILURE: gui:animateToColor() :: Incorrect param[object] - expecting table and got " .. type(o))
+	assert(c, "FAILURE: gui:animateToColor() :: Missing param[color]")
+	assert(type(c) == "table", "FAILURE: gui:animateToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
+	assert(#c == 4, "FAILURE: gui:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
+	s = s or 2
+	assert(type(s) == "number", "FAILURE: gui:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
+	o.colorToAnimateTo = c
+	o.colorAnimateSpeed = s
+	o.colorAnimateTime = lt.getTime()
+	o.inAnimation = true
+	o.animateColor = true
+end
+function gui:animateToPosition(o, x, y, s)
+	assert(o, "FAILURE: gui:animateToPosition() :: Missing param[object]")
+	assert(type(o) == "table", "FAILURE: gui:animateToPosition() :: Incorrect param[object] - expecting table and got " .. type(o))
+	assert(x, "FAILURE: gui:animateToPosition() :: Missing param[x]")
+	assert(type(x) == "number", "FAILURE: gui:animateToPosition() :: Incorrect param[x] - expecting number and got " .. type(x))
+	assert(y, "FAILURE: gui:animateToPosition() :: Missing param[y]")
+	assert(type(y) == "number", "FAILURE: gui:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
+	s = s or 2
+	assert(type(s) == "number", "FAILURE: gui:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
+	for k,v in pairs(o.pos) do o.positionToAnimateFrom[k] = v end
+	o.positionToAnimateTo = {x = x, y = y}
+	o.positionAnimateSpeed = s
+	o.positionAnimateTime = lt.getTime()
+	o.inAnimation = true
+	o.animatePosition = true
+end
+
+function gui:animateToOpacity(obj, o, s)
+	assert(obj, "FAILURE: gui:animateToColor() :: Missing param[object]")
+	assert(type(obj) == "table", "FAILURE: gui:animateToColor() :: Incorrect param[object] - expecting table and got " .. type(obj))
+	assert(o, "FAILURE: gui:animateToOpacity() :: Missing param[o]")
+	assert(type(o) == "number", "FAILURE: gui:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
+	s = s or 1
+	assert(s, "FAILURE: gui:animateToOpacity() :: Missing param[s]")
+	assert(type(s) == "number", "FAILURE: gui:animateToOpacity() :: Incorrect param[s] - expecting number and got " .. type(s))
+	o.opacityToAnimateTo = o
+	o.opacityAnimateTime = lt.getTime()
+	o.opacityAnimateSpeed = s
+	o.inAnimation = true
+	o.animateOpacity = true
+end
+
 function gui:addColor(c, n)
 	assert(c, "FAILURE: gui:addColor() :: Missing param[color]")
 	assert(type(c) == "table", "FAILURE: gui:addColor() :: Incorrect param[color] - expecting table and got " .. type(c))
