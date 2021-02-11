@@ -159,7 +159,7 @@ function box:new(n, id)
 		
 		lg.setColor(1,1,1,1)
 		if self.border then
-			if parent.use255 then
+			if self.parent.use255 then
 				lg.setColor(love.math.colorFromBytes(self.borderColor))
 			else
 				lg.setColor(self.borderColor)
@@ -167,7 +167,7 @@ function box:new(n, id)
 			lg.rectangle("line", self.pos.x - 1, self.pos.y - 1, self.w + 2, self.h + 2)
 		end
 		
-		if parent.use255 then
+		if self.parent.use255 then
 			lg.setColor(love.math.colorFromBytes(self.color))
 		else
 			lg.setColor(self.color)
