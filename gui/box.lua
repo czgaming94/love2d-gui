@@ -31,20 +31,24 @@ function box:new(n, id)
 	b.colorToAnimateTo = {1,1,1,1}
 	b.colorAnimateSpeed = 0
 	b.colorAnimateTime = lt.getTime()
+	b.animateBorderColor = false
+	b.borderColorToAnimateTo = {1,1,1,1}
+	b.borderColorAnimateSpeed = 0
+	b.borderColorAnimateTime = lt.getTime()
 	b.animatePosition = false
+	b.positionAnimateSpeed = 0
 	b.positionToAnimateTo = {x = 0, y = 0}
 	b.positionToAnimateFrom = {x = 0, y = 0}
-	b.positionAnimateSpeed = 0
 	b.positionAnimateTime = lt.getTime()
 	b.animateOpacity = false
+	b.opacityAnimateSpeed = 0
 	b.opacityToAnimateTo = 0
 	b.opacityAnimateTime = lt.getTime()
-	b.opacityAnimateSpeed = 0
 	
 	function b:animateToColor(c, s)
 		assert(c, "FAILURE: box:animateToColor() :: Missing param[color]")
 		assert(type(c) == "table", "FAILURE: box:animateToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
-		assert(#c == 4, "FAILURE: box:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
+		assert(#c > 2, "FAILURE: box:animateToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
 		s = s or 2
 		assert(type(s) == "number", "FAILURE: box:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		self.colorToAnimateTo = c
@@ -52,6 +56,19 @@ function box:new(n, id)
 		self.colorAnimateTime = lt.getTime()
 		self.inAnimation = true
 		self.animateColor = true
+	end
+	
+	function b:animateBorderToColor(c, s)
+		assert(c, "FAILURE: box:animateBorderToColor() :: Missing param[color]")
+		assert(type(c) == "table", "FAILURE: box:animateBorderToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
+		assert(#c > 2, "FAILURE: box:animateBorderToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
+		s = s or 2
+		assert(type(s) == "number", "FAILURE: box:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		self.borderColorToAnimateTo = c
+		self.borderColorAnimateSpeed = s
+		self.borderColorAnimateTime = lt.getTime()
+		self.inAnimation = true
+		self.animateBorderColor = true
 	end
 	
 	function b:animateToPosition(x, y, s)
@@ -106,7 +123,7 @@ function box:new(n, id)
 	function b:setColor(c)
 		assert(c, "FAILURE: box:setColor() :: Missing param[color]")
 		assert(type(c) == "table", "FAILURE: box:setColor() :: Incorrect param[color] - expecting table and got " .. type(c))
-		assert(#c == 4, "FAILURE: box:setColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
+		assert(#c > 2, "FAILURE: box:setColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
 		self.color = c
 	end
 	
@@ -142,11 +159,19 @@ function box:new(n, id)
 		
 		lg.setColor(1,1,1,1)
 		if self.border then
-			lg.setColor(self.borderColor)
+			if parent.use255 then
+				lg.setColor(love.math.colorFromBytes(self.borderColor))
+			else
+				lg.setColor(self.borderColor)
+			end
 			lg.rectangle("line", self.pos.x - 1, self.pos.y - 1, self.w + 2, self.h + 2)
 		end
 		
-		lg.setColor(self.color)
+		if parent.use255 then
+			lg.setColor(love.math.colorFromBytes(self.color))
+		else
+			lg.setColor(self.color)
+		end
 		if self.image then 
 			assert(type(self.image) == "userdata", "FAILURE: box:update() :: Incorrect param[image] - expecting userdata and got " .. type(self.image))
 			lg.draw(self.image, self.pos.x, self.pos.y)
@@ -222,6 +247,7 @@ function box:new(n, id)
 		end
 		if self.inAnimation then
 			local allColorsMatch = true
+			local allBorderColorsMatch = true
 			local inProperPosition = true
 			local atProperOpacity = true
 			
@@ -258,7 +284,20 @@ function box:new(n, id)
 				end
 			end
 			
-			if allColorsMatch and inProperPosition and atProperOpacity then
+			if self.animateBorderColor then
+				for k,v in ipairs(self.borderColorToAnimateTo) do
+					if self.borderColor[k] ~= v then
+						if v > self.borderColor[k] then
+							self.borderColor[k] = min(v, self.borderColor[k] + (self.borderColorAnimateSpeed * dt))
+						else
+							self.borderColor[k] = max(v, self.borderColor[k] - (self.borderColorAnimateSpeed * dt))
+						end
+						allBorderColorsMatch = false
+					end
+				end
+			end
+			
+			if allColorsMatch and inProperPosition and atProperOpacity and allBorderColorsMatch then
 				self.inAnimation = false
 				self.animateColor = false
 				self.animatePosition = false

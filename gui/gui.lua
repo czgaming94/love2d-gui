@@ -11,6 +11,7 @@ local items = {}
 
 gui.items = {}
 gui.z = 0
+gui.use255 = false
 
 gui.colors = {
 	red = {1,0,0,1},
@@ -53,12 +54,18 @@ function gui:generate(item)
     return copy
 end
 
+function gui:setUse255(u)
+	assert(u ~= nil, "FAILURE: gui:setUse255() :: Missing param[use255]")
+	assert(type(o) == "boolean", "FAILURE: gui:setUse255() :: Incorrect param[use255] - expecting boolean and got " .. type(o))
+	self.use255 = u
+end
+
 function gui:animateToColor(o, c, s)
 	assert(o, "FAILURE: gui:animateToColor() :: Missing param[object]")
 	assert(type(o) == "table", "FAILURE: gui:animateToColor() :: Incorrect param[object] - expecting table and got " .. type(o))
 	assert(c, "FAILURE: gui:animateToColor() :: Missing param[color]")
 	assert(type(c) == "table", "FAILURE: gui:animateToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
-	assert(#c == 4, "FAILURE: gui:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
+	assert(#c > 2, "FAILURE: gui:animateToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
 	s = s or 2
 	assert(type(s) == "number", "FAILURE: gui:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
 	o.colorToAnimateTo = c
@@ -67,6 +74,22 @@ function gui:animateToColor(o, c, s)
 	o.inAnimation = true
 	o.animateColor = true
 end
+
+function gui:animateBorderToColor(o, c, s)
+	assert(o, "FAILURE: gui:animateToColor() :: Missing param[object]")
+	assert(type(o) == "table", "FAILURE: gui:animateToColor() :: Incorrect param[object] - expecting table and got " .. type(o))
+	assert(c, "FAILURE: box:animateBorderToColor() :: Missing param[color]")
+	assert(type(c) == "table", "FAILURE: box:animateBorderToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
+	assert(#c > 2, "FAILURE: box:animateBorderToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
+	s = s or 2
+	assert(type(s) == "number", "FAILURE: box:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
+	self.borderColorToAnimateTo = c
+	self.borderColorAnimateSpeed = s
+	self.borderColorAnimateTime = lt.getTime()
+	self.inAnimation = true
+	self.animateBorderColor = true
+end
+	
 function gui:animateToPosition(o, x, y, s)
 	assert(o, "FAILURE: gui:animateToPosition() :: Missing param[object]")
 	assert(type(o) == "table", "FAILURE: gui:animateToPosition() :: Incorrect param[object] - expecting table and got " .. type(o))
@@ -102,6 +125,7 @@ end
 function gui:addColor(c, n)
 	assert(c, "FAILURE: gui:addColor() :: Missing param[color]")
 	assert(type(c) == "table", "FAILURE: gui:addColor() :: Incorrect param[color] - expecting table and got " .. type(c))
+	assert(#c > 2, "FAILURE : gui:addColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
 	assert(n, "FAILURE: gui:addColor() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addColor() :: Incorrect param[name] - expecting string and got " .. type(n))
 	self.colors[n] = c
@@ -111,7 +135,7 @@ function gui:addBox(n)
 	assert(n, "FAILURE: gui:addBox() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addBox() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
-	self.items[id] = box:new(n, id)
+	self.items[id] = box:new(n, self)
 	return self.items[id]
 end
 
@@ -123,7 +147,7 @@ function gui:addCheckbox(n)
 	assert(n, "FAILURE: gui:addCheckbox() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addCheckbox() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
-	self.items[id] = checkbox:new(n, id)
+	self.items[id] = checkbox:new(n, self)
 	return self.items[id]
 end
 
@@ -135,7 +159,7 @@ function gui:addDropdown(n)
 	assert(n, "FAILURE: gui:addDropdown() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addDropdown() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
-	self.items[id] = dropdown:new(n, id)
+	self.items[id] = dropdown:new(n, self)
 	return self.items[id]
 end
 
@@ -147,7 +171,7 @@ function gui:addTextfield(n)
 	assert(n, "FAILURE: gui:addTextfield() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addTextfield() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
-	self.items[id] = textfield:new(n, id)
+	self.items[id] = textfield:new(n, self)
 	return self.items[id]
 end
 
@@ -159,7 +183,7 @@ function gui:addToggle(n)
 	assert(n, "FAILURE: gui:addToggle() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addToggle() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
-	self.items[id] = toggle:new(n, id)
+	self.items[id] = toggle:new(n, self)
 	return self.items[id]
 end
 
@@ -171,7 +195,7 @@ function gui:addText(n)
 	assert(n, "FAILURE: gui:addText() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addText() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
-	self.items[id] = text:new(n, id)
+	self.items[id] = text:new(n, self)
 	return self.items[id]
 end
 
