@@ -21,6 +21,8 @@ gui.colors = {
 	purple = {1,0,1,1}
 }
 
+gui.images = {}
+
 function gui.color(c)
 	assert(c, "FAILURE: gui:color() :: Missing param[name]")
 	assert(type(c) == "string", "FAILURE: gui:color() :: Incorrect param[name] - expecting string and got " .. type(c))
@@ -78,11 +80,11 @@ end
 function gui:animateBorderToColor(o, c, s)
 	assert(o, "FAILURE: gui:animateToColor() :: Missing param[object]")
 	assert(type(o) == "table", "FAILURE: gui:animateToColor() :: Incorrect param[object] - expecting table and got " .. type(o))
-	assert(c, "FAILURE: box:animateBorderToColor() :: Missing param[color]")
-	assert(type(c) == "table", "FAILURE: box:animateBorderToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
-	assert(#c > 2, "FAILURE: box:animateBorderToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
+	assert(c, "FAILURE: gui:animateBorderToColor() :: Missing param[color]")
+	assert(type(c) == "table", "FAILURE: gui:animateBorderToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
+	assert(#c > 2, "FAILURE: gui:animateBorderToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
 	s = s or 2
-	assert(type(s) == "number", "FAILURE: box:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
+	assert(type(s) == "number", "FAILURE: gui:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
 	self.borderColorToAnimateTo = c
 	self.borderColorAnimateSpeed = s
 	self.borderColorAnimateTime = lt.getTime()
@@ -135,7 +137,7 @@ function gui:addBox(n)
 	assert(n, "FAILURE: gui:addBox() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addBox() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
-	self.items[id] = box:new(n, self)
+	self.items[id] = gui:new(n, self)
 	return self.items[id]
 end
 
@@ -147,7 +149,7 @@ function gui:addCheckbox(n)
 	assert(n, "FAILURE: gui:addCheckbox() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addCheckbox() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
-	self.items[id] = checkbox:new(n, self)
+	self.items[id] = checkgui:new(n, self)
 	return self.items[id]
 end
 
@@ -165,6 +167,14 @@ end
 
 function gui:removeDropdown(n)
 
+end
+
+function gui:addImage(i, n)
+	assert(i, "FAILURE: gui:addImage() :: Missing param[img]")
+	assert(type(i) == "userdata", "FAILURE: gui:addImage() :: Incorrect param[img] - expecting image userdata and got " .. type(i))
+	assert(n, "FAILURE gui:addImage() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:addImage() :: Incorrect param[img] - expecting string and got " .. type(n))
+	self.images[n] = i
 end
 
 function gui:addTextfield(n)
