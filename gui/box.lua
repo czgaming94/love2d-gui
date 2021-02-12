@@ -233,7 +233,7 @@ function box:new(n, id)
 	function b:setImage(i)
 		assert(i, "FAILURE: box:setImage() :: Missing param[img]")
 		assert(type(i) == "string", "FAILURE: box:setImage() :: Incorrect param[img] - expecting string and got " .. type(i))
-		--assert(type(i) == "userdata", "FAILURE: box:setImage() :: Incorrect param[img] - expecting image userdata and got " .. type(i))
+		assert(type(i) == "userdata", "FAILURE: box:setImage() :: Incorrect param[img] - expecting image userdata and got " .. type(i))
 		self.image = self.images[i] or self.parent.images[i]
 	end
 	
