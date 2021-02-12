@@ -25,7 +25,12 @@ function box:new(n, id)
 	b.clickable = true
 	b.faded = false
 	b.hidden = false
+	b.images = {}
 	b.image = nil
+	b.paddingLeft = 0
+	b.paddingRight = 0
+	b.paddingTop = 0
+	b.paddingBottom = 0
 	b.inAnimation = false
 	b.animateColor = false
 	b.colorToAnimateTo = {1,1,1,1}
@@ -44,6 +49,15 @@ function box:new(n, id)
 	b.opacityAnimateSpeed = 0
 	b.opacityToAnimateTo = 0
 	b.opacityAnimateTime = lt.getTime()
+	
+	function b:addImage(i, n, a)
+		assert(i, "FAILURE: box:addImage() :: Missing param[img]")
+		assert(type(i) == "userdata", "FAILURE: box:addImage() :: Incorrect param[img] - expecting image userdata and got " .. type(i))
+		assert(n, "FAILURE box:addImage() :: Missing param[name]")
+		assert(type(n) == "string", "FAILURE: box:addImage() :: Incorrect param[img] - expecting string and got " .. type(n))
+		self.images[n] = i
+		if a and a == true then self:setImage(n) end
+	end
 	
 	function b:animateToColor(c, s)
 		assert(c, "FAILURE: box:animateToColor() :: Missing param[color]")
@@ -146,8 +160,11 @@ function box:new(n, id)
 		self.border = t.useBorder and t.useBorder or self.border
 		self.borderColor = t.borderColor or self.borderColor
 		self.color = t.color or self.color
-		self.image = t.image or self.image
+		self.image = self.images[t.image] or self.image
 		self.clickable = t.clickable and t.clickable or self.clickable
+		if t.padding then
+			self.padding = unpack(t.padding)
+		end
 	end
 	
 	function b:disable()
@@ -164,7 +181,7 @@ function box:new(n, id)
 			else
 				lg.setColor(self.borderColor)
 			end
-			lg.rectangle("line", self.pos.x - 1, self.pos.y - 1, self.w + 2, self.h + 2)
+			lg.rectangle("line", self.pos.x - 1, self.pos.y - 1, self.paddingLeft + self.w + self.paddingRight + 2, self.paddingTop + self.h + self.paddingBottom + 2)
 		end
 		
 		if self.parent.use255 then
@@ -215,12 +232,44 @@ function box:new(n, id)
 	
 	function b:setImage(i)
 		assert(i, "FAILURE: box:setImage() :: Missing param[img]")
-		assert(type(i) == "userdata", "FAILURE: box:setImage() :: Incorrect param[img] - expecting image userdata and got " .. type(i))
-		self.image = i
+		assert(type(i) == "string", "FAILURE: box:setImage() :: Incorrect param[img] - expecting string and got " .. type(i))
+		--assert(type(i) == "userdata", "FAILURE: box:setImage() :: Incorrect param[img] - expecting image userdata and got " .. type(i))
+		self.image = self.images[i]
 	end
 	
 	function b:getImage()
 		return self.image
+	end
+	
+	function b:setPadding(p)
+		assert(p, "FAILURE: box:setPadding() :: Missing param[padding]")
+		assert(type(p) == "table", "FAILURE: box:setPadding() :: Incorrect param[padding] - expecting table and got " .. type(p))
+		assert(#p == 4, "FAILURE: box:setPadding() :: Incorrect param[padding] - expecting table length 4 and got " .. #p)
+		self.paddingTop, self.paddingRight, self.paddingBottom, self.paddingTop = unpack(p)
+	end
+	
+	function b:setPaddingBottom(p)
+		assert(p, "FAILURE: box:setPaddingBottom() :: Missing param[padding]")
+		assert(type(p) == "number", "FAILURE: box:setPaddingBottom() :: Incorrect param[padding] - expecting number and got " .. type(p))
+		self.paddingBottom = p
+	end
+	
+	function b:setPaddingLeft(p)
+		assert(p, "FAILURE: box:setPaddingLeft() :: Missing param[padding]")
+		assert(type(p) == "number", "FAILURE: box:setPaddingLeft() :: Incorrect param[padding] - expecting number and got " .. type(p))
+		self.paddingLeft = p
+	end
+	
+	function b:setPaddingRight(p)
+		assert(p, "FAILURE: box:setPaddingRight() :: Missing param[padding]")
+		assert(type(p) == "number", "FAILURE: box:setPaddingRight() :: Incorrect param[padding] - expecting number and got " .. type(p))
+		self.paddingRight = p
+	end
+	
+	function b:setPaddingTop(p)
+		assert(p, "FAILURE: box:setPaddingTop() :: Missing param[padding]")
+		assert(type(p) == "number", "FAILURE: box:setPaddingTop() :: Incorrect param[padding] - expecting number and got " .. type(p))
+		self.paddingTop = p
 	end
 	
 	function b:startAnimation()
@@ -233,7 +282,7 @@ function box:new(n, id)
 	
 	function b:update(dt)
 		local x,y = love.mouse.getPosition()
-		if (x >= self.pos.x and x <= self.pos.x + self.w) and (y >= self.pos.y and y <= self.pos.y + self.h) then
+		if (x >= self.pos.x + self.paddingLeft and x <= self.pos.x + self.w + self.paddingRight) and (y >= self.pos.y + self.paddingTop and y <= self.pos.y + self.h + self.paddingBottom) then
 			if not self.hovered then
 				if self.onHoverEnter then self:onHoverEnter() end
 				self.hovered = true 

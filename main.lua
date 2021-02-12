@@ -19,21 +19,27 @@ function love.load()
 	GUI:addColor({0,0,0,1}, "black")
 	GUI:addColor({0,0,0,0}, "empty")
 	
+	-- Add images to your box, easily.
+	-- image (userdata)
+	-- name (string)
+	-- default (boolean)
+	myBox:addImage(lg.newImage("res/img/background.png"), "background")
 	
 	-- [PARAMS]
-	-- borderColor
-	-- clickable
-	-- color
-	-- h | height
-	-- image
-	-- opacity
-	-- useBorder
-	-- w | width
-	-- x
-	-- y
-	-- z
-	myBox:setData({w = 800, h = 600, x = 0, y = 0, z = 0, image = love.graphics.newImage("res/img/background.png")})
-	-- This line can do the same as these 11. Order does not matter. Assosciative table required.
+	-- borderColor  (table)
+	-- clickable    (boolean)
+	-- color        (table)
+	-- h | height   (number)
+	-- image        (string)
+	-- opacity      (number)
+	-- padding      (numbers)(top, right, bottom, left)
+	-- useBorder    (boolean)
+	-- w | width    (number)
+	-- x            (number)
+	-- y            (number)
+	-- z            (number)
+	myBox:setData({w = 800, h = 600, x = 0, y = 0, z = 0, image = "background"})
+	-- This line can do the same as these 12. Order does not matter. Assosciative table required.
 
 	--[[
 		myBox:setBorderColor({1,0,1,1})
@@ -42,6 +48,7 @@ function love.load()
 		myBox:setHeight(50)
 		myBox:setImage(love.graphics.newImage("path/to/image.png"))
 		myBox:setOpacity(0.5)
+		myBox:setPadding(0,5,0,5)
 		myBox:setUseBorder(true)
 		myBox:setWidth(50)
 		myBox:setX(5)
