@@ -30,13 +30,13 @@ function gui.color(c)
 end
 
 function gui:new(item)
-	local newGUI = self:generate(item)
-	newGUI.id = #items
-	items[#items + 1] = newGUI
-	return newGUI
+	local new = self:generate(item)
+	new.id = #items
+	items[#items + 1] = new
+	return new
 end
 
-function gui:generate(item)
+function gui:generate(item, skip)
 	local copies = {}
     local copy
     if type(item) == 'table' then
@@ -46,7 +46,11 @@ function gui:generate(item)
             copy = {}
             copies[item] = copy
             for orig_key, orig_value in next, item, nil do
-                copy[self:generate(orig_key, copies)] = self:generate(orig_value, copies)
+				if skip and skip == orig_key then 
+					copy[orig_key] = {}
+				else
+					copy[self:generate(orig_key, copies)] = self:generate(orig_value, copies)
+				end
             end
             setmetatable(copy, self:generate(getmetatable(item), copies))
         end
@@ -85,11 +89,11 @@ function gui:animateBorderToColor(o, c, s)
 	assert(#c > 2, "FAILURE: gui:animateBorderToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
 	s = s or 2
 	assert(type(s) == "number", "FAILURE: gui:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-	self.borderColorToAnimateTo = c
-	self.borderColorAnimateSpeed = s
-	self.borderColorAnimateTime = lt.getTime()
-	self.inAnimation = true
-	self.animateBorderColor = true
+	o.borderColorToAnimateTo = c
+	o.borderColorAnimateSpeed = s
+	o.borderColorAnimateTime = lt.getTime()
+	o.inAnimation = true
+	o.animateBorderColor = true
 end
 	
 function gui:animateToPosition(o, x, y, s)
@@ -117,11 +121,11 @@ function gui:animateToOpacity(obj, o, s)
 	s = s or 1
 	assert(s, "FAILURE: gui:animateToOpacity() :: Missing param[s]")
 	assert(type(s) == "number", "FAILURE: gui:animateToOpacity() :: Incorrect param[s] - expecting number and got " .. type(s))
-	o.opacityToAnimateTo = o
-	o.opacityAnimateTime = lt.getTime()
-	o.opacityAnimateSpeed = s
-	o.inAnimation = true
-	o.animateOpacity = true
+	obj.opacityToAnimateTo = o
+	obj.opacityAnimateTime = lt.getTime()
+	obj.opacityAnimateSpeed = s
+	obj.inAnimation = true
+	obj.animateOpacity = true
 end
 
 function gui:addColor(c, n)
@@ -137,7 +141,7 @@ function gui:addBox(n)
 	assert(n, "FAILURE: gui:addBox() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addBox() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
-	self.items[id] = gui:new(n, self)
+	self.items[id] = box:new(n, self)
 	return self.items[id]
 end
 
@@ -149,7 +153,7 @@ function gui:addCheckbox(n)
 	assert(n, "FAILURE: gui:addCheckbox() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addCheckbox() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
-	self.items[id] = checkgui:new(n, self)
+	self.items[id] = checkbox:new(n, self)
 	return self.items[id]
 end
 
@@ -233,12 +237,13 @@ end
 
 function gui:mousepressed(button)
 	local x,y = love.mouse.getPosition()
-	local guis = self:generate(items)
-	table.sort(guis, function(a, b) return a.z > b.z end)
+	local objs = self:generate(items, "parent")
+	table.sort(objs, function(a, b) return a.z > b.z end)
 	local hitTarget = false
-	for _,v in ipairs(guis) do
+	for _,v in ipairs(objs) do
 		for k,i in ipairs(v.items) do
-			if (x >= i.pos.x and x <= i.pos.x + i.w) and (y >= i.pos.y and y <= i.pos.y + i.h) then
+			if (x >= i.pos.x + i.paddingLeft and x <= (i.pos.x + i.w) - i.paddingRight) and 
+			(y >= i.pos.y + i.paddingTop and y <= (i.pos.y + i.h) - i.paddingBottom) then
 				if not hitTarget then 
 					if i.clickable then
 						if i.onClick then 
@@ -246,11 +251,11 @@ function gui:mousepressed(button)
 						end
 						hitTarget = true
 					end
-				end
+				else break end
 			end
 		end
 	end
-	guis = nil
+	objs = nil
 end
 
 function gui:setZ(z)

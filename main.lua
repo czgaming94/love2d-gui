@@ -1,4 +1,5 @@
 local GUI = require("gui")
+local lg = love.graphics
 
 -- Create GUI instances
 -- Doing this allows you to change settings between the two GUI's
