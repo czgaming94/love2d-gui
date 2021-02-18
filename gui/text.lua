@@ -32,6 +32,7 @@ function text:new(n, p)
 	t.hovered = false
 	t.clicked = false
 	t.clickable = true
+	t.faded = false
 	t.typewriter = false
 	t.typewriterPrint = ""
 	t.typewriterText = self:split(t.text)
@@ -48,10 +49,14 @@ function text:new(n, p)
 	t.colorAnimateSpeed = 0
 	t.colorAnimateTime = lt.getTime()
 	t.animatePosition = false
+	t.positionAnimateSpeed = 0
 	t.positionToAnimateTo = {x = 0, y = 0}
-	b.positionToAnimateFrom = {x = 0, y = 0}
-	t.positionAnimateDrag = 0
-	t.positionAnimationTimer = lt.getTime()
+	t.positionToAnimateFrom = {x = 0, y = 0}
+	t.positionAnimateTime = lt.getTime()
+	t.animateOpacity = false
+	t.opacityAnimateSpeed = 0
+	t.opacityToAnimateTo = 0
+	t.opacityAnimateTime = lt.getTime()
 	
 	function t:animateToColor(c, s)
 		assert(c, "FAILURE: text:animateToColor() :: Missing param[color]")
@@ -80,6 +85,23 @@ function text:new(n, p)
 		self.positionAnimateTime = lt.getTime()
 		self.inAnimation = true
 		self.animatePosition = true
+	end
+	
+	function t:animateToOpacity(o, s)
+		assert(o, "FAILURE: text:animateToOpacity() :: Missing param[o]")
+		assert(type(o) == "number", "FAILURE: text:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
+		s = s or 1
+		assert(s, "FAILURE: text:animateToOpacity() :: Missing param[speed]")
+		assert(type(s) == "number", "FAILURE: text:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		self.opacityToAnimateTo = o
+		self.opacityAnimateTime = lt.getTime()
+		self.opacityAnimateSpeed = s
+		self.inAnimation = true
+		self.animateOpacity = true
+	end
+	
+	function t:isAnimating()
+		return self.inAnimation
 	end
 	
 	function t:setClickable(c)
@@ -121,6 +143,10 @@ function text:new(n, p)
 		self.font = d.font or self.font
 	end
 	
+	function t:disable()
+		self.hidden = true
+	end
+	
 	function t:draw()
 		lg.push()
 		
@@ -157,8 +183,33 @@ function text:new(n, p)
 		lg.pop()
 	end
 	
+	function t:enable()
+		self.hidden = false
+	end
+	
+	function t:fadeIn()
+		self:animateToOpacity(1)
+		self.hidden = false
+		self.faded = false
+		if self.onFadeIn then self:onFadeIn() end
+	end
+	
+	function t:fadeOut(p)
+		if p then self.faded = true end
+		self:animateToOpacity(0)
+		if self.onFadeOut then self:onFadeOut() end
+	end
+	
 	function t:isHovered()
 		return self.hovered
+	end
+	
+	function b:startAnimation()
+		self.inAnimation = true
+	end
+	
+	function b:stopAnimation()
+		self.inAnimation = false
 	end
 	
 	function t:update(dt)
@@ -190,7 +241,9 @@ function text:new(n, p)
 		
 		if self.inAnimation then
 			local allColorsMatch = true
+			local allBorderColorsMatch = true
 			local inProperPosition = true
+			local atProperOpacity = true
 			
 			if self.animateColor then
 				for k,v in ipairs(self.colorToAnimateTo) do
@@ -206,7 +259,7 @@ function text:new(n, p)
 			end
 			
 			if self.animatePosition then
-				local t = math.min((lt.getTime() - self.positionAnimateTime) / (self.positionAnimateDrag / 2), 1.0)
+				local t = math.min((lt.getTime() - self.positionAnimateTime) * (self.positionAnimateSpeed / 2), 1.0)
 				if self.pos.x ~= self.positionToAnimateTo.x or self.pos.y ~= self.positionToAnimateTo.y then
 					self.pos.x = self.lerp(self.positionToAnimateFrom.x, self.positionToAnimateTo.x, t)
 					self.pos.y = self.lerp(self.positionToAnimateFrom.y, self.positionToAnimateTo.y, t)
@@ -214,13 +267,48 @@ function text:new(n, p)
 				end
 			end
 			
+			if self.animateOpacity then
+				if self.color[4] ~= self.opacityToAnimateTo then
+					if self.color[4] < self.opacityToAnimateTo then
+						self.color[4] = min(self.opacityToAnimateTo, self.color[4] + (self.opacityAnimateSpeed * dt))
+					else
+						self.color[4] = max(self.opacityToAnimateTo, self.color[4] - (self.opacityAnimateSpeed * dt))
+					end
+					atProperOpacity = false
+				end
+			end
 			
-			if allColorsMatch and inProperPosition then
+			if self.animateBorderColor then
+				for k,v in ipairs(self.borderColorToAnimateTo) do
+					if self.borderColor[k] ~= v then
+						if v > self.borderColor[k] then
+							self.borderColor[k] = min(v, self.borderColor[k] + (self.borderColorAnimateSpeed * dt))
+						else
+							self.borderColor[k] = max(v, self.borderColor[k] - (self.borderColorAnimateSpeed * dt))
+						end
+						allBorderColorsMatch = false
+					end
+				end
+			end
+			
+			if allColorsMatch and inProperPosition and atProperOpacity and allBorderColorsMatch then
 				self.inAnimation = false
 				self.animateColor = false
 				self.animatePosition = false
+				if self.animateOpacity and self.faded then self.hidden = true end
+				self.animateOpacity = false
 			end
 		end
+	end
+	
+	function t:setOpacity(o)
+		assert(o, "FAILURE: text:setUseBorder() :: Missing param[opacity]")
+		assert(type(o) == "number", "FAILURE: text:setUseBorder() :: Incorrect param[opacity] - expecting number and got " .. type(o))
+		self.color[4] = o
+	end
+	
+	function t:getOpacity()
+		return self.color[4]
 	end
 	
 	function t:typewriterCycle()
@@ -250,16 +338,6 @@ function text:new(n, p)
 	
 	function t:isTypewriter()
 		return self.typewriter
-	end
-	
-	function t:setWidth(w)
-		assert(w, "FAILURE: text:setWidth() :: Missing param[width]")
-		assert(type(w) == "number", "FAILURE: text:setWidth() :: Incorrect param[width] - expecting number and got " .. type(w))
-		self.w = w
-	end
-	
-	function t:getWidth()
-		return self.w
 	end
 	
 	function t:setX(x)

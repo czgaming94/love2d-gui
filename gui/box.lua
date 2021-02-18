@@ -105,8 +105,8 @@ function box:new(n, p)
 		assert(o, "FAILURE: box:animateToOpacity() :: Missing param[o]")
 		assert(type(o) == "number", "FAILURE: box:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 		s = s or 1
-		assert(s, "FAILURE: box:animateToOpacity() :: Missing param[s]")
-		assert(type(s) == "number", "FAILURE: box:animateToOpacity() :: Incorrect param[s] - expecting number and got " .. type(s))
+		assert(s, "FAILURE: box:animateToOpacity() :: Missing param[speed]")
+		assert(type(s) == "number", "FAILURE: box:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		self.opacityToAnimateTo = o
 		self.opacityAnimateTime = lt.getTime()
 		self.opacityAnimateSpeed = s
@@ -294,6 +294,7 @@ function box:new(n, p)
 				self.hovered = false 
 			end
 		end
+		
 		if self.inAnimation then
 			local allColorsMatch = true
 			local allBorderColorsMatch = true
