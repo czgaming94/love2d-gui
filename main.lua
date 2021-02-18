@@ -12,6 +12,8 @@ local myBox2 = myGui:addBox("myBox2")
 local myBox3 = myGui2:addBox("myBox3")
 local myBox4 = myGui2:addBox("myBox4")
 
+local myText = myGui:addText("continue")
+
 local colors = GUI.color
 
 function love.load()
@@ -19,6 +21,7 @@ function love.load()
 	GUI:addColor({1,1,1,1}, "white")
 	GUI:addColor({0,0,0,1}, "black")
 	GUI:addColor({0,0,0,0}, "empty")
+	GUI:addColor({1,0,0,.5}, "alphaRed")
 	
 	-- Add images to your box, easily.
 	-- image (userdata)
@@ -61,8 +64,8 @@ function love.load()
 	-- Clicks will pass through this object.
 	myBox:setClickable(false)
 	
-	myBox2:setData({w = 250, h = 50, x = 105, y = 10, color = colors("green"), useBorder = true, borderColor = colors("yellow")})
-	myBox3:setData({w = 100, h = 50, x = 105, y = 10, color = colors("yellow"), useBorder = false})
+	myBox2:setData({w = 50, h = lg.getHeight(), x = 1, y = 0, color = colors("green"), useBorder = true, borderColor = colors("yellow")})
+	myBox3:setData({w = 225, h = 65, x = 105, y = 400, color = colors("alphaRed"), useBorder = false})
 	myBox4:setData({w = 50, h = 250, x = 105, y = 200, color = colors("purple"), useBorder = true, borderColor = colors("blue")})
 	
 	

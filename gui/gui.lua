@@ -36,8 +36,25 @@ function gui:new(item)
 	return new
 end
 
-function gui:generate(item, skip)
-	local copies = {}
+function gui:copy(item, skip)
+    local c
+    if type(item) == "table" then
+        c = {}
+        for orig_key, orig_value in pairs(item) do
+			if skip and orig_key == skip then
+				c[orig_key] = {}
+			else
+				c[orig_key] = orig_value
+			end
+		end
+    else
+        c = item
+    end
+    return c
+end
+
+function gui:generate(item, copies, skip)
+	local copies = copies or {}
     local copy
     if type(item) == 'table' then
         if copies[item] then
@@ -46,8 +63,8 @@ function gui:generate(item, skip)
             copy = {}
             copies[item] = copy
             for orig_key, orig_value in next, item, nil do
-				if skip and skip == orig_key then 
-					copy[orig_key] = {}
+				if skip and orig_key == skip then
+					copy[skip] = {}
 				else
 					copy[self:generate(orig_key, copies)] = self:generate(orig_value, copies)
 				end
@@ -237,21 +254,23 @@ end
 
 function gui:mousepressed(button)
 	local x,y = love.mouse.getPosition()
-	local objs = self:generate(items, "parent")
+	local objs = self:generate(items)
 	table.sort(objs, function(a, b) return a.z > b.z end)
 	local hitTarget = false
-	for _,v in ipairs(objs) do
+	for o,v in ipairs(objs) do
 		for k,i in ipairs(v.items) do
-			if (x >= i.pos.x + i.paddingLeft and x <= (i.pos.x + i.w) - i.paddingRight) and 
-			(y >= i.pos.y + i.paddingTop and y <= (i.pos.y + i.h) - i.paddingBottom) then
-				if not hitTarget then 
-					if i.clickable then
-						if i.onClick then 
-							i:onClick(button)
+			if not i.hidden and not i.faded then 
+				if (x >= i.pos.x + i.paddingLeft and x <= (i.pos.x + i.w) - i.paddingRight) and 
+				(y >= i.pos.y + i.paddingTop and y <= (i.pos.y + i.h) - i.paddingBottom) then
+					if not hitTarget then 
+						if i.clickable then
+							if i.onClick then
+								i:onClick(button)
+							end
+							hitTarget = true
 						end
-						hitTarget = true
 					end
-				else break end
+				end
 			end
 		end
 	end

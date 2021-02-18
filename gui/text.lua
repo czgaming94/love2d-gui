@@ -3,13 +3,15 @@ local min, max = math.min, math.max
 local text = {}
 
 text.items = {}
+text.guis = {}
 
-function text:new(n, id)
+function text:new(n, p)
 	local t = {}
+	if not self.guis[p.id] then self.guis[p.id] = p end
 	
 	t.name = n
 	t.id = #self.items + 1
-	t.parent = id
+	t.parent = p.id
 	t.text = ""
 	t.w = 0
 	t.h = 0

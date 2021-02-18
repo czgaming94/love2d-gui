@@ -3,13 +3,14 @@ local min, max = math.min, math.max
 local box = {}
 
 box.items = {}
+box.guis = {}
 
 function box:new(n, p)
 	local b = {}
-	
+	if not self.guis[p.id] then self.guis[p.id] = p end
 	b.name = n
 	b.id = #self.items + 1
-	b.parent = p
+	b.parent = p.id
 	b.w = 0
 	b.h = 0
 	b.pos = {
@@ -176,7 +177,7 @@ function box:new(n, p)
 		
 		lg.setColor(1,1,1,1)
 		if self.border then
-			if self.parent.use255 then
+			if box.guis[self.parent].use255 then
 				lg.setColor(love.math.colorFromBytes(self.borderColor))
 			else
 				lg.setColor(self.borderColor)
@@ -184,7 +185,7 @@ function box:new(n, p)
 			lg.rectangle("line", self.pos.x - 1, self.pos.y - 1, self.paddingLeft + self.w + self.paddingRight + 2, self.paddingTop + self.h + self.paddingBottom + 2)
 		end
 		
-		if self.parent.use255 then
+		if box.guis[self.parent].use255 then
 			lg.setColor(love.math.colorFromBytes(self.color))
 		else
 			lg.setColor(self.color)
@@ -233,7 +234,7 @@ function box:new(n, p)
 	function b:setImage(i)
 		assert(i, "FAILURE: box:setImage() :: Missing param[img]")
 		assert(type(i) == "string", "FAILURE: box:setImage() :: Incorrect param[img] - expecting string and got " .. type(i))
-		self.image = self.images[i] or self.parent.images[i]
+		self.image = self.images[i] or box.guis[self.parent].images[i]
 	end
 	
 	function b:getImage()
