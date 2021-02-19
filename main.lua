@@ -65,7 +65,7 @@ function love.load()
 	myBox:setClickable(false)
 	
 	myBox2:setData({w = 50, h = lg.getHeight(), x = 1, y = 0, color = colors("green"), useBorder = true, borderColor = colors("yellow")})
-	myBox3:setData({w = 225, h = 65, x = 105, y = 400, color = colors("alphaRed"), useBorder = false})
+	myBox3:setData({w = 225, h = 65, x = 105, y = 485, color = colors("alphaRed"), useBorder = false})
 	myBox4:setData({w = 50, h = 250, x = 105, y = 200, color = colors("purple"), useBorder = true, borderColor = colors("blue")})
 	
 	

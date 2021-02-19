@@ -20,7 +20,6 @@ function text:new(n, p)
 		y = 0,
 		z = 0
 	}
-	t.timer = require("lib.hump.timer")
 	t.timerEvent = nil
 	t.border = false
 	t.borderColor = {1,1,1,1}
@@ -124,14 +123,16 @@ function text:new(n, p)
 	function t:setData(d)
 		assert(d, "FAILURE: text:setData() :: Missing param[data]")
 		assert(type(d) == "table", "FAILURE: text:setData() :: Incorrect param[data] - expecting table and got " .. type(d))
-		assert(d.texd, "FAILURE: text:setData() :: Missing param[data['text']")
-		assert(type(d.text) == "number", "FAILURE: text:setData() :: Incorrect param[text] - expecting number and got " .. type(d.text))
+		assert(d.t or d.text, "FAILURE: text:setData() :: Missing param[data['text']")
+		assert(type(d.text) == "string", "FAILURE: text:setData() :: Incorrect param[text] - expecting string and got " .. type(d.text))
 		assert(d.x, "FAILURE: text:setData() :: Missing param[data['x']")
 		assert(type(d.x) == "number", "FAILURE: text:setData() :: Incorrect param[x] - expecting number and got " .. type(d.x))
 		assert(d.y, "FAILURE: text:setData() :: Missing param[data['y']")
 		assert(type(d.y) == "number", "FAILURE: text:setData() :: Incorrect param[y] - expecting number and got " .. type(d.y))
 		self.w = d.w or self.w
 		self.h = d.h or self.h
+		self.text = d.t or or d.text or self.text
+		self.typewriterText = self:split(self.text)
 		self.pos.x = d.x or self.pos.x
 		self.pos.y = d.y or self.pos.y
 		self.pos.z = d.z or self.pos.z
@@ -141,6 +142,7 @@ function text:new(n, p)
 		self.borderColor = d.borderColor or self.borderColor
 		self.color = d.color or self.color
 		self.font = d.font or self.font
+		self.clickable = d.clickable and d.clickable or self.clickable
 	end
 	
 	function t:disable()
@@ -149,31 +151,9 @@ function text:new(n, p)
 	
 	function t:draw()
 		lg.push()
+		lg.setColor(self.color)
 		
 		if self.typewriter then
-			if self.backgroundData[1] then
-				local color, xPad, yPad, round = unpack(self.backgroundData)
-				color = color or {1,1,1,1}
-				xPad = xPad or 0
-				yPad = yPad or 0
-				round = round and round or false
-				
-				lg.setColor(color)
-				if round then
-					lg.rectangle("fill", self.pos.x - (xPad / 2), self.pos.y - (yPad / 2), self.font:getWidth(self.text) + xPad, self.font:getHeight(self.text) + yPad, 5, 5)
-				else
-					lg.rectangle("fill", self.pos.x - (xPad / 2), self.pos.y - (yPad / 2), self.font:getWidth(self.text) + xPad, self.font:getHeight(self.text) + yPad)
-				end
-				if self.border then
-					lg.setColor(self.borderColor)
-					if round then
-						lg.rectangle("line", self.pos.x - (xPad / 2), self.pos.y - (yPad / 2), self.font:getWidth(self.text) + xPad, self.font:getHeight(self.text) + yPad, 5, 5)
-					else
-						lg.rectangle("line", self.pos.x - (xPad / 2), self.pos.y - (yPad / 2), self.font:getWidth(self.text) + xPad, self.font:getHeight(self.text) + yPad)
-					end
-				end
-			end
-			
 			lg.print({self.color, self.typewriterPrint}, self.font, self.pos.x, self.pos.y)
 		else
 			lg.print({self.color, self.text}, self.font, self.pos.x, self.pos.y)
@@ -204,11 +184,11 @@ function text:new(n, p)
 		return self.hovered
 	end
 	
-	function b:startAnimation()
+	function t:startAnimation()
 		self.inAnimation = true
 	end
 	
-	function b:stopAnimation()
+	function t:stopAnimation()
 		self.inAnimation = false
 	end
 	
@@ -330,6 +310,17 @@ function text:new(n, p)
 		return self.border
 	end
 	
+	function t:setText(text)
+		assert(text ~= nil, "FAILURE: text:setText() :: Missing param[text]")
+		assert(type(text) == "string", "FAILURE: text:setText() :: Incorrect param[text] - expecting boolean and got " .. type(text))
+		self.text = text
+		self.typewriterText = self:split(text)
+	end
+	
+	function t:getText()
+		return self.text
+	end
+	
 	function t:setAsTypewriter(aT)
 		assert(aT ~= nil, "FAILURE: text:setAsTypewriter() :: Missing param[useBorder]")
 		assert(type(aT) == "boolean", "FAILURE: text:setAsTypewriter() :: Incorrect param[useBorder] - expecting boolean and got " .. type(aT))
@@ -383,7 +374,7 @@ function text:draw()
 
 end
 
-function text:split()
+function text:split(str)
 	local t={}
 	for s in string.gmatch(str, ".") do
 		t[#t+1] = s
