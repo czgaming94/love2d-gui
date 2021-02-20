@@ -9,11 +9,7 @@ local gui = {}
 
 local items = {}
 
-gui.items = {}
-gui.z = 0
-gui.use255 = false
-
-gui.colors = {
+local colors = {
 	red = {1,0,0,1},
 	green = {0,1,0,1},
 	blue = {0,0,1,1},
@@ -21,12 +17,17 @@ gui.colors = {
 	purple = {1,0,1,1}
 }
 
+gui.items = {}
+gui.z = 0
+gui.use255 = false
+
+
 gui.images = {}
 
 function gui.color(c)
 	assert(c, "FAILURE: gui:color() :: Missing param[name]")
 	assert(type(c) == "string", "FAILURE: gui:color() :: Incorrect param[name] - expecting string and got " .. type(c))
-	return gui:generate(gui.colors[c])
+	return gui:generate(colors[c])
 end
 
 function gui:new(item)
@@ -151,7 +152,7 @@ function gui:addColor(c, n)
 	assert(#c > 2, "FAILURE : gui:addColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
 	assert(n, "FAILURE: gui:addColor() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addColor() :: Incorrect param[name] - expecting string and got " .. type(n))
-	self.colors[n] = c
+	colors[n] = c
 end
 
 function gui:addBox(n)
@@ -162,10 +163,6 @@ function gui:addBox(n)
 	return self.items[id]
 end
 
-function gui:removeBox(n)
-	
-end
-
 function gui:addCheckbox(n)
 	assert(n, "FAILURE: gui:addCheckbox() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addCheckbox() :: Incorrect param[name] - expecting string and got " .. type(n))
@@ -174,20 +171,12 @@ function gui:addCheckbox(n)
 	return self.items[id]
 end
 
-function gui:removeCheckbox(n)
-
-end
-
 function gui:addDropdown(n)
 	assert(n, "FAILURE: gui:addDropdown() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addDropdown() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
 	self.items[id] = dropdown:new(n, self)
 	return self.items[id]
-end
-
-function gui:removeDropdown(n)
-
 end
 
 function gui:addImage(i, n)
@@ -206,10 +195,6 @@ function gui:addTextfield(n)
 	return self.items[id]
 end
 
-function gui:removeTextfield(n)
-
-end
-
 function gui:addToggle(n)
 	assert(n, "FAILURE: gui:addToggle() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addToggle() :: Incorrect param[name] - expecting string and got " .. type(n))
@@ -218,20 +203,12 @@ function gui:addToggle(n)
 	return self.items[id]
 end
 
-function gui:addToggle(n)
-
-end
-
 function gui:addText(n)
 	assert(n, "FAILURE: gui:addText() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addText() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
 	self.items[id] = text:new(n, self)
 	return self.items[id]
-end
-
-function gui:removeText(n)
-
 end
 
 function gui:update(dt)
@@ -275,6 +252,23 @@ function gui:mousepressed(button)
 		end
 	end
 	objs = nil
+end
+
+function gui:remove(n)
+	assert(n, "FAILURE: gui:remove() :: Missing param[name]")
+	if type(n) ~= "string" and type(n) ~= "number" then
+		error("FAILURE: gui:remove() :: Incorrect param[name] - expecting string or number and got " .. type(n))
+	end
+	
+	if type(n) == "string" then
+		for k,v in ipairs(self.items) do
+			if v.name == n then 
+				self.items[k] = nil
+			end
+		end
+	else
+		self.items[n] = nil
+	end
 end
 
 function gui:setZ(z)

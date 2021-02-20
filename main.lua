@@ -12,7 +12,7 @@ local myBox2 = myGui:addBox("myBox2")
 local myBox3 = myGui2:addBox("myBox3")
 local myBox4 = myGui2:addBox("myBox4")
 
-local myText = myGui:addText("continue")
+local myText = myGui2:addText("continue")
 
 local colors = GUI.color
 
@@ -66,6 +66,7 @@ function love.load()
 	
 	myBox2:setData({w = 50, h = lg.getHeight(), x = 1, y = 0, color = colors("green"), useBorder = true, borderColor = colors("yellow")})
 	myBox3:setData({w = 225, h = 65, x = 105, y = 485, color = colors("alphaRed"), useBorder = false})
+	myText:setData({x = 110, y = 490, z = 2, color = colors("green"), text = "Hello World!"})
 	myBox4:setData({w = 50, h = 250, x = 105, y = 200, color = colors("purple"), useBorder = true, borderColor = colors("blue")})
 	
 	

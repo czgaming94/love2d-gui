@@ -2,6 +2,13 @@ local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
 local text = {}
 
+local prefixes = {
+	color = "c",
+	delay = "d",
+	font = "f",
+	time = "t"
+}
+
 text.items = {}
 text.guis = {}
 
@@ -21,17 +28,14 @@ function text:new(n, p)
 		z = 0
 	}
 	t.timerEvent = nil
-	t.border = false
-	t.borderColor = {1,1,1,1}
-	t.background = false
-	t.backgroundColor = {1,1,1,1}
-	t.backgroundData = {}
 	t.color = {1,1,1,1}
 	t.font = love.graphics.getFont()
+	t.fonts = {}
 	t.hovered = false
 	t.clicked = false
 	t.clickable = true
 	t.faded = false
+	t.fancy = false
 	t.typewriter = false
 	t.typewriterPrint = ""
 	t.typewriterText = self:split(t.text)
@@ -131,8 +135,8 @@ function text:new(n, p)
 		assert(type(d.y) == "number", "FAILURE: text:setData() :: Incorrect param[y] - expecting number and got " .. type(d.y))
 		self.w = d.w or self.w
 		self.h = d.h or self.h
-		self.text = d.t or or d.text or self.text
-		self.typewriterText = self:split(self.text)
+		self.text = d.t or d.text or self.text
+		self.typewriterText, self.fancy = text:split(self.text)
 		self.pos.x = d.x or self.pos.x
 		self.pos.y = d.y or self.pos.y
 		self.pos.z = d.z or self.pos.z
@@ -152,9 +156,29 @@ function text:new(n, p)
 	function t:draw()
 		lg.push()
 		lg.setColor(self.color)
+		lg.setFont(self.font)
 		
 		if self.typewriter then
-			lg.print({self.color, self.typewriterPrint}, self.font, self.pos.x, self.pos.y)
+			if self.fancy then
+				for k,v in ipairs(self.typewriterText) do
+					lg.push()
+					
+					if v.color ~= "white" then
+						lg.setColor(text.guis[self.parent].color(v.color))
+					end
+					if v.font ~= "default" then
+						lg.setColor(v.font)
+					end
+					--[[
+						TO DO:
+							DETERMINE X/Y OF BLOCKS
+					--]]
+					lg.pop()
+					if not v.finished then break end
+				end
+			else
+				lg.print({self.color, self.typewriterPrint}, self.font, self.pos.x, self.pos.y)
+			end
 		else
 			lg.print({self.color, self.text}, self.font, self.pos.x, self.pos.y)
 		end
@@ -178,6 +202,20 @@ function text:new(n, p)
 		if p then self.faded = true end
 		self:animateToOpacity(0)
 		if self.onFadeOut then self:onFadeOut() end
+	end
+	
+	function t:addFont(f, n)
+		assert(f, "FAILURE: text:addFont() :: Missing param[font]")
+		assert(type(f) == "userdata", "FAILURE: text:addFont() :: Incorrect param[font] - expecting font userdata and got " .. type(f))
+		assert(n, "FAILURE: text:addFont() :: Missing param[name]")
+		assert(type(n) == "string", "FAILURE: text:addFont() :: Incorrect param[name] - expecting string and got " .. type(n))
+		self.fonts[n] = f
+	end
+	
+	function t:setFont(n)
+		assert(n, "FAILURE: text:setFont() :: Missing param[name]")
+		assert(type(n) == "string", "FAILURE: text:setFont() :: Incorrect param[name] - expecting string and got " .. type(n))
+		self.font = self.fonts[n]
 	end
 	
 	function t:isHovered()
@@ -208,14 +246,38 @@ function text:new(n, p)
 		
 		if self.typewriter then
 			self.typewriterWaited = self.typewriterWaited + dt
-			while self.typewriterWaited >= self.typewriterSpeed and self.typewriterPrint <= #self.typewriterText do
-				self.typewriterWaited = self.typewriterWaited - self.typewriterSpeed
-				self.typewriterPrint = self.typewriterPrint .. self.typewriterText[self.typewriterPos]
-				self.typewriterPos = self.typewriterPos + 1
-			end
-			if self.typewriterPos >= #self.typewriterText and not self.typewriterFinished then
-				if not self.typewriterRepeat then self.typewriterFinished = true else self:typewriterCycle() end
-				self.typewriterRunCount = self.typewriterRunCount + 1
+			if self.fancy then
+				for k,v in ipairs(self.typewriterText) do
+					if v.text then
+						if v.delay > 0 and not delayWaited >= v.delay then
+							delayWaited = delayWaited + dt
+						end
+						if not v.needToWait then
+							if not v.started then
+								v.started = true
+							end
+							while v.timeWaited >= v.time and v.textPos <= #v.text do
+								v.timeWaited = v.timeWaited - v.time
+								v.toShow = v.toShow .. v.text[v.textPos]
+								v.textPos = v.textPos = 1
+							end
+							if v.textPos >= #v.text then
+								v.finished = true
+							end
+						end
+					end
+					if not v.finished then break end
+				end
+			else
+				while self.typewriterWaited >= self.typewriterSpeed and self.typewriterPrint <= #self.typewriterText do
+					self.typewriterWaited = self.typewriterWaited - self.typewriterSpeed
+					self.typewriterPrint = self.typewriterPrint .. self.typewriterText[self.typewriterPos]
+					self.typewriterPos = self.typewriterPos + 1
+				end
+				if self.typewriterPos >= #self.typewriterText and not self.typewriterFinished then
+					if not self.typewriterRepeat then self.typewriterFinished = true else self:typewriterCycle() end
+					self.typewriterRunCount = self.typewriterRunCount + 1
+				end
 			end
 		end
 		
@@ -310,11 +372,11 @@ function text:new(n, p)
 		return self.border
 	end
 	
-	function t:setText(text)
-		assert(text ~= nil, "FAILURE: text:setText() :: Missing param[text]")
-		assert(type(text) == "string", "FAILURE: text:setText() :: Incorrect param[text] - expecting boolean and got " .. type(text))
+	function t:setText(txt)
+		assert(txt ~= nil, "FAILURE: text:setText() :: Missing param[text]")
+		assert(type(txt) == "string", "FAILURE: text:setText() :: Incorrect param[text] - expecting boolean and got " .. type(txt))
 		self.text = text
-		self.typewriterText = self:split(text)
+		self.typewriterText, self.fancy = text:split(txt)
 	end
 	
 	function t:getText()
@@ -364,22 +426,63 @@ function text:new(n, p)
 	function t.lerp(t1,t2,t)
 		return (1 - t) * t1 + t * t2
 	end
-end
-
-function text:update(dt)
-
-end
-
-function text:draw()
-
-end
-
-function text:split(str)
-	local t={}
-	for s in string.gmatch(str, ".") do
-		t[#t+1] = s
-	end
+	
 	return t
+end
+
+function text:split(s)
+	local t={}
+	local f = false
+	if string.match(s, "{") then
+		f = true
+		for b in string.gmatch(str, ".-{") do
+			local id = #t + 1
+			t[id] = {}
+			t[id].text = {}
+			t[id].color = "white"
+			t[id].delay = 0
+			t[id].delayWaited = 0
+			t[id].needToWait = false
+			t[id].font = "default"
+			t[id].time = 0.5
+			t[id].started = false
+			t[id].finished = false
+			t[id].textPos = 0
+			t[id].timeWaited = 0
+			t[id].toShow = ""
+			if string.match(b, "}") then
+				for o in string.gmatch(b, ".-}") do
+					local d = o:gsub("}","")
+					for m in string.gmatch(d, "([^,]+)") do
+						if string.sub(m,1,1) == prefixes.color then
+							t[id].color = m:gsub("^" .. prefixes.color .. "=", "")
+						end
+						if string.sub(m,1,1) == prefixes.delay then
+							t[id].delay = m:gsub("^" .. prefixes.delay .. "=", "")
+							t[id].needToWait = true
+						end
+						if string.sub(m,1,1) == prefixes.font then
+							t[id].font = m:gsub("^" .. prefixes.font .. "=", "")
+						end
+						if string.sub(m,1,1) == prefixes.time then
+							t[id].time = m:gsub("^" .. prefixes.time .. "=", "")
+						end
+					end
+				end
+				local i = b:gsub("^.-}",""):gsub("{",""):gsub("^%s*(.-)%s*$","%1")
+				for str in i:gmatch(".") do
+					t[id].text[#t[id].text + 1] = str
+				end
+			else
+				t[id] = { text = b:gsub("{", "")}
+			end
+		end
+	else
+		for str in string.gmatch(s, ".") do
+			t[#t+1] = str
+		end
+	end
+	return t, f
 end
 
 return text

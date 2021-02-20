@@ -282,7 +282,8 @@ function box:new(n, p)
 	
 	function b:update(dt)
 		local x,y = love.mouse.getPosition()
-		if (x >= self.pos.x + self.paddingLeft and x <= self.pos.x + self.w + self.paddingRight) and (y >= self.pos.y + self.paddingTop and y <= self.pos.y + self.h + self.paddingBottom) then
+		if (x >= self.pos.x + self.paddingLeft and x <= self.pos.x + self.w + self.paddingRight) and 
+		(y >= self.pos.y + self.paddingTop and y <= self.pos.y + self.h + self.paddingBottom) then
 			if not self.hovered then
 				if self.onHoverEnter then self:onHoverEnter() end
 				self.hovered = true 
