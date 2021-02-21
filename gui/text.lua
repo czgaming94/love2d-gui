@@ -137,6 +137,7 @@ function text:new(n, p)
 		self.h = d.h or self.h
 		self.text = d.t or d.text or self.text
 		self.typewriterText, self.fancy = text:split(self.text)
+		self.typewriter = d.typewriter or self.typewriter
 		self.pos.x = d.x or self.pos.x
 		self.pos.y = d.y or self.pos.y
 		self.pos.z = d.z or self.pos.z
@@ -161,26 +162,44 @@ function text:new(n, p)
 		if self.typewriter then
 			if self.fancy then
 				for k,v in ipairs(self.typewriterText) do
-					lg.push()
-					
-					if v.color ~= "white" then
-						lg.setColor(text.guis[self.parent].color(v.color))
+					if v.text then
+						lg.push()
+						
+						if v.color ~= "white" then
+							lg.setColor(text.guis[self.parent].color(v.color))
+						end
+						if v.font ~= "default" then
+							lg.setColor(v.font)
+						end
+						
+						if not v.y then
+							v.y = self.pos.y
+						end
+						
+						if not v.x then
+							if k == 1 then
+								v.x = self.pos.x
+							else
+								v.x = self.typewriterText[k - 1].x + lg.getFont():getWidth(v.fullText)
+								
+								if v.x > self.pos.x + (self.width - lg.getFont():getWidth(v.fullText)) then
+									v.x = self.pos.x
+									v.y = self.typewriterText[k - 1].y + lg.getFont():getHeight(v.fullText) 
+								end
+							end
+						end
+						
+						lg.print(v.toShow, v.x, v.y)
+						lg.setColor(1,1,1,1)
+						lg.pop()
+						if not v.finished then break end
 					end
-					if v.font ~= "default" then
-						lg.setColor(v.font)
-					end
-					--[[
-						TO DO:
-							DETERMINE X/Y OF BLOCKS
-					--]]
-					lg.pop()
-					if not v.finished then break end
 				end
 			else
-				lg.print({self.color, self.typewriterPrint}, self.font, self.pos.x, self.pos.y)
+				lg.print(self.typewriterPrint, self.pos.x, self.pos.y)
 			end
 		else
-			lg.print({self.color, self.text}, self.font, self.pos.x, self.pos.y)
+			lg.print(self.text, self.pos.x, self.pos.y)
 		end
 		
 		lg.setColor(1,1,1,1)
@@ -469,17 +488,17 @@ function text:split(s)
 						end
 					end
 				end
-				local i = b:gsub("^.-}",""):gsub("{",""):gsub("^%s*(.-)%s*$","%1")
-				for str in i:gmatch(".") do
-					t[id].text[#t[id].text + 1] = str
+				t[id].fullText = b:gsub("^.-}",""):gsub("{",""):gsub("^%s*(.-)%s*$","%1")
+				for i in t[id].fullText:gmatch(".") do
+					t[id].text[#t[id].text + 1] = i
 				end
 			else
 				t[id] = { text = b:gsub("{", "")}
 			end
 		end
 	else
-		for str in string.gmatch(s, ".") do
-			t[#t+1] = str
+		for i in string.gmatch(s, ".") do
+			t[#t+1] = i
 		end
 	end
 	return t, f
