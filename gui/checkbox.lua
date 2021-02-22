@@ -211,6 +211,7 @@ function checkbox:new(n, p)
 	end
 	
 	function c:fadeIn()
+		if self.beforeFadeIn then self:beforeFadeIn() end
 		self:animateToOpacity(1)
 		self.hidden = false
 		self.faded = false
@@ -218,6 +219,7 @@ function checkbox:new(n, p)
 	end
 	
 	function c:fadeOut(p)
+		if self.beforeFadeOut then self:beforeFadeOut() end
 		if p then self.faded = true end
 		self:animateToOpacity(0)
 		if self.onFadeOut then self:onFadeOut() end
@@ -293,6 +295,12 @@ function checkbox:new(n, p)
 						self.color[4] = max(self.opacityToAnimateTo, self.color[4] - (self.opacityAnimateSpeed * dt))
 					end
 					atProperOpacity = false
+				else
+					if self.color[4] == 1 then
+						if self.afterFadeIn then self:afterFadeIn() end
+					elseif self.color[4] == 0 then
+						if self.afterFadeOut then self:afterFadeOut() end
+					end
 				end
 			end
 			

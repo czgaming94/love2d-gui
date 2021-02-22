@@ -218,6 +218,7 @@ function box:new(n, p)
 	end
 	
 	function b:fadeOut(p)
+		if self.beforeFadeOut then self:beforeFadeOut() end
 		if p then self.faded = true end
 		self:animateToOpacity(0)
 		if self.onFadeOut then self:onFadeOut() end
@@ -342,6 +343,12 @@ function box:new(n, p)
 						self.color[4] = max(self.opacityToAnimateTo, self.color[4] - (self.opacityAnimateSpeed * dt))
 					end
 					atProperOpacity = false
+				else
+					if self.color[4] == 1 then
+						if self.afterFadeIn then self:afterFadeIn() end
+					elseif self.color[4] == 0 then
+						if self.afterFadeOut then self:afterFadeOut() end
+					end
 				end
 			end
 			
