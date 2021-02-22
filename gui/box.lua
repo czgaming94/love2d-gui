@@ -10,7 +10,7 @@ function box:new(n, p)
 	if not self.guis[p.id] then self.guis[p.id] = p end
 	b.name = n
 	b.id = #self.items + 1
-	b.parent = p.id
+	if p and p.id then b.parent = p.id else b.parent = nil end
 	b.w = 0
 	b.h = 0
 	b.pos = {
@@ -177,15 +177,17 @@ function box:new(n, p)
 		
 		lg.setColor(1,1,1,1)
 		if self.border then
-			if box.guis[self.parent].use255 then
-				lg.setColor(love.math.colorFromBytes(self.borderColor))
+			if self.parent then
+				if box.guis[self.parent].use255 then
+					lg.setColor(love.math.colorFromBytes(self.borderColor))
+				end
 			else
 				lg.setColor(self.borderColor)
 			end
 			lg.rectangle("line", self.pos.x - 1, self.pos.y - 1, self.paddingLeft + self.w + self.paddingRight + 2, self.paddingTop + self.h + self.paddingBottom + 2)
 		end
 		
-		if box.guis[self.parent].use255 then
+		if self.parent and box.guis[self.parent].use255 then
 			lg.setColor(love.math.colorFromBytes(self.color))
 		else
 			lg.setColor(self.color)
@@ -234,7 +236,11 @@ function box:new(n, p)
 	function b:setImage(i)
 		assert(i, "FAILURE: box:setImage() :: Missing param[img]")
 		assert(type(i) == "string", "FAILURE: box:setImage() :: Incorrect param[img] - expecting string and got " .. type(i))
-		self.image = self.images[i] or box.guis[self.parent].images[i]
+		if self.parent then
+			self.image = self.images[i] or box.guis[self.parent].images[i]
+		else
+			self.image = i or self.images[i]
+		end
 	end
 	
 	function b:getImage()

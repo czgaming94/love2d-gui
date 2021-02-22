@@ -14,11 +14,11 @@ text.guis = {}
 
 function text:new(n, p)
 	local t = {}
-	if not self.guis[p.id] then self.guis[p.id] = p end
+	if p and p.id and not self.guis[p.id] then self.guis[p.id] = p end
 	
 	t.name = n
 	t.id = #self.items + 1
-	t.parent = p.id
+	if p and p.id then t.parent = p.id else t.parent = nil end
 	t.text = ""
 	t.w = 0
 	t.h = 0
@@ -133,18 +133,15 @@ function text:new(n, p)
 		assert(type(d.x) == "number", "FAILURE: text:setData() :: Incorrect param[x] - expecting number and got " .. type(d.x))
 		assert(d.y, "FAILURE: text:setData() :: Missing param[data['y']")
 		assert(type(d.y) == "number", "FAILURE: text:setData() :: Incorrect param[y] - expecting number and got " .. type(d.y))
-		self.w = d.w or self.w
-		self.h = d.h or self.h
+		self.w = d.w or d.width or self.w
+		self.h = d.h or d.height or self.h
 		self.text = d.t or d.text or self.text
 		self.typewriterText, self.fancy = text:split(self.text)
-		self.typewriter = d.typewriter or self.typewriter
+		self.typewriter = d.tw and d.tw or d.typewriter and d.typewriter or self.typewriter
 		self.pos.x = d.x or self.pos.x
 		self.pos.y = d.y or self.pos.y
+		self.typewriterSpeed = d.s or d.speed or self.typewriterSpeed
 		self.pos.z = d.z or self.pos.z
-		self.background = d.useBackground and d.useBackground or self.background
-		self.border = d.useBorder and d.useBorder or self.border
-		self.backgroundColor = d.backgroundColor or self.backgroundColor
-		self.borderColor = d.borderColor or self.borderColor
 		self.color = d.color or self.color
 		self.font = d.font or self.font
 		self.clickable = d.clickable and d.clickable or self.clickable
@@ -166,7 +163,11 @@ function text:new(n, p)
 						lg.push()
 						
 						if v.color ~= "white" then
-							lg.setColor(text.guis[self.parent].color(v.color))
+							if self.parent then
+								lg.setColor(text.guis[self.parent].color(v.color))
+							else
+								lg.setColor(v.color)
+							end
 						end
 						if v.font ~= "default" then
 							lg.setColor(v.font)
@@ -182,7 +183,7 @@ function text:new(n, p)
 							else
 								v.x = self.typewriterText[k - 1].x + lg.getFont():getWidth(v.fullText)
 								
-								if v.x > self.pos.x + (self.width - lg.getFont():getWidth(v.fullText)) then
+								if self.width > 0 and v.x > self.pos.x + (self.width - lg.getFont():getWidth(v.fullText)) then
 									v.x = self.pos.x
 									v.y = self.typewriterText[k - 1].y + lg.getFont():getHeight(v.fullText) 
 								end
@@ -239,6 +240,16 @@ function text:new(n, p)
 	
 	function t:isHovered()
 		return self.hovered
+	end
+	
+	function t:setTypewriterSpeed(s)
+		assert(s, "FAILURE: text:setTypewriterSpeed() :: Missing param[speed]")
+		assert(type(s) == "number", "FAILURE: text:setTypewriterSpeed() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		self.typewriterSpeed = n
+	end
+	
+	function t:getTypewriterSpeed()
+		return self.typewriterSpeed
 	end
 	
 	function t:startAnimation()
@@ -381,16 +392,6 @@ function text:new(n, p)
 		self.typewriterPaused = false
 	end
 	
-	function t:setUseBorder(uB)
-		assert(uB ~= nil, "FAILURE: text:setUseBorder() :: Missing param[useBorder]")
-		assert(type(uB) == "boolean", "FAILURE: text:setUseBorder() :: Incorrect param[useBorder] - expecting boolean and got " .. type(uB))
-		self.border = uB
-	end
-	
-	function t:getUseBorder()
-		return self.border
-	end
-	
 	function t:setText(txt)
 		assert(txt ~= nil, "FAILURE: text:setText() :: Missing param[text]")
 		assert(type(txt) == "string", "FAILURE: text:setText() :: Incorrect param[text] - expecting boolean and got " .. type(txt))
@@ -442,8 +443,8 @@ function text:new(n, p)
 		return self.pos.z
 	end
 	
-	function t.lerp(t1,t2,t)
-		return (1 - t) * t1 + t * t2
+	function t.lerp(e,s,c)
+		return (1 - c) * e + c * s
 	end
 	
 	return t
@@ -489,11 +490,11 @@ function text:split(s)
 					end
 				end
 				t[id].fullText = b:gsub("^.-}",""):gsub("{",""):gsub("^%s*(.-)%s*$","%1")
-				for i in t[id].fullText:gmatch(".") do
-					t[id].text[#t[id].text + 1] = i
-				end
 			else
-				t[id] = { text = b:gsub("{", "")}
+				t[id].fullText = b:gsub("{", "")
+			end
+			for i in t[id].fullText:gmatch(".") do
+				t[id].text[#t[id].text + 1] = i
 			end
 		end
 	else
