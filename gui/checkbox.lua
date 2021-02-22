@@ -27,7 +27,9 @@ function checkbox:new(n, p)
 	c.clicked = false
 	c.clickable = true
 	c.faded = false
+	c.fadedByFunc = false
 	c.hidden = false
+	c.vertical = false
 	c.paddingLeft = 0
 	c.paddingRight = 0
 	c.paddingTop = 0
@@ -159,14 +161,14 @@ function checkbox:new(n, p)
 				self.options = {}
 			end
 			for k,v in ipairs(d.options) do
-				local id #self.options + 1
 				if k == 1 then
-					self.options[id] = {text = v, x = self.pos.x + self.font:getWidth(v), y = self.pos.y}
+					self.options[k] = {text = v, x = self.pos.x + self.font:getWidth(v), y = self.pos.y}
 				else
-					self.options[id] = {text = v, x = self.pos.x + self.font:getWidth(v), y = self.pos.y}
+					self.options[k] = {text = v, x = self.pos.x + self.font:getWidth(v), y = self.pos.y}
 					if d.verticalOptions then
-						self.options[id].x = self.pos.x
-						self.options[id].y = self.options[id - 1].y + self.font:getHeight(v)
+						self.vertical = true
+						self.options[k].x = self.pos.x
+						self.options[k].y = self.options[k - 1].y + self.font:getHeight(v)
 					end
 				end
 			end
@@ -215,12 +217,14 @@ function checkbox:new(n, p)
 		self:animateToOpacity(1)
 		self.hidden = false
 		self.faded = false
+		self.fadedByFunc = true
 		if self.onFadeIn then self:onFadeIn() end
 	end
 	
 	function c:fadeOut(p)
 		if self.beforeFadeOut then self:beforeFadeOut() end
 		if p then self.faded = true end
+		self.fadedByFunc = true
 		self:animateToOpacity(0)
 		if self.onFadeOut then self:onFadeOut() end
 	end
@@ -296,10 +300,13 @@ function checkbox:new(n, p)
 					end
 					atProperOpacity = false
 				else
-					if self.color[4] == 1 then
-						if self.afterFadeIn then self:afterFadeIn() end
-					elseif self.color[4] == 0 then
-						if self.afterFadeOut then self:afterFadeOut() end
+					if self.fadedByFunc then
+						if self.color[4] == 1 then
+							if self.afterFadeIn then self:afterFadeIn() end
+						elseif self.color[4] == 0 then
+							if self.afterFadeOut then self:afterFadeOut() end
+						end
+						self.fadedByFunc = false
 					end
 				end
 			end
@@ -335,6 +342,19 @@ function checkbox:new(n, p)
 	
 	function c:getOpacity()
 		return self.color[4]
+	end
+	
+	function c:addOption(o)
+		assert(o, "FAILURE: checkbox:addOption() :: Missing param[option]")
+		assert(type(o) == "string", "FAILURE: checkbox:addOption() :: Incorrect param[option] - expecting string and got " .. type(o))
+		local x,y
+		
+		if self.vertical then
+			x,y = self.pos.x, self.pos.y + self.font:getHeight(o)
+		else
+			x,y = self.options[#self.options].x + self.font:getWidth(o), self.pos.y
+		end
+		self.options[#self.options + 1] = {text = o, x = x, y = y}
 	end
 	
 	function c:setX(x)

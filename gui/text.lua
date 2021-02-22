@@ -35,6 +35,7 @@ function text:new(n, p)
 	t.clicked = false
 	t.clickable = true
 	t.faded = false
+	t.fadedByFunc = false
 	t.fancy = false
 	t.typewriter = false
 	t.typewriterPrint = ""
@@ -215,6 +216,7 @@ function text:new(n, p)
 		if self.beforeFadeOut then self:beforeFadeOut() end
 		self:animateToOpacity(1)
 		self.hidden = false
+		self.fadedByFunc = true
 		self.faded = false
 		if self.onFadeIn then self:onFadeIn() end
 	end
@@ -222,6 +224,7 @@ function text:new(n, p)
 	function t:fadeOut(p)
 		if self.beforeFadeOut then self:beforeFadeOut() end
 		if p then self.faded = true end
+		self.fadedByFunc = true
 		self:animateToOpacity(0)
 		if self.onFadeOut then self:onFadeOut() end
 	end
@@ -350,10 +353,13 @@ function text:new(n, p)
 					end
 					atProperOpacity = false
 				else
-					if self.color[4] == 1 then
-						if self.afterFadeIn then self:afterFadeIn() end
-					elseif self.color[4] == 0 then
-						if self.afterFadeOut then self:afterFadeOut() end
+					if self.fadedByFunc then
+						if self.color[4] == 1 then
+							if self.afterFadeIn then self:afterFadeIn() end
+						elseif self.color[4] == 0 then
+							if self.afterFadeOut then self:afterFadeOut() end
+						end
+						self.fadedByFunc = false
 					end
 				end
 			end

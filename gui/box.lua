@@ -25,6 +25,7 @@ function box:new(n, p)
 	b.clicked = false
 	b.clickable = true
 	b.faded = false
+	b.fadedByFunc = false
 	b.hidden = false
 	b.images = {}
 	b.image = nil
@@ -214,12 +215,14 @@ function box:new(n, p)
 		self:animateToOpacity(1)
 		self.hidden = false
 		self.faded = false
+		self.fadedByFunc = true
 		if self.onFadeIn then self:onFadeIn() end
 	end
 	
 	function b:fadeOut(p)
 		if self.beforeFadeOut then self:beforeFadeOut() end
 		if p then self.faded = true end
+		self.fadedByFunc = true
 		self:animateToOpacity(0)
 		if self.onFadeOut then self:onFadeOut() end
 	end
@@ -344,10 +347,13 @@ function box:new(n, p)
 					end
 					atProperOpacity = false
 				else
-					if self.color[4] == 1 then
-						if self.afterFadeIn then self:afterFadeIn() end
-					elseif self.color[4] == 0 then
-						if self.afterFadeOut then self:afterFadeOut() end
+					if self.fadedByFunc then
+						if self.color[4] == 1 then
+							if self.afterFadeIn then self:afterFadeIn() end
+						elseif self.color[4] == 0 then
+							if self.afterFadeOut then self:afterFadeOut() end
+						end
+						self.fadedByFunc = false
 					end
 				end
 			end
