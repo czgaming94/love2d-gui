@@ -22,13 +22,18 @@ function checkbox:new(n, p)
 	c.border = false
 	c.borderColor = {1,1,1,1}
 	c.color = {1,1,1,1}
+	c.overlayColor = {1,1,1,.5}
 	c.hovered = false
 	c.clicked = false
 	c.clickable = true
 	c.faded = false
 	c.hidden = false
+	c.paddingLeft = 0
+	c.paddingRight = 0
+	c.paddingTop = 0
+	c.paddingBottom = 0
 	c.options = {}
-	c.selected = 0
+	c.selected = {}
 	c.font = lg.getFont()
 	c.inAnimation = false
 	c.animateColor = false
@@ -57,6 +62,19 @@ function checkbox:new(n, p)
 		self.colorAnimateTime = lt.getTime()
 		self.inAnimation = true
 		self.animateColor = true
+	end
+	
+	function c:animateBorderToColor(t, s)
+		assert(t, "FAILURE: checkbox:animateBorderToColor() :: Missing param[color]")
+		assert(type(t) == "table", "FAILURE: checkbox:animateBorderToColor() :: Incorrect param[color] - expecting table and got " .. type(t))
+		assert(#t > 2, "FAILURE: checkbox:animateBorderToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #t)
+		s = s or 2
+		assert(type(s) == "number", "FAILURE: checkbox:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		self.borderColorToAnimateTo = t
+		self.borderColorAnimateSpeed = s
+		self.borderColorAnimateTime = lt.getTime()
+		self.inAnimation = true
+		self.animateBorderColor = true
 	end
 	
 	function c:animateToPosition(x, y, s)
@@ -89,6 +107,17 @@ function checkbox:new(n, p)
 	
 	function c:isAnimating()
 		return self.inAnimation
+	end
+	
+	function c:setBorderColor(bC)
+		assert(bC, "FAILURE: checkbox:setBorderColor() :: Missing param[color]")
+		assert(type(bC) == "table", "FAILURE: checkbox:setBorderColor() :: Incorrect param[color] - expecting table and got " .. type(bC))
+		assert(#bC == 4, "FAILURE: checkbox:setBorderColor() :: Incorrect param[color] - table length 4 expected and got " .. #bC)
+		self.borderColor = bC
+	end
+	
+	function c:getBorderColor()
+		return self.borderColor
 	end
 	
 	function c:setClickable(t)
@@ -129,8 +158,17 @@ function checkbox:new(n, p)
 			if not d.keepOptions then
 				self.options = {}
 			end
-			for _,v in ipairs(d.options) do
-				self.options[#self.options + 1] = v
+			for k,v in ipairs(d.options) do
+				local id #self.options + 1
+				if k == 1 then
+					self.options[id] = {text = v, x = self.pos.x + self.font:getWidth(v), y = self.pos.y}
+				else
+					self.options[id] = {text = v, x = self.pos.x + self.font:getWidth(v), y = self.pos.y}
+					if d.verticalOptions then
+						self.options[id].x = self.pos.x
+						self.options[id].y = self.options[id - 1].y + self.font:getHeight(v)
+					end
+				end
 			end
 		end
 	end
@@ -140,7 +178,32 @@ function checkbox:new(n, p)
 	end
 	
 	function c:draw()
-	
+		lg.setColor(1,1,1,1)
+		lg.setFont(self.font)
+		for k,v in ipairs(self.options) do
+			lg.push()
+			if self.border then
+				if self.parent and checkbox.guis[self.parent].use255 then
+					lg.setColor(love.math.colorFromBytes(self.borderColor))
+				else
+					lg.setColor(self.borderColor)
+				end
+				lg.rectangle("line", v.x - 1, v.y - 1, v.w + 2, v.h + 2)
+			end
+			if self.parent and box.guis[self.parent].use255 then
+				lg.setColor(love.math.colorFromBytes(self.color))
+			else
+				lg.setColor(self.color)
+			end
+			lg.rectangle("fill", v.x, v.y, v.w, v.h)
+			for _,i in ipairs(self.selected) do
+				lg.setColor(self.overlayColor)
+				lg.rectangle("fill", v.x, v.y, v.w, v.h)
+				lg.setColor(self.color)
+			end
+			lg.print(v.text, v.x + self.paddingRight, v.y)
+			lg.pop()
+		end
 	end
 	
 	function c:enable()
@@ -176,6 +239,21 @@ function checkbox:new(n, p)
 	
 	function c:stopAnimation()
 		self.inAnimation = false
+	end
+	
+	function c:mousepressed(button)
+		local x,y = love.mouse.getPosition()
+		if button == 1 then
+			for k,v in ipairs(self.options) do
+				if x >= v.x and x <= v.x + self.font:getWidth(v.text) and y >= v.y and y <= v.y + self.font:getHeight(v.text) then
+					if self.selected[k] then
+						self.selected[k] = nil
+					else
+						self.selected[k] = v
+					end
+				end
+			end
+		end
 	end
 	
 	function c:update(dt)

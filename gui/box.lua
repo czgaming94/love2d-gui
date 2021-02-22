@@ -125,6 +125,10 @@ function box:new(n, p)
 		self.borderColor = bC
 	end
 	
+	function b:getBorderColor()
+		return self.borderColor
+	end
+	
 	function b:setClickable(c)
 		assert(c ~= nil, "FAILURE: box:setClickable() :: Missing param[clickable]")
 		assert(type(c) == "boolean", "FAILURE: box:setClickable() :: Incorrect param[clickable] - expecting boolean and got " .. type(c))
@@ -198,7 +202,6 @@ function box:new(n, p)
 		else
 			lg.rectangle("fill", self.pos.x, self.pos.y, self.w, self.h)
 		end
-		lg.setColor(1,1,1,1)
 		lg.pop()
 	end
 	
@@ -207,6 +210,7 @@ function box:new(n, p)
 	end
 	
 	function b:fadeIn()
+		if self.beforeFadeIn then self:beforeFadeIn() end
 		self:animateToOpacity(1)
 		self.hidden = false
 		self.faded = false
