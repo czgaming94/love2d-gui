@@ -241,9 +241,8 @@ function gui:mousepressed(button)
 				(y >= i.pos.y + i.paddingTop and y <= (i.pos.y + i.h) - i.paddingBottom) then
 					if not hitTarget then 
 						if i.clickable then
-							if i.onClick then
-								i:onClick(button)
-							end
+							if i.mousepressed then i:mousepressed(button) end
+							if i.onClick then i:onClick(button) end
 							hitTarget = true
 						end
 					end
