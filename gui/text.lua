@@ -37,6 +37,10 @@ function text:new(n, p)
 	t.faded = false
 	t.fadedByFunc = false
 	t.fancy = false
+	t.paddingLeft = 0
+	t.paddingRight = 0
+	t.paddingTop = 0
+	t.paddingBottom = 0
 	t.typewriter = false
 	t.typewriterPrint = ""
 	t.typewriterText = self:split(t.text)
@@ -63,12 +67,12 @@ function text:new(n, p)
 	t.opacityAnimateTime = lt.getTime()
 	
 	function t:animateToColor(c, s)
-		assert(c, error("[" .. self.name .. "] FAILURE: text:animateToColor() :: Missing param[color]"), 3)
-		assert(type(c) == "table", error("[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[color] - expecting table and got " .. type(c)), 3)
-		assert(#c == 4, error("[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #c), 3)
+		assert(c, "[" .. self.name .. "] FAILURE: text:animateToColor() :: Missing param[color]")
+		assert(type(c) == "table", "[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
+		assert(#c == 4, "[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
 		s = s or 2
-		assert(s, error("[" .. self.name .. "] FAILURE: text:animateToColor() :: Missing param[speed]"), 3)
-		assert(type(s) == "number", error("[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s)), 3)
+		assert(s, "[" .. self.name .. "] FAILURE: text:animateToColor() :: Missing param[speed]")
+		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		self.colorToAnimateTo = c
 		self.colorAnimateSpeed = s
 		self.colorAnimateTime = lt.getTime()
@@ -77,12 +81,12 @@ function text:new(n, p)
 	end
 	
 	function t:animateToPosition(x, y, s)
-		assert(x, error("[" .. self.name .. "] FAILURE: text:animateToPosition() :: Missing param[x]")
-		assert(type(x) == "number", error("[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[x] - expecting number and got " .. type(x))
-		assert(y, error("[" .. self.name .. "] FAILURE: text:animateToPosition() :: Missing param[y]")
-		assert(type(y) == "number", error("[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
+		assert(x, "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Missing param[x]")
+		assert(type(x) == "number", "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[x] - expecting number and got " .. type(x))
+		assert(y, "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Missing param[y]")
+		assert(type(y) == "number", "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
 		s = s or 2
-		assert(type(s) == "number", error("[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
 		self.positionToAnimateTo = {x = x, y = y}
 		self.positionAnimateDrag = s
@@ -92,11 +96,11 @@ function text:new(n, p)
 	end
 	
 	function t:animateToOpacity(o, s)
-		assert(o, error("[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Missing param[o]"), 3)
-		assert(type(o) == "number", error("[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o)), 3)
+		assert(o, "[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Missing param[o]")
+		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 		s = s or 1
-		assert(s, error("[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Missing param[speed]"), 3)
-		assert(type(s) == "number", error("[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s)), 3)
+		assert(s, "[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Missing param[speed]")
+		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		self.opacityToAnimateTo = o
 		self.opacityAnimateTime = lt.getTime()
 		self.opacityAnimateSpeed = s
@@ -109,8 +113,8 @@ function text:new(n, p)
 	end
 	
 	function t:setClickable(c)
-		assert(c ~= nil, error("[" .. self.name .. "] FAILURE: text:setClickable() :: Missing param[clickable]"), 3)
-		assert(type(c) == "boolean", error("[" .. self.name .. "] FAILURE: text:setClickable() :: Incorrect param[clickable] - expecting boolean and got " .. type(c)), 3)
+		assert(c ~= nil, "[" .. self.name .. "] FAILURE: text:setClickable() :: Missing param[clickable]")
+		assert(type(c) == "boolean", "[" .. self.name .. "] FAILURE: text:setClickable() :: Incorrect param[clickable] - expecting boolean and got " .. type(c))
 		self.clickable = c
 	end
 	
@@ -119,25 +123,25 @@ function text:new(n, p)
 	end
 	
 	function t:setColor(c)
-		assert(c, error("[" .. self.name .. "] FAILURE: text:setColor() :: Missing param[color]"), 3)
-		assert(type(c) == "table", error("[" .. self.name .. "] FAILURE: text:setColor() :: Incorrect param[color] - expecting table and got " .. type(c)), 3)
-		assert(#c == 4, error("[" .. self.name .. "] FAILURE: text:setColor() :: Incorrect param[color] - table length 4 expected and got " .. #c), 3)
+		assert(c, "[" .. self.name .. "] FAILURE: text:setColor() :: Missing param[color]")
+		assert(type(c) == "table", "[" .. self.name .. "] FAILURE: text:setColor() :: Incorrect param[color] - expecting table and got " .. type(c))
+		assert(#c == 4, "[" .. self.name .. "] FAILURE: text:setColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
 		self.color = c
 	end
 	
-	function b:getColor()
+	function t:getColor()
 		return self.color
 	end
 	
 	function t:setData(d)
-		assert(d, error("[" .. self.name .. "] FAILURE: text:setData() :: Missing param[data]"), 3)
-		assert(type(d) == "table", error("[" .. self.name .. "] FAILURE: text:setData() :: Incorrect param[data] - expecting table and got " .. type(d)), 3)
-		assert(d.t or d.text, error("[" .. self.name .. "] FAILURE: text:setData() :: Missing param[data['text']"), 3)
-		assert(type(d.text) == "string", error("[" .. self.name .. "] FAILURE: text:setData() :: Incorrect param[text] - expecting string and got " .. type(d.text)), 3)
-		assert(d.x, error("[" .. self.name .. "] FAILURE: text:setData() :: Missing param[data['x']"), 3)
-		assert(type(d.x) == "number", error("[" .. self.name .. "] FAILURE: text:setData() :: Incorrect param[x] - expecting number and got " .. type(d.x)), 3)
-		assert(d.y, error("[" .. self.name .. "] FAILURE: text:setData() :: Missing param[data['y']"), 3)
-		assert(type(d.y) == "number", error("[" .. self.name .. "] FAILURE: text:setData() :: Incorrect param[y] - expecting number and got " .. type(d.y)), 3)
+		assert(d, "[" .. self.name .. "] FAILURE: text:setData() :: Missing param[data]")
+		assert(type(d) == "table", "[" .. self.name .. "] FAILURE: text:setData() :: Incorrect param[data] - expecting table and got " .. type(d))
+		assert(d.t or d.text, "[" .. self.name .. "] FAILURE: text:setData() :: Missing param[data['text']")
+		assert(type(d.text) == "string", "[" .. self.name .. "] FAILURE: text:setData() :: Incorrect param[text] - expecting string and got " .. type(d.text))
+		assert(d.x, "[" .. self.name .. "] FAILURE: text:setData() :: Missing param[data['x']")
+		assert(type(d.x) == "number", "[" .. self.name .. "] FAILURE: text:setData() :: Incorrect param[x] - expecting number and got " .. type(d.x))
+		assert(d.y, "[" .. self.name .. "] FAILURE: text:setData() :: Missing param[data['y']")
+		assert(type(d.y) == "number", "[" .. self.name .. "] FAILURE: text:setData() :: Incorrect param[y] - expecting number and got " .. type(d.y))
 		self.w = d.w or d.width or self.w
 		self.h = d.h or d.height or self.h
 		self.text = d.t or d.text or self.text
@@ -234,16 +238,16 @@ function text:new(n, p)
 	end
 	
 	function t:addFont(f, n)
-		assert(f, error("[" .. self.name .. "] FAILURE: text:addFont() :: Missing param[font]"), 3)
-		assert(type(f) == "userdata", error("[" .. self.name .. "] FAILURE: text:addFont() :: Incorrect param[font] - expecting font userdata and got " .. type(f)), 3)
-		assert(n, error("[" .. self.name .. "] FAILURE: text:addFont() :: Missing param[name]"), 3)
-		assert(type(n) == "string", error("[" .. self.name .. "] FAILURE: text:addFont() :: Incorrect param[name] - expecting string and got " .. type(n)), 3)
+		assert(f, "[" .. self.name .. "] FAILURE: text:addFont() :: Missing param[font]")
+		assert(type(f) == "userdata", "[" .. self.name .. "] FAILURE: text:addFont() :: Incorrect param[font] - expecting font userdata and got " .. type(f))
+		assert(n, "[" .. self.name .. "] FAILURE: text:addFont() :: Missing param[name]")
+		assert(type(n) == "string", "[" .. self.name .. "] FAILURE: text:addFont() :: Incorrect param[name] - expecting string and got " .. type(n))
 		self.fonts[n] = f
 	end
 	
 	function t:setFont(n)
-		assert(n, error("[" .. self.name .. "] FAILURE: text:setFont() :: Missing param[name]"), 3)
-		assert(type(n) == "string", error("[" .. self.name .. "] FAILURE: text:setFont() :: Incorrect param[name] - expecting string and got " .. type(n)), 3)
+		assert(n, "[" .. self.name .. "] FAILURE: text:setFont() :: Missing param[name]")
+		assert(type(n) == "string", "[" .. self.name .. "] FAILURE: text:setFont() :: Incorrect param[name] - expecting string and got " .. type(n))
 		self.font = self.fonts[n]
 	end
 	
@@ -252,8 +256,8 @@ function text:new(n, p)
 	end
 	
 	function t:setTypewriterSpeed(s)
-		assert(s, error("[" .. self.name .. "] FAILURE: text:setTypewriterSpeed() :: Missing param[speed]"), 3)
-		assert(type(s) == "number", error("[" .. self.name .. "] FAILURE: text:setTypewriterSpeed() :: Incorrect param[speed] - expecting number and got " .. type(s)), 3)
+		assert(s, "[" .. self.name .. "] FAILURE: text:setTypewriterSpeed() :: Missing param[speed]")
+		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:setTypewriterSpeed() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		self.typewriterSpeed = n
 	end
 	
@@ -298,7 +302,7 @@ function text:new(n, p)
 							while v.timeWaited >= v.time and v.textPos <= #v.text do
 								v.timeWaited = v.timeWaited - v.time
 								v.toShow = v.toShow .. v.text[v.textPos]
-								v.textPos = v.textPos = 1
+								v.textPos = v.textPos + 1
 							end
 							if v.textPos >= #v.text then
 								v.finished = true
@@ -392,8 +396,8 @@ function text:new(n, p)
 	end
 	
 	function t:setOpacity(o)
-		assert(o, error("[" .. self.name .. "] FAILURE: text:setUseBorder() :: Missing param[opacity]"), 3)
-		assert(type(o) == "number", error("[" .. self.name .. "] FAILURE: text:setUseBorder() :: Incorrect param[opacity] - expecting number and got " .. type(o)), 3)
+		assert(o, "[" .. self.name .. "] FAILURE: text:setUseBorder() :: Missing param[opacity]")
+		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: text:setUseBorder() :: Incorrect param[opacity] - expecting number and got " .. type(o))
 		self.color[4] = o
 	end
 	
@@ -411,8 +415,8 @@ function text:new(n, p)
 	end
 	
 	function t:setText(txt)
-		assert(txt ~= nil, error("[" .. self.name .. "] FAILURE: text:setText() :: Missing param[text]"), 3)
-		assert(type(txt) == "string", error("[" .. self.name .. "] FAILURE: text:setText() :: Incorrect param[text] - expecting boolean and got " .. type(txt)), 3)
+		assert(txt ~= nil, "[" .. self.name .. "] FAILURE: text:setText() :: Missing param[text]")
+		assert(type(txt) == "string", "[" .. self.name .. "] FAILURE: text:setText() :: Incorrect param[text] - expecting boolean and got " .. type(txt))
 		self.text = text
 		self.typewriterText, self.fancy = text:split(txt)
 	end
@@ -422,8 +426,8 @@ function text:new(n, p)
 	end
 	
 	function t:setAsTypewriter(aT)
-		assert(aT ~= nil, error("[" .. self.name .. "] FAILURE: text:setAsTypewriter() :: Missing param[useBorder]"), 3)
-		assert(type(aT) == "boolean", error("[" .. self.name .. "] FAILURE: text:setAsTypewriter() :: Incorrect param[useBorder] - expecting boolean and got " .. type(aT)), 3)
+		assert(aT ~= nil, "[" .. self.name .. "] FAILURE: text:setAsTypewriter() :: Missing param[useBorder]")
+		assert(type(aT) == "boolean", "[" .. self.name .. "] FAILURE: text:setAsTypewriter() :: Incorrect param[useBorder] - expecting boolean and got " .. type(aT))
 		self.typewriter = aT
 	end
 	
@@ -432,8 +436,8 @@ function text:new(n, p)
 	end
 	
 	function t:setX(x)
-		assert(x, error("[" .. self.name .. "] FAILURE: text:setX() :: Missing param[x]"), 3)
-		assert(type(x) == "number", error("[" .. self.name .. "] FAILURE: text:setX() :: Incorrect param[x] - expecting number and got " .. type(x)), 3)
+		assert(x, "[" .. self.name .. "] FAILURE: text:setX() :: Missing param[x]")
+		assert(type(x) == "number", "[" .. self.name .. "] FAILURE: text:setX() :: Incorrect param[x] - expecting number and got " .. type(x))
 		self.pos.x = x
 	end
 	
@@ -442,8 +446,8 @@ function text:new(n, p)
 	end
 	
 	function t:setY(y)
-		assert(y, error("[" .. self.name .. "] FAILURE: text:setY() :: Missing param[y]"), 3)
-		assert(type(y) == "number", error("[" .. self.name .. "] FAILURE: text:setY() :: Incorrect param[y] - expecting number and got " .. type(y)), 3)
+		assert(y, "[" .. self.name .. "] FAILURE: text:setY() :: Missing param[y]")
+		assert(type(y) == "number", "[" .. self.name .. "] FAILURE: text:setY() :: Incorrect param[y] - expecting number and got " .. type(y))
 		self.pos.y = y
 	end
 	
@@ -452,8 +456,8 @@ function text:new(n, p)
 	end
 	
 	function t:setZ(z)
-		assert(z, error("[" .. self.name .. "] FAILURE: text:setZ() :: Missing param[z]"), 3)
-		assert(type(z) == "number", error("[" .. self.name .. "] FAILURE: text:setZ() :: Incorrect param[z] - expecting number and got " .. type(z)), 3)
+		assert(z, "[" .. self.name .. "] FAILURE: text:setZ() :: Missing param[z]")
+		assert(type(z) == "number", "[" .. self.name .. "] FAILURE: text:setZ() :: Incorrect param[z] - expecting number and got " .. type(z))
 		self.pos.z = z
 	end
 	

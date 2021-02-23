@@ -64,9 +64,9 @@ function love.load()
 	-- Clicks will pass through this object.
 	myBox:setClickable(false)
 	
-	myBox2:setData({w = 50, h = lg.getHeight(), x = 1, y = 0, color = colors("green"), useBorder = true, borderColor = colors("yellow")})
+	myBox2:setData({w = 50, h = lg.getHeight(), x = 1, y = 0, color = colors("green"), useBorder = true, borderColor = colors("black")})
 	myBox3:setData({w = 225, h = 65, x = 105, y = 485, color = colors("alphaRed"), useBorder = false})
-	myText:setData({x = 110, y = 490, z = 2, color = colors("green"), text = "Hello World!"})
+	myText:setData({x = 110, y = 490, z = 2, color = colors("yellow"), text = "Hello World!"})
 	myBox4:setData({w = 50, h = 250, x = 105, y = 200, color = colors("purple"), useBorder = true, borderColor = colors("blue")})
 	
 	
@@ -76,12 +76,13 @@ function love.load()
 	-- You can define onClick callbacks for your GUI elements
 	function myBox2:onClick(button)
 		print("Hello! I clicked.")
+		self:animateBorderToColor(colors("blue"))
 	end
 	
 	-- You can define onHoverEnter callbacks for your GUI elements
 	function myBox3:onHoverEnter()
 		-- You can animate your objects to a new color
-		myBox3:animateToColor(colors("white"))
+		self:animateToColor(colors("white"))
 	end
 	
 	function myBox4:onHoverEnter()
@@ -89,22 +90,22 @@ function love.load()
 		-- x
 		-- y
 		-- speed
-		myBox4:animateToPosition(150, 64, 1)
+		self:animateToPosition(150, 64, 1)
 	end
 	
 	function myBox4:onHoverExit()
-		myBox4:stopAnimation()
+		self:stopAnimation()
 	end
 	
 	-- You can define onHoverExit callbacks for your GUI elements
 	function myBox3:onHoverExit()
-		myBox3:animateToColor(colors("red"))
+		self:animateToColor(colors("red"))
 	end
 	
 	function myBox3:onClick()
 		-- You can make an object fade in or out, and also disable the object by using (true)
 		-- :fadeIn() will automatically restore an object to update status
-		myBox3:fadeOut(true)
+		self:fadeOut(true)
 	end
 	
 	-- You can define onFadeOut callbacks for your GUI elements

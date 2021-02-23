@@ -25,9 +25,9 @@ gui.use255 = false
 gui.images = {}
 
 function gui.color(c)
-	assert(c, "GUI[" .. self.id .. "] FAILURE: gui:color() :: Missing param[name]")
-	assert(type(c) == "string", "GUI[" .. self.id .. "] FAILURE: gui:color() :: Incorrect param[name] - expecting string and got " .. type(c))
-	return gui:generate(colors[c])
+	assert(c, "FAILURE: gui:color() :: Missing param[name]")
+	assert(type(c) == "string", "FAILURE: gui:color() :: Incorrect param[name] - expecting string and got " .. type(c))
+	return gui:copy(colors[c])
 end
 
 function gui:new(item)
@@ -79,19 +79,19 @@ function gui:generate(item, copies, skip)
 end
 
 function gui:setUse255(u)
-	assert(u ~= nil, "GUI[" .. self.id .. "] FAILURE: gui:setUse255() :: Missing param[use255]")
-	assert(type(o) == "boolean", "GUI[" .. self.id .. "] FAILURE: gui:setUse255() :: Incorrect param[use255] - expecting boolean and got " .. type(o))
+	assert(u ~= nil, "FAILURE: gui:setUse255() :: Missing param[use255]")
+	assert(type(o) == "boolean", "FAILURE: gui:setUse255() :: Incorrect param[use255] - expecting boolean and got " .. type(o))
 	self.use255 = u
 end
 
 function gui:animateToColor(o, c, s)
-	assert(o, "GUI[" .. self.id .. "] FAILURE: gui:animateToColor() :: Missing param[object]")
-	assert(type(o) == "table", "GUI[" .. self.id .. "] FAILURE: gui:animateToColor() :: Incorrect param[object] - expecting table and got " .. type(o))
-	assert(c, "GUI[" .. self.id .. "] FAILURE: gui:animateToColor() :: Missing param[color]")
-	assert(type(c) == "table", "GUI[" .. self.id .. "] FAILURE: gui:animateToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
-	assert(#c > 2, "GUI[" .. self.id .. "] FAILURE: gui:animateToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
+	assert(o, "FAILURE: gui:animateToColor() :: Missing param[object]")
+	assert(type(o) == "table", "FAILURE: gui:animateToColor() :: Incorrect param[object] - expecting table and got " .. type(o))
+	assert(c, "FAILURE: gui:animateToColor() :: Missing param[color]")
+	assert(type(c) == "table", "FAILURE: gui:animateToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
+	assert(#c > 2, "FAILURE: gui:animateToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
 	s = s or 2
-	assert(type(s) == "number", "GUI[" .. self.id .. "] FAILURE: gui:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
+	assert(type(s) == "number", "FAILURE: gui:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
 	o.colorToAnimateTo = c
 	o.colorAnimateSpeed = s
 	o.colorAnimateTime = lt.getTime()
@@ -100,13 +100,13 @@ function gui:animateToColor(o, c, s)
 end
 
 function gui:animateBorderToColor(o, c, s)
-	assert(o, "GUI[" .. self.id .. "] FAILURE: gui:animateToColor() :: Missing param[object]")
-	assert(type(o) == "table", "GUI[" .. self.id .. "] FAILURE: gui:animateToColor() :: Incorrect param[object] - expecting table and got " .. type(o))
-	assert(c, "GUI[" .. self.id .. "] FAILURE: gui:animateBorderToColor() :: Missing param[color]")
-	assert(type(c) == "table", "GUI[" .. self.id .. "] FAILURE: gui:animateBorderToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
-	assert(#c > 2, "GUI[" .. self.id .. "] FAILURE: gui:animateBorderToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
+	assert(o, "FAILURE: gui:animateToColor() :: Missing param[object]")
+	assert(type(o) == "table", "FAILURE: gui:animateToColor() :: Incorrect param[object] - expecting table and got " .. type(o))
+	assert(c, "FAILURE: gui:animateBorderToColor() :: Missing param[color]")
+	assert(type(c) == "table", "FAILURE: gui:animateBorderToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
+	assert(#c > 2, "FAILURE: gui:animateBorderToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
 	s = s or 2
-	assert(type(s) == "number", "GUI[" .. self.id .. "] FAILURE: gui:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
+	assert(type(s) == "number", "FAILURE: gui:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
 	o.borderColorToAnimateTo = c
 	o.borderColorAnimateSpeed = s
 	o.borderColorAnimateTime = lt.getTime()
@@ -115,14 +115,14 @@ function gui:animateBorderToColor(o, c, s)
 end
 	
 function gui:animateToPosition(o, x, y, s)
-	assert(o, "GUI[" .. self.id .. "] FAILURE: gui:animateToPosition() :: Missing param[object]")
-	assert(type(o) == "table", "GUI[" .. self.id .. "] FAILURE: gui:animateToPosition() :: Incorrect param[object] - expecting table and got " .. type(o))
-	assert(x, "GUI[" .. self.id .. "] FAILURE: gui:animateToPosition() :: Missing param[x]")
-	assert(type(x) == "number", "GUI[" .. self.id .. "] FAILURE: gui:animateToPosition() :: Incorrect param[x] - expecting number and got " .. type(x))
-	assert(y, "GUI[" .. self.id .. "] FAILURE: gui:animateToPosition() :: Missing param[y]")
-	assert(type(y) == "number", "GUI[" .. self.id .. "] FAILURE: gui:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
+	assert(o, "FAILURE: gui:animateToPosition() :: Missing param[object]")
+	assert(type(o) == "table", "FAILURE: gui:animateToPosition() :: Incorrect param[object] - expecting table and got " .. type(o))
+	assert(x, "FAILURE: gui:animateToPosition() :: Missing param[x]")
+	assert(type(x) == "number", "FAILURE: gui:animateToPosition() :: Incorrect param[x] - expecting number and got " .. type(x))
+	assert(y, "FAILURE: gui:animateToPosition() :: Missing param[y]")
+	assert(type(y) == "number", "FAILURE: gui:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
 	s = s or 2
-	assert(type(s) == "number", "GUI[" .. self.id .. "] FAILURE: gui:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
+	assert(type(s) == "number", "FAILURE: gui:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 	for k,v in pairs(o.pos) do o.positionToAnimateFrom[k] = v end
 	o.positionToAnimateTo = {x = x, y = y}
 	o.positionAnimateSpeed = s
@@ -132,13 +132,13 @@ function gui:animateToPosition(o, x, y, s)
 end
 
 function gui:animateToOpacity(obj, o, s)
-	assert(obj, "GUI[" .. self.id .. "] FAILURE: gui:animateToColor() :: Missing param[object]")
-	assert(type(obj) == "table", "GUI[" .. self.id .. "] FAILURE: gui:animateToColor() :: Incorrect param[object] - expecting table and got " .. type(obj))
-	assert(o, "GUI[" .. self.id .. "] FAILURE: gui:animateToOpacity() :: Missing param[o]")
-	assert(type(o) == "number", "GUI[" .. self.id .. "] FAILURE: gui:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
+	assert(obj, "FAILURE: gui:animateToColor() :: Missing param[object]")
+	assert(type(obj) == "table", "FAILURE: gui:animateToColor() :: Incorrect param[object] - expecting table and got " .. type(obj))
+	assert(o, "FAILURE: gui:animateToOpacity() :: Missing param[o]")
+	assert(type(o) == "number", "FAILURE: gui:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 	s = s or 1
-	assert(s, "GUI[" .. self.id .. "] FAILURE: gui:animateToOpacity() :: Missing param[s]")
-	assert(type(s) == "number", "GUI[" .. self.id .. "] FAILURE: gui:animateToOpacity() :: Incorrect param[s] - expecting number and got " .. type(s))
+	assert(s, "FAILURE: gui:animateToOpacity() :: Missing param[s]")
+	assert(type(s) == "number", "FAILURE: gui:animateToOpacity() :: Incorrect param[s] - expecting number and got " .. type(s))
 	obj.opacityToAnimateTo = o
 	obj.opacityAnimateTime = lt.getTime()
 	obj.opacityAnimateSpeed = s
@@ -147,65 +147,65 @@ function gui:animateToOpacity(obj, o, s)
 end
 
 function gui:addColor(c, n)
-	assert(c, "GUI[" .. self.id .. "] FAILURE: gui:addColor() :: Missing param[color]")
-	assert(type(c) == "table", "GUI[" .. self.id .. "] FAILURE: gui:addColor() :: Incorrect param[color] - expecting table and got " .. type(c))
-	assert(#c > 2, "GUI[" .. self.id .. "] FAILURE : gui:addColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
-	assert(n, "GUI[" .. self.id .. "] FAILURE: gui:addColor() :: Missing param[name]")
-	assert(type(n) == "string", "GUI[" .. self.id .. "] FAILURE: gui:addColor() :: Incorrect param[name] - expecting string and got " .. type(n))
+	assert(c, "FAILURE: gui:addColor() :: Missing param[color]")
+	assert(type(c) == "table", "FAILURE: gui:addColor() :: Incorrect param[color] - expecting table and got " .. type(c))
+	assert(#c > 2, "FAILURE : gui:addColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
+	assert(n, "FAILURE: gui:addColor() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:addColor() :: Incorrect param[name] - expecting string and got " .. type(n))
 	colors[n] = c
 end
 
 function gui:addBox(n)
-	assert(n, "GUI[" .. self.id .. "] FAILURE: gui:addBox() :: Missing param[name]")
-	assert(type(n) == "string", "GUI[" .. self.id .. "] FAILURE: gui:addBox() :: Incorrect param[name] - expecting string and got " .. type(n))
+	assert(n, "FAILURE: gui:addBox() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:addBox() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
 	self.items[id] = box:new(n, self)
 	return self.items[id]
 end
 
 function gui:addCheckbox(n)
-	assert(n, "GUI[" .. self.id .. "] FAILURE: gui:addCheckbox() :: Missing param[name]")
-	assert(type(n) == "string", "GUI[" .. self.id .. "] FAILURE: gui:addCheckbox() :: Incorrect param[name] - expecting string and got " .. type(n))
+	assert(n, "FAILURE: gui:addCheckbox() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:addCheckbox() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
 	self.items[id] = checkbox:new(n, self)
 	return self.items[id]
 end
 
 function gui:addDropdown(n)
-	assert(n, "GUI[" .. self.id .. "] FAILURE: gui:addDropdown() :: Missing param[name]")
-	assert(type(n) == "string", "GUI[" .. self.id .. "] FAILURE: gui:addDropdown() :: Incorrect param[name] - expecting string and got " .. type(n))
+	assert(n, "FAILURE: gui:addDropdown() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:addDropdown() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
 	self.items[id] = dropdown:new(n, self)
 	return self.items[id]
 end
 
 function gui:addImage(i, n)
-	assert(i, "GUI[" .. self.id .. "] FAILURE: gui:addImage() :: Missing param[img]")
-	assert(type(i) == "userdata", "GUI[" .. self.id .. "] FAILURE: gui:addImage() :: Incorrect param[img] - expecting image userdata and got " .. type(i))
-	assert(n, "GUI[" .. self.id .. "] FAILURE gui:addImage() :: Missing param[name]")
-	assert(type(n) == "string", "GUI[" .. self.id .. "] FAILURE: gui:addImage() :: Incorrect param[img] - expecting string and got " .. type(n))
+	assert(i, "FAILURE: gui:addImage() :: Missing param[img]")
+	assert(type(i) == "userdata", "FAILURE: gui:addImage() :: Incorrect param[img] - expecting image userdata and got " .. type(i))
+	assert(n, "FAILURE gui:addImage() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:addImage() :: Incorrect param[img] - expecting string and got " .. type(n))
 	self.images[n] = i
 end
 
 function gui:addTextfield(n)
-	assert(n, "GUI[" .. self.id .. "] FAILURE: gui:addTextfield() :: Missing param[name]")
-	assert(type(n) == "string", "GUI[" .. self.id .. "] FAILURE: gui:addTextfield() :: Incorrect param[name] - expecting string and got " .. type(n))
+	assert(n, "FAILURE: gui:addTextfield() :: Missing param[name]")
+	assert(type(n) == "FAILURE: gui:addTextfield() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
 	self.items[id] = textfield:new(n, self)
 	return self.items[id]
 end
 
 function gui:addToggle(n)
-	assert(n, "GUI[" .. self.id .. "] FAILURE: gui:addToggle() :: Missing param[name]")
-	assert(type(n) == "string", "GUI[" .. self.id .. "] FAILURE: gui:addToggle() :: Incorrect param[name] - expecting string and got " .. type(n))
+	assert(n, "FAILURE: gui:addToggle() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:addToggle() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
 	self.items[id] = toggle:new(n, self)
 	return self.items[id]
 end
 
 function gui:addText(n)
-	assert(n, "GUI[" .. self.id .. "] FAILURE: gui:addText() :: Missing param[name]")
-	assert(type(n) == "string", "GUI[" .. self.id .. "] FAILURE: gui:addText() :: Incorrect param[name] - expecting string and got " .. type(n))
+	assert(n, "FAILURE: gui:addText() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:addText() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
 	self.items[id] = text:new(n, self)
 	return self.items[id]
@@ -256,9 +256,9 @@ function gui:mousepressed(button)
 end
 
 function gui:remove(n)
-	assert(n, "GUI[" .. self.id .. "] FAILURE: gui:remove() :: Missing param[name]")
+	assert(n, "FAILURE: gui:remove() :: Missing param[name]")
 	if type(n) ~= "string" and type(n) ~= "number" then
-		error("GUI[" .. self.id .. "] FAILURE: gui:remove() :: Incorrect param[name] - expecting string or number and got " .. type(n))
+		error("FAILURE: gui:remove() :: Incorrect param[name] - expecting string or number and got " .. type(n))
 	end
 	
 	if type(n) == "string" then
@@ -273,8 +273,8 @@ function gui:remove(n)
 end
 
 function gui:setZ(z)
-	assert(z, "GUI[" .. self.id .. "] FAILURE: gui:setZ() :: Missing param[z]")
-	assert(type(z) == "number", "GUI[" .. self.id .. "] FAILURE: gui:setZ() :: Incorrect param[z] - expecting number and got " .. type(z))
+	assert(z, "FAILURE: gui:setZ() :: Missing param[z]")
+	assert(type(z) == "number", "FAILURE: gui:setZ() :: Incorrect param[z] - expecting number and got " .. type(z))
 	self.z = z
 end
 
