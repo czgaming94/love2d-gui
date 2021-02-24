@@ -186,10 +186,8 @@ function box:new(n, p)
 		
 		lg.setColor(1,1,1,1)
 		if self.border then
-			if self.parent then
-				if box.guis[self.parent].use255 then
-					lg.setColor(love.math.colorFromBytes(self.borderColor))
-				end
+			if self.parent and box.guis[self.parent].use255 then
+				lg.setColor(love.math.colorFromBytes(self.borderColor))
 			else
 				lg.setColor(self.borderColor)
 			end
@@ -247,9 +245,10 @@ function box:new(n, p)
 	
 	function b:setImage(i)
 		assert(i, "[" .. self.name .. "] FAILURE: box:setImage() :: Missing param[img]")
-		assert(type(i) == "string" or type(i) == "userdata", "[" .. self.name .. "] FAILURE: box:setImage() :: Incorrect param[img] - expecting string or image userdata and got " .. type(i))
+		local t = type(i)
+		assert(t == "string" or t == "userdata", "[" .. self.name .. "] FAILURE: box:setImage() :: Incorrect param[img] - expecting string or image userdata and got " .. t)
 		
-		if type(i) == "string" then
+		if t == "string" then
 			if self.parent then
 				self.image = self.images[i] or box.guis[self.parent].images[i]
 			else
@@ -317,7 +316,7 @@ function box:new(n, p)
 			end
 		end
 		
-		if self.inAnimation then
+		if self:isAnimating() then
 			local allColorsMatch = true
 			local allBorderColorsMatch = true
 			local inProperPosition = true

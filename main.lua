@@ -8,8 +8,8 @@ local myGui2 = GUI:new(GUI)
 
 local myBox = myGui:addBox("myBox")
 local myBox2 = myGui:addBox("myBox2")
-
-local myBox3 = myGui2:addBox("myBox3")
+local boxes = {}
+boxes.myBox3 = myGui2:addBox("myBox3")
 local myBox4 = myGui2:addBox("myBox4")
 
 local myText = myGui2:addText("continue")
@@ -65,9 +65,9 @@ function love.load()
 	myBox:setClickable(false)
 	
 	myBox2:setData({w = 50, h = lg.getHeight(), x = 1, y = 0, color = colors("green"), useBorder = true, borderColor = colors("black")})
-	myBox3:setData({w = 225, h = 65, x = 105, y = 485, color = colors("alphaRed"), useBorder = false})
+	boxes.myBox3:setData({w = 225, h = 65, x = 105, y = 485, color = colors("alphaRed"), useBorder = false})
 	myText:setData({x = 110, y = 490, z = 2, color = colors("yellow"), text = "Hello World!"})
-	myBox4:setData({w = 50, h = 250, x = 105, y = 200, color = colors("purple"), useBorder = true, borderColor = colors("blue")})
+	myBox4:setData({w = 50, h = 250, x = 105, y = 200, color = colors("purple"), useBorder = true, borderColor = colors("black")})
 	
 	
 	-- You can change the Z index of an entire GUI container, or just a single object
@@ -76,13 +76,13 @@ function love.load()
 	-- You can define onClick callbacks for your GUI elements
 	function myBox2:onClick(button)
 		print("Hello! I clicked.")
-		self:animateBorderToColor(colors("blue"))
+		myBox2:animateBorderToColor(colors("red"))
 	end
 	
 	-- You can define onHoverEnter callbacks for your GUI elements
-	function myBox3:onHoverEnter()
+	function boxes.myBox3:onHoverEnter()
 		-- You can animate your objects to a new color
-		self:animateToColor(colors("white"))
+		boxes.myBox3:animateToColor(colors("white"))
 	end
 	
 	function myBox4:onHoverEnter()
@@ -90,31 +90,31 @@ function love.load()
 		-- x
 		-- y
 		-- speed
-		self:animateToPosition(150, 64, 1)
+		myBox4:animateToPosition(150, 64, 1)
 	end
 	
 	function myBox4:onHoverExit()
-		self:stopAnimation()
+		myBox4:stopAnimation()
 	end
 	
 	-- You can define onHoverExit callbacks for your GUI elements
-	function myBox3:onHoverExit()
-		self:animateToColor(colors("red"))
+	function boxes.myBox3:onHoverExit()
+		boxes.myBox3:animateToColor(colors("red"))
 	end
 	
-	function myBox3:onClick()
+	function boxes.myBox3:onClick()
 		-- You can make an object fade in or out, and also disable the object by using (true)
 		-- :fadeIn() will automatically restore an object to update status
-		self:fadeOut(true)
+		boxes.myBox3:fadeOut(true)
 	end
 	
 	-- You can define onFadeOut callbacks for your GUI elements
-	function myBox3:onFadeOut()
+	function boxes.myBox3:onFadeOut()
 		print(1)
 	end
 	
 	-- You can define onFadeIn callbacks for your GUI elements
-	function myBox3:onFadeIn()
+	function boxes.myBox3:onFadeIn()
 		print(2)
 	end
 end
