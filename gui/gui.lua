@@ -1,3 +1,31 @@
+--[[
+	Copyright (c) 2021- David Ashton | CognizanceGaming
+	
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+	
+	The above copyright notice and this permission notice shall be included in
+	all copies or substantial portions of the Software.
+	
+	Except as contained in this notice, the name(s) of the above copyright holders
+	shall not be used in advertising or otherwise to promote the sale, use or
+	other dealings in this Software without prior written authorization.
+	
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	THE SOFTWARE.
+--]]
+
+
+
 local box = require("gui.box")
 local checkbox = require("gui.checkbox")
 local dropdown = require("gui.dropdown")
@@ -229,9 +257,8 @@ function gui:draw()
 	end
 end
 
-function gui:mousepressed(button)
-	local x,y = love.mouse.getPosition()
-	local objs = self:generate(items)
+function gui:mousepressed(x, y, button, istouch, presses)
+	local objs = self:copy(items)
 	table.sort(objs, function(a, b) return a.z > b.z end)
 	local hitTarget = false
 	for o,v in ipairs(objs) do
@@ -241,7 +268,42 @@ function gui:mousepressed(button)
 				(y >= i.pos.y + i.paddingTop and y <= (i.pos.y + i.h) - i.paddingBottom) then
 					if not hitTarget then 
 						if i.clickable then
-							if i.mousepressed then i:mousepressed(button) end
+							if i.mousepressed then i:mousepressed(x, y, button, istouch, presses) end
+							if i.onClick then i:onClick(x, y, button, istouch, presses) end
+							if not i.hollow then
+								hitTarget = true
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	objs = nil
+end
+
+function gui:touchmoved(id, x, y, dx, dy, pressure)
+	for _,v in ipairs(items) do 
+		for _,i in ipairs(v.items) do 
+			if not i.hidden then 
+				if i.touchmoved then i:touchmoved(id, x, y, dx, dy, pressure) end
+			end
+		end 
+	end
+end
+
+function gui:touchpressed(id, x, y, dx, dy, pressure)
+	local objs = self:copy(items)
+	table.sort(objs, function(a, b) return a.z > b.z end)
+	local hitTarget = false
+	for o,v in ipairs(objs) do
+		for k,i in ipairs(v.items) do
+			if not i.hidden and not i.faded then 
+				if (x >= i.pos.x + i.paddingLeft and x <= (i.pos.x + i.w) - i.paddingRight) and 
+				(y >= i.pos.y + i.paddingTop and y <= (i.pos.y + i.h) - i.paddingBottom) then
+					if not hitTarget then 
+						if i.clickable then
+							if i.touchpressed then i:touchpressed(button) end
 							if i.onClick then i:onClick(button) end
 							if not i.hollow then
 								hitTarget = true

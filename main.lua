@@ -35,6 +35,7 @@ function love.load()
 	-- color        (table)
 	-- h | height   (number)
 	-- image        (string)
+	-- moveable		(boolean)
 	-- opacity      (number)
 	-- padding      (numbers)(top, right, bottom, left)
 	-- useBorder    (boolean)
@@ -43,7 +44,7 @@ function love.load()
 	-- y            (number)
 	-- z            (number)
 	myBox:setData({w = 800, h = 600, x = 0, y = 0, z = 0, image = "background"})
-	-- This line can do the same as these 12. Order does not matter. Assosciative table required.
+	-- This line can do the same as these 13. Order does not matter. Assosciative table required.
 
 	--[[
 		myBox:setBorderColor({1,0,1,1})
@@ -51,6 +52,7 @@ function love.load()
 		myBox:setColor({0,0,1,1})
 		myBox:setHeight(50)
 		myBox:setImage(love.graphics.newImage("path/to/image.png"))
+		myBox:setMoveable(true)
 		myBox:setOpacity(0.5)
 		myBox:setPadding(0,5,0,5)
 		myBox:setUseBorder(true)
@@ -85,27 +87,16 @@ function love.load()
 		boxes.myBox3:animateToColor(colors("white"))
 	end
 	
-	function myBox4:onHoverEnter()
-		-- You can animate your objects to a new position
-		-- x
-		-- y
-		-- speed
-		myBox4:animateToPosition(150, 64, 1)
-	end
-	
-	function myBox4:onHoverExit()
-		myBox4:stopAnimation()
-	end
-	
 	-- You can define onHoverExit callbacks for your GUI elements
 	function boxes.myBox3:onHoverExit()
 		boxes.myBox3:animateToColor(colors("red"))
 	end
 	
 	function boxes.myBox3:onClick()
-		-- You can make an object fade in or out, and also disable the object by using (true)
+		-- disable object click detection - boolean
+		-- disable object animation to instantly fade - boolean
 		-- :fadeIn() will automatically restore an object to update status
-		boxes.myBox3:fadeOut(true)
+		boxes.myBox3:fadeOut(true, true)
 	end
 	
 	-- You can define onFadeOut callbacks for your GUI elements
@@ -116,6 +107,18 @@ function love.load()
 	-- You can define onFadeIn callbacks for your GUI elements
 	function boxes.myBox3:onFadeIn()
 		print(2)
+	end
+	
+	function myBox4:onHoverEnter()
+		-- You can animate your objects to a new position
+		-- x
+		-- y
+		-- speed
+		myBox4:animateToPosition(150, 64, 1)
+	end
+	
+	function myBox4:onHoverExit()
+		myBox4:stopAnimation()
 	end
 end
 
@@ -129,7 +132,16 @@ function love.draw()
 	GUI:draw()
 end
 
-function love.mousepressed(button)
+function love.mousepressed(x, y, button, istouch, presses)
 	-- Use global source for callbacks
-	GUI:mousepressed(button)
+	GUI:mousepressed(x, y, button, istouch, presses)
+end
+
+-- For mobile
+function love.touchpressed(id, x, y, dx, dy, pressure)
+	GUI:touchpressed(id, x, y, dx, dy, pressure)
+end
+
+function love.touchmoved(id, x, y, dx, dy, pressure)
+	GUI:touchmoved(id, x, y, dx, dy, pressure)
 end

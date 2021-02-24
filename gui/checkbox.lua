@@ -1,3 +1,31 @@
+--[[
+	Copyright (c) 2021- David Ashton | CognizanceGaming
+	
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+	
+	The above copyright notice and this permission notice shall be included in
+	all copies or substantial portions of the Software.
+	
+	Except as contained in this notice, the name(s) of the above copyright holders
+	shall not be used in advertising or otherwise to promote the sale, use or
+	other dealings in this Software without prior written authorization.
+	
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	THE SOFTWARE.
+--]]
+
+
+
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
 local checkbox = {}
@@ -219,16 +247,28 @@ function checkbox:new(n, p)
 	
 	function c:fadeIn()
 		if self.beforeFadeIn then self:beforeFadeIn() end
-		self:animateToOpacity(1)
 		self.hidden = false
+		if self.faded then
+			self.animateColor = true
+			self.animatePosition = true
+			self.animateBorderColor = true
+		end
 		self.faded = false
 		self.fadedByFunc = true
+		self:animateToOpacity(1)
 		if self.onFadeIn then self:onFadeIn() end
 	end
 	
-	function c:fadeOut(p)
+	function c:fadeOut(p, h)
 		if self.beforeFadeOut then self:beforeFadeOut() end
-		if p then self.faded = true end
+		if p then 
+			self.faded = true
+			if h then
+				self.animateColor = false
+				self.animatePosition = false
+				self.animateBorderColor = false
+			end
+		end
 		self.fadedByFunc = true
 		self:animateToOpacity(0)
 		if self.onFadeOut then self:onFadeOut() end
@@ -262,7 +302,7 @@ function checkbox:new(n, p)
 		self.inAnimation = false
 	end
 	
-	function c:mousepressed(button)
+	function c:mousepressed(x, y, button, istouch, presses)
 		local x,y = love.mouse.getPosition()
 		if button == 1 then
 			for k,v in ipairs(self.options) do
@@ -381,6 +421,22 @@ function checkbox:new(n, p)
 	
 	function c:getOverlayColor()
 		return self.overlayColor
+	end
+	
+	function c:touchmoved(id, x, y, dx, dy, pressure)
+		if (x >= self.pos.x + self.paddingLeft and x <= self.pos.x + self.w + self.paddingRight) and 
+		(y >= self.pos.y + self.paddingTop and y <= self.pos.y + self.h + self.paddingBottom) then
+			if not self.hovered then
+				if self.onHoverEnter then self:onHoverEnter() end
+				self.hovered = true 
+			end
+			if self.whileHovering then self:whileHovering() end
+		else
+			if self.hovered then 
+				if self.onHoverExit then self:onHoverExit() end
+				self.hovered = false 
+			end
+		end
 	end
 	
 	function c:setX(x)
