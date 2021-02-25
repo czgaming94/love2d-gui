@@ -97,11 +97,13 @@ function box:new(n, p)
 		assert(#c > 2, "[" .. self.name .. "] FAILURE: box:animateToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		self.colorToAnimateTo = c
-		self.colorAnimateSpeed = s
-		self.colorAnimateTime = lt.getTime()
-		self.inAnimation = true
-		self.animateColor = true
+		if not self.fadedByFunc then
+			self.colorToAnimateTo = c
+			self.colorAnimateSpeed = s
+			self.colorAnimateTime = lt.getTime()
+			self.inAnimation = true
+			self.animateColor = true
+		end
 	end
 	
 	function b:animateBorderToColor(c, s)
@@ -110,11 +112,13 @@ function box:new(n, p)
 		assert(#c > 2, "[" .. self.name .. "] FAILURE: box:animateBorderToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		self.borderColorToAnimateTo = c
-		self.borderColorAnimateSpeed = s
-		self.borderColorAnimateTime = lt.getTime()
-		self.inAnimation = true
-		self.animateBorderColor = true
+		if not self.fadedByFunc then
+			self.borderColorToAnimateTo = c
+			self.borderColorAnimateSpeed = s
+			self.borderColorAnimateTime = lt.getTime()
+			self.inAnimation = true
+			self.animateBorderColor = true
+		end
 	end
 	
 	function b:animateToPosition(x, y, s)
@@ -125,11 +129,13 @@ function box:new(n, p)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
-		self.positionToAnimateTo = {x = x, y = y}
-		self.positionAnimateSpeed = s
-		self.positionAnimateTime = lt.getTime()
-		self.inAnimation = true
-		self.animatePosition = true
+		if not self.fadedByFunc then
+			self.positionToAnimateTo = {x = x, y = y}
+			self.positionAnimateSpeed = s
+			self.positionAnimateTime = lt.getTime()
+			self.inAnimation = true
+			self.animatePosition = true
+		end
 	end
 	
 	function b:animateToOpacity(o, s)
@@ -138,11 +144,13 @@ function box:new(n, p)
 		s = s or 1
 		assert(s, "[" .. self.name .. "] FAILURE: box:animateToOpacity() :: Missing param[speed]")
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		self.opacityToAnimateTo = o
-		self.opacityAnimateTime = lt.getTime()
-		self.opacityAnimateSpeed = s
-		self.inAnimation = true
-		self.animateOpacity = true
+		if not self.fadedByFunc then
+			self.opacityToAnimateTo = o
+			self.opacityAnimateTime = lt.getTime()
+			self.opacityAnimateSpeed = s
+			self.inAnimation = true
+			self.animateOpacity = true
+		end
 	end
 	
 	function b:isAnimating()
@@ -247,6 +255,7 @@ function box:new(n, p)
 	function b:fadeIn()
 		if self.beforeFadeIn then self:beforeFadeIn() end
 		self.hidden = false
+		self:animateToOpacity(1)
 		if self.faded then
 			self.animateColor = true
 			self.animatePosition = true
@@ -254,12 +263,12 @@ function box:new(n, p)
 		end
 		self.faded = false
 		self.fadedByFunc = true
-		self:animateToOpacity(1)
 		if self.onFadeIn then self:onFadeIn() end
 	end
 	
 	function b:fadeOut(p, h)
 		if self.beforeFadeOut then self:beforeFadeOut() end
+		self:animateToOpacity(0)
 		if p then 
 			self.faded = true
 			if h then
@@ -269,7 +278,6 @@ function box:new(n, p)
 			end
 		end
 		self.fadedByFunc = true
-		self:animateToOpacity(0)
 		if self.onFadeOut then self:onFadeOut() end
 	end
 	
@@ -309,7 +317,14 @@ function box:new(n, p)
 		assert(p, "[" .. self.name .. "] FAILURE: box:setPadding() :: Missing param[padding]")
 		assert(type(p) == "table", "[" .. self.name .. "] FAILURE: box:setPadding() :: Incorrect param[padding] - expecting table and got " .. type(p))
 		assert(#p == 4, "[" .. self.name .. "] FAILURE: box:setPadding() :: Incorrect param[padding] - expecting table length 4 and got " .. #p)
-		self.paddingTop, self.paddingRight, self.paddingBottom, self.paddingTop = unpack(p)
+		if p.top or p.paddingTop then
+			self.paddingTop = p.paddingTop or p.top
+			self.paddingRight = p.paddingRight or p.right or self.paddingRight
+			self.paddingBottom = p.paddingBottom or p.bottom or self.paddingBottom
+			self.paddingLeft = p.paddingLeft or p.left or self.paddingLeft
+		else
+			self.paddingTop, self.paddingRight, self.paddingBottom, self.paddingTop = unpack(p)
+		end
 	end
 	
 	function b:setPaddingBottom(p)

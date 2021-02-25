@@ -47,10 +47,22 @@ function checkbox:new(n, p)
 		y = 0,
 		z = 0
 	}
+	c.label = ""
+	c.labelColor = {1,1,1,1}
+	c.labelPosition = {
+		x = 0,
+		y = 0,
+		z = 0
+	}
 	c.border = false
 	c.borderColor = {1,1,1,1}
 	c.color = {1,1,1,1}
 	c.overlayColor = {1,1,1,.5}
+	c.optionsColor = {1,1,1,1}
+	c.paddingLeft = 0
+	c.paddingRight = 0
+	c.paddingTop = 0
+	c.paddingBottom = 0
 	c.hovered = false
 	c.clicked = false
 	c.clickable = true
@@ -59,11 +71,11 @@ function checkbox:new(n, p)
 	c.hidden = false
 	c.vertical = false
 	c.hollow = false
-	c.paddingLeft = 0
-	c.paddingRight = 0
-	c.paddingTop = 0
-	c.paddingBottom = 0
 	c.options = {}
+	c.optionsPaddingLeft = 0
+	c.optionsPaddingRight = 0
+	c.optionsPaddingTop = 0
+	c.optionsPaddingBottom = 0
 	c.selected = {}
 	c.font = lg.getFont()
 	c.inAnimation = false
@@ -140,6 +152,14 @@ function checkbox:new(n, p)
 		return self.inAnimation
 	end
 	
+	function c:startAnimation()
+		self.inAnimation = true
+	end
+	
+	function c:stopAnimation()
+		self.inAnimation = false
+	end
+	
 	function c:setBorderColor(bC)
 		assert(bC, "[" .. self.name .. "] FAILURE: checkbox:setBorderColor() :: Missing param[color]")
 		assert(type(bC) == "table", "[" .. self.name .. "] FAILURE: checkbox:setBorderColor() :: Incorrect param[color] - expecting table and got " .. type(bC))
@@ -168,25 +188,48 @@ function checkbox:new(n, p)
 		self.color = t
 	end
 	
-	function b:getColor()
+	function c:getColor()
 		return self.color
 	end
 	
 	function c:setData(d)
 		assert(d, "[" .. self.name .. "] FAILURE: checkbox:setData() :: Missing param[data]")
 		assert(type(d) == "table", "[" .. self.name .. "] FAILURE: checkbox:setData() :: Incorrect param[data] - expecting table and got " .. type(d))
-		assert(d.t or d.text, "[" .. self.name .. "] FAILURE: checkbox:setData() :: Missing param[data['text']")
-		assert(type(d.text) == "string", "[" .. self.name .. "] FAILURE: checkbox:setData() :: Incorrect param[text] - expecting string and got " .. type(d.text))
-		assert(d.x, "[" .. self.name .. "] FAILURE: checkbox:setData() :: Missing param[data['x']")
-		assert(type(d.x) == "number", "[" .. self.name .. "] FAILURE: checkbox:setData() :: Incorrect param[x] - expecting number and got " .. type(d.x))
-		assert(d.y, "[" .. self.name .. "] FAILURE: checkbox:setData() :: Missing param[data['y']")
-		assert(type(d.y) == "number", "[" .. self.name .. "] FAILURE: checkbox:setData() :: Incorrect param[y] - expecting number and got " .. type(d.y))
+		assert(d.label or d.text, "[" .. self.name .. "] FAILURE: checkbox:setData() :: Missing param[data['text']]")
+		assert(type(d.label) or type(d.text) == "string", "[" .. self.name .. "] FAILURE: checkbox:setData() :: Incorrect param[data['text']] - expecting string and got " .. type(d.label or d.text))
+		assert(d.x, "[" .. self.name .. "] FAILURE: checkbox:setData() :: Missing param[data['x']]")
+		assert(type(d.x) == "number", "[" .. self.name .. "] FAILURE: checkbox:setData() :: Incorrect param[data['x']] - expecting number and got " .. type(d.x))
+		assert(d.y, "[" .. self.name .. "] FAILURE: checkbox:setData() :: Missing param[data['y']]")
+		assert(type(d.y) == "number", "[" .. self.name .. "] FAILURE: checkbox:setData() :: Incorrect param[data['y']] - expecting number and got " .. type(d.y))
 		self.w = d.w or d.width or self.w
 		self.h = d.h or d.height or self.h
+		self.label = d.label or d.text or self.label
+		self.labelColor = d.labelColor or self.labelColor
+		if d.labelPosition or d.labelPos then
+			local i = d.labelPosition or d.labelPos
+			if i.x then
+				self.labelPosition = i
+			else
+				self.labelPosition.x, self.labelPosition.y, self.labelPosition.z = unpack(i)
+			end
+		end
+		if d.padding then
+			if d.padding.top or d.padding.paddingTop then
+				self.optionsPaddingTop = d.padding.paddingTop or d.padding.top
+				self.optionsPaddingRight = d.padding.paddingRight or d.padding.right or self.optionsPaddingRight
+				self.optionsPaddingBottom = d.padding.paddingBottom or d.padding.bottom or self.optionsPaddingBottom
+				self.optionsPaddingLeft = d.padding.paddingLeft or d.padding.left or self.optionsPaddingLeft
+			else
+				self.optionsPaddingTop, self.optionsPaddingRight, self.optionsPaddingBottom, self.optionsPaddingLeft = unpack(d.padding)
+			end
+		end
 		self.pos.x = d.x or self.pos.x
 		self.pos.y = d.y or self.pos.y
 		self.pos.z = d.z or self.pos.z
 		self.color = d.color or self.color
+		self.border = d.useBorder and d.useBorder or self.border
+		self.borderColor = d.borderColor or self.borderColor
+		self.optionsColor = d.optionColor or self.optionsColor
 		self.font = d.font or self.font
 		self.clickable = d.clickable and d.clickable or self.clickable
 		if d.options then
@@ -195,9 +238,9 @@ function checkbox:new(n, p)
 			end
 			for k,v in ipairs(d.options) do
 				if k == 1 then
-					self.options[k] = {text = v, x = self.pos.x + self.font:getWidth(v), y = self.pos.y}
+					self.options[k] = {text = v, x = self.pos.x + self.font:getWidth(v), y = self.pos.y, w = self.w + self.font:getWidth(v), h = self.font:getHeight()}
 				else
-					self.options[k] = {text = v, x = self.pos.x + self.font:getWidth(v), y = self.pos.y}
+					self.options[k] = {text = v, x = self.options[k - 1].x + self.w + self.font:getWidth(v) + self.optionsPaddingLeft, y = self.pos.y, w = self.w + self.font:getWidth(v), h = self.font:getHeight()}
 					if d.verticalOptions then
 						self.vertical = true
 						self.options[k].x = self.pos.x
@@ -213,32 +256,39 @@ function checkbox:new(n, p)
 	end
 	
 	function c:draw()
+		lg.push()
 		lg.setColor(1,1,1,1)
 		lg.setFont(self.font)
 		for k,v in ipairs(self.options) do
-			lg.push()
-			if self.border then
-				if self.parent and checkbox.guis[self.parent].use255 then
-					lg.setColor(love.math.colorFromBytes(self.borderColor))
-				else
-					lg.setColor(self.borderColor)
+			if v.text then
+				lg.push()
+				if self.border then
+					if self.parent and checkbox.guis[self.parent].use255 then
+						lg.setColor(love.math.colorFromBytes(self.borderColor))
+					else
+						lg.setColor(self.borderColor)
+					end
+					lg.rectangle("line", v.x - 1, v.y - 1, v.w + 2, v.h + 2)
 				end
-				lg.rectangle("line", v.x - 1, v.y - 1, v.w + 2, v.h + 2)
-			end
-			if self.parent and box.guis[self.parent].use255 then
-				lg.setColor(love.math.colorFromBytes(self.color))
-			else
-				lg.setColor(self.color)
-			end
-			lg.rectangle("fill", v.x, v.y, v.w, v.h)
-			for _,i in ipairs(self.selected) do
-				lg.setColor(self.overlayColor)
+				if self.parent and checkbox.guis[self.parent].use255 then
+					lg.setColor(love.math.colorFromBytes(self.color))
+				else
+					lg.setColor(self.color)
+				end
 				lg.rectangle("fill", v.x, v.y, v.w, v.h)
-				lg.setColor(self.color)
+				if self.selected[k] then
+					lg.setColor(self.overlayColor)
+					lg.rectangle("fill", v.x, v.y, v.w, v.h)
+					lg.setColor(self.color)
+				end
+				lg.setColor(self.optionsColor)
+				lg.print(v.text, v.x + self.optionsPaddingRight, v.y  + self.optionsPaddingTop)
+				lg.pop()
 			end
-			lg.print(v.text, v.x + self.paddingRight, v.y)
-			lg.pop()
 		end
+		lg.setColor(self.labelColor)
+		lg.print(self.label, self.labelPosition.x, self.labelPosition.y)
+		lg.pop()
 	end
 	
 	function c:enable()
@@ -294,22 +344,52 @@ function checkbox:new(n, p)
 		return self.hovered
 	end
 	
-	function c:startAnimation()
-		self.inAnimation = true
+	function c:setLabel(l)
+		assert(l, "[" .. self.name .. "] FAILURE: checkbox:setLabel() :: Missing param[label]")
+		assert(type(l) == "string", "[" .. self.name .. "] FAILURE: checkbox:setLabel() :: Incorrect param[label] - expecting string and got " .. type(l))
+		self.label = l
 	end
 	
-	function c:stopAnimation()
-		self.inAnimation = false
+	function c:getLabel()
+		return self.label
+	end
+	
+	function c:setLabelColor(t)
+		assert(t, "[" .. self.name .. "] FAILURE: checkbox:setLabelColor() :: Missing param[color]")
+		assert(type(t) == "table", "[" .. self.name .. "] FAILURE: checkbox:setLabelColor() :: Incorrect param[color] - expecting table and got " .. type(t))
+		assert(#t == 4, "[" .. self.name .. "] FAILURE: checkbox:setLabelColor() :: Incorrect param[color] - table length 4 expected and got " .. #t)
+		self.labelColor = t
+	end
+	
+	function c:getLabelColor()
+		return self.labelColor
+	end
+	
+	function c:setLabelPosition(t)
+		assert(t, "[" .. self.name .. "] FAILURE: checkbox:setLabelPosition() :: Missing param[position]")
+		assert(type(t) == "table", "[" .. self.name .. "] FAILURE: checkbox:setLabelPosition() :: Incorrect param[position] - expecting table and got " .. type(t))
+		assert(#t == 3, "[" .. self.name .. "] FAILURE: checkbox:setLabelPosition() :: Incorrect param[position] - table length 4 expected and got " .. #t)
+		if t.x then
+			self.labelPosition = t
+		else
+			self.labelPosition.x, self.labelPosition.y, self.labelPosition.z = unpack(t)
+		end
+	end
+	
+	function c:getLabelPosition()
+		return self.labelPosition
 	end
 	
 	function c:mousepressed(x, y, button, istouch, presses)
-		local x,y = love.mouse.getPosition()
 		if button == 1 then
+			print(1)
 			for k,v in ipairs(self.options) do
-				if x >= v.x and x <= v.x + self.font:getWidth(v.text) and y >= v.y and y <= v.y + self.font:getHeight(v.text) then
+				if x >= v.x and x <= v.x + v.w and y >= v.y and y <= v.y + v.h then
 					if self.selected[k] then
+						print(1)
 						self.selected[k] = nil
 					else
+						print(2)
 						self.selected[k] = v
 					end
 				end
@@ -412,6 +492,63 @@ function checkbox:new(n, p)
 		self.options[#self.options + 1] = {text = o, x = x, y = y}
 	end
 	
+	function c:removeOption(o)
+		assert(o, "[" .. self.name .. "] FAILURE: checkbox:addOption() :: Missing param[option]")
+		assert(type(o) == "string", "[" .. self.name .. "] FAILURE: checkbox:addOption() :: Incorrect param[option] - expecting string and got " .. type(o))
+		for k,v in ipairs(self.options) do
+			if v.text == o then self.options[k] = nil end
+		end
+	end
+	
+	function c:setOptionColor(t)
+		assert(t, "[" .. self.name .. "] FAILURE: checkbox:setOverlayColor() :: Missing param[color]")
+		assert(type(t) == "table", "[" .. self.name .. "] FAILURE: checkbox:setOverlayColor() :: Incorrect param[color] - expecting table and got " .. type(t))
+		assert(#t == 4, "[" .. self.name .. "] FAILURE: checkbox:setOverlayColor() :: Incorrect param[color] - table length 4 expected and got " .. #t)
+		self.optionsColor = t
+	end
+	
+	function c:getOptionColor()
+		return self.optionsColor
+	end
+	
+	function c:setOptionPadding(p)
+		assert(p, "[" .. self.name .. "] FAILURE: checkbox:setOptionPadding() :: Missing param[padding]")
+		assert(type(p) == "table", "[" .. self.name .. "] FAILURE: checkbox:setOptionPadding() :: Incorrect param[padding] - expecting table and got " .. type(p))
+		assert(#p == 4, "[" .. self.name .. "] FAILURE: checkbox:setOptionPadding() :: Incorrect param[padding] - expecting table length 4 and got " .. #p)
+		if p.top or p.paddingTop then
+			self.optionPaddingTop = p.paddingTop or p.top
+			self.optionPaddingRight = p.paddingRight or p.right or self.optionPaddingRight
+			self.optionPaddingBottom = p.paddingBottom or p.bottom or self.optionPaddingBottom
+			self.optionPaddingLeft = p.paddingLeft or p.left or self.optionPaddingLeft
+		else
+			self.optionPaddingTop, self.optionPaddingRight, self.optionPaddingBottom, self.optionPaddingTop = unpack(p)
+		end
+	end
+	
+	function c:setOptionPaddingBottom(p)
+		assert(p, "[" .. self.name .. "] FAILURE: checkbox:setOptionPaddingBottom() :: Missing param[padding]")
+		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: checkbox:setOptionPaddingBottom() :: Incorrect param[padding] - expecting number and got " .. type(p))
+		self.OptionaddingBottom = p
+	end
+	
+	function c:setOptionPaddingLeft(p)
+		assert(p, "[" .. self.name .. "] FAILURE: checkbox:setOptionPaddingLeft() :: Missing param[padding]")
+		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: checkbox:setOptionPaddingLeft() :: Incorrect param[padding] - expecting number and got " .. type(p))
+		self.OptionaddingLeft = p
+	end
+	
+	function c:setOptionPaddingRight(p)
+		assert(p, "[" .. self.name .. "] FAILURE: checkbox:setOptionPaddingRight() :: Missing param[padding]")
+		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: checkbox:setOptionPaddingRight() :: Incorrect param[padding] - expecting number and got " .. type(p))
+		self.OptionaddingRight = p
+	end
+	
+	function c:setOptionPaddingTop(p)
+		assert(p, "[" .. self.name .. "] FAILURE: checkbox:setOptionPaddingTop() :: Missing param[padding]")
+		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: checkbox:setOptionPaddingTop() :: Incorrect param[padding] - expecting number and got " .. type(p))
+		self.OptionaddingTop = p
+	end
+	
 	function c:setOverlayColor(t)
 		assert(t, "[" .. self.name .. "] FAILURE: checkbox:setOverlayColor() :: Missing param[color]")
 		assert(type(t) == "table", "[" .. self.name .. "] FAILURE: checkbox:setOverlayColor() :: Incorrect param[color] - expecting table and got " .. type(t))
@@ -424,8 +561,7 @@ function checkbox:new(n, p)
 	end
 	
 	function c:touchmoved(id, x, y, dx, dy, pressure)
-		if (x >= self.pos.x + self.paddingLeft and x <= self.pos.x + self.w + self.paddingRight) and 
-		(y >= self.pos.y + self.paddingTop and y <= self.pos.y + self.h + self.paddingBottom) then
+		if (x >= self.pos.x and x <= self.pos.x + self.w) and (y >= self.pos.y and y <= self.pos.y + self.h) then
 			if not self.hovered then
 				if self.onHoverEnter then self:onHoverEnter() end
 				self.hovered = true 
@@ -445,7 +581,7 @@ function checkbox:new(n, p)
 		self.pos.x = x
 	end
 	
-	function t:getX()
+	function c:getX()
 		return self.pos.x
 	end
 	
@@ -472,6 +608,8 @@ function checkbox:new(n, p)
 	function c.lerp(e,s,c)
 		return (1 - c) * e + c * s
 	end
+	
+	return c
 end
 
 return checkbox

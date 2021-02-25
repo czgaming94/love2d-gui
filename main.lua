@@ -8,6 +8,7 @@ local myGui2 = GUI:new(GUI)
 
 local myBox = myGui:addBox("myBox")
 local myBox2 = myGui:addBox("myBox2")
+local myCheckbox = myGui:addCheckbox("myCheckbox")
 local boxes = {}
 boxes.myBox3 = myGui2:addBox("myBox3")
 local myBox4 = myGui2:addBox("myBox4")
@@ -69,6 +70,14 @@ function love.load()
 	myBox2:setData({w = 50, h = lg.getHeight(), x = 1, y = 0, color = colors("green"), useBorder = true, borderColor = colors("black")})
 	boxes.myBox3:setData({w = 225, h = 65, x = 105, y = 485, color = colors("alphaRed"), useBorder = false})
 	myText:setData({x = 110, y = 490, z = 2, color = colors("yellow"), text = "Hello World!"})
+	myCheckbox:setData({
+		w = 10, h = 10, x = 250, y = 150, z = 1, 
+		label = "Favorite Number?", labelColor = colors("black"), labelPos = {250, 120, 1}, 
+		padding = {0,5,0,5}, 
+		options = {"1", "2", "3"}, optionColor = colors("blue"), 
+		color = colors("green"), 
+		useBorder = true, borderColor = colors("red")
+	})
 	myBox4:setData({w = 50, h = 250, x = 105, y = 200, color = colors("purple"), useBorder = true, borderColor = colors("black")})
 	
 	

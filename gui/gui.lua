@@ -263,16 +263,14 @@ function gui:mousepressed(x, y, button, istouch, presses)
 	local hitTarget = false
 	for o,v in ipairs(objs) do
 		for k,i in ipairs(v.items) do
-			if not i.hidden and not i.faded then 
+			if not i.hidden and not i.faded and i.clickable then 
 				if (x >= i.pos.x + i.paddingLeft and x <= (i.pos.x + i.w) - i.paddingRight) and 
 				(y >= i.pos.y + i.paddingTop and y <= (i.pos.y + i.h) - i.paddingBottom) then
-					if not hitTarget then 
-						if i.clickable then
-							if i.mousepressed then i:mousepressed(x, y, button, istouch, presses) end
-							if i.onClick then i:onClick(x, y, button, istouch, presses) end
-							if not i.hollow then
-								hitTarget = true
-							end
+					if not hitTarget then
+						if i.mousepressed then print(1) i:mousepressed(x, y, button, istouch, presses) end
+						if i.onClick then i:onClick(x, y, button, istouch, presses) end
+						if not i.hollow then
+							hitTarget = true
 						end
 					end
 				end
