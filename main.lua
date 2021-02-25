@@ -23,6 +23,7 @@ function love.load()
 	GUI:addColor({0,0,0,1}, "black")
 	GUI:addColor({0,0,0,0}, "empty")
 	GUI:addColor({1,0,0,.5}, "alphaRed")
+	GUI:addColor({.92,.97,.92,1}, "eggshell")
 	
 	-- Add images to your box, easily.
 	-- image (userdata)
@@ -72,11 +73,13 @@ function love.load()
 	myText:setData({x = 110, y = 490, z = 2, color = colors("yellow"), text = "Hello World!"})
 	myCheckbox:setData({
 		w = 10, h = 10, x = 250, y = 150, z = 1, 
-		label = "Favorite Number?", labelColor = colors("black"), labelPos = {250, 120, 1}, 
-		padding = {0,5,0,5}, 
-		options = {"1", "2", "3"}, optionColor = colors("blue"), 
-		color = colors("green"), 
-		useBorder = true, borderColor = colors("red")
+		label = "Favorite Number?", labelColor = colors("black"), labelPos = {265, 125, 1}, 
+		padding = {0,10,0,10}, 
+		options = {"1", "2", "3"}, optionColor = colors("blue"), singleSelection = true,
+		color = colors("eggshell"), 
+		useBorder = true, borderColor = colors("red"),
+		round = true, radius = 3,
+		overlayColor = colors("alphaRed")
 	})
 	myBox4:setData({w = 50, h = 250, x = 105, y = 200, color = colors("purple"), useBorder = true, borderColor = colors("black")})
 	
@@ -128,6 +131,11 @@ function love.load()
 	
 	function myBox4:onHoverExit()
 		myBox4:stopAnimation()
+	end
+	
+	-- You can define onOptionChange callbacks for your GUI elements
+	function myCheckbox:onOptionChange(option)
+		print(option.text)
 	end
 end
 

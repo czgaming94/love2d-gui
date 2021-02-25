@@ -41,7 +41,9 @@ function checkbox:new(n, p)
 	c.id = #self.items + 1
 	if p and p.id then c.parent = p.id else c.parent = nil end
 	c.w = 0
+	c.uW = 0
 	c.h = 0
+	c.uH = 0
 	c.pos = {
 		x = 0,
 		y = 0,
@@ -63,6 +65,7 @@ function checkbox:new(n, p)
 	c.paddingRight = 0
 	c.paddingTop = 0
 	c.paddingBottom = 0
+	c.roundRadius = 0
 	c.hovered = false
 	c.clicked = false
 	c.clickable = true
@@ -70,7 +73,9 @@ function checkbox:new(n, p)
 	c.fadedByFunc = false
 	c.hidden = false
 	c.vertical = false
+	c.round = false
 	c.hollow = false
+	c.single = false
 	c.options = {}
 	c.optionsPaddingLeft = 0
 	c.optionsPaddingRight = 0
@@ -201,8 +206,8 @@ function checkbox:new(n, p)
 		assert(type(d.x) == "number", "[" .. self.name .. "] FAILURE: checkbox:setData() :: Incorrect param[data['x']] - expecting number and got " .. type(d.x))
 		assert(d.y, "[" .. self.name .. "] FAILURE: checkbox:setData() :: Missing param[data['y']]")
 		assert(type(d.y) == "number", "[" .. self.name .. "] FAILURE: checkbox:setData() :: Incorrect param[data['y']] - expecting number and got " .. type(d.y))
-		self.w = d.w or d.width or self.w
-		self.h = d.h or d.height or self.h
+		self.uW = d.w or d.width or self.uW
+		self.uH = d.h or d.height or self.uH
 		self.label = d.label or d.text or self.label
 		self.labelColor = d.labelColor or self.labelColor
 		if d.labelPosition or d.labelPos then
@@ -230,29 +235,56 @@ function checkbox:new(n, p)
 		self.border = d.useBorder and d.useBorder or self.border
 		self.borderColor = d.borderColor or self.borderColor
 		self.optionsColor = d.optionColor or self.optionsColor
+		self.overlayColor = d.overlayColor or self.overlayColor
 		self.font = d.font or self.font
 		self.clickable = d.clickable and d.clickable or self.clickable
+		self.round = d.round and d.round or self.round
+		self.roundRadius = (d.radius and d.radius) or (d.roundRadius and d.roundRadius) or self.roundRadius
+		self.single = (d.singleSelection and d.singleSelection) or (d.single and d.single) or self.single
 		if d.options then
 			if not d.keepOptions then
 				self.options = {}
 			end
+			local w, h = 0, 0
 			for k,v in ipairs(d.options) do
 				if k == 1 then
-					self.options[k] = {text = v, x = self.pos.x + self.font:getWidth(v), y = self.pos.y, w = self.w + self.font:getWidth(v), h = self.font:getHeight()}
+					self.options[k] = {text = v, x = self.pos.x + self.optionsPaddingLeft + self.font:getWidth(v) + self.optionsPaddingRight, y = self.optionsPaddingTop + self.pos.y + self.optionsPaddingBottom, w = self.uW + self.font:getWidth(v), h = self.font:getHeight()}
 				else
-					self.options[k] = {text = v, x = self.options[k - 1].x + self.w + self.font:getWidth(v) + self.optionsPaddingLeft, y = self.pos.y, w = self.w + self.font:getWidth(v), h = self.font:getHeight()}
+					self.options[k] = {text = v, x = self.options[k - 1].x + self.uW + self.optionsPaddingLeft + self.font:getWidth(v) + self.optionsPaddingRight, 
+					y = self.optionsPaddingTop + self.pos.y + self.optionsPaddingBottom, w = self.uW + self.font:getWidth(v), h = self.font:getHeight()}
 					if d.verticalOptions then
 						self.vertical = true
 						self.options[k].x = self.pos.x
 						self.options[k].y = self.options[k - 1].y + self.font:getHeight(v)
 					end
 				end
+				w = w + (self.uW + self.font:getWidth(v))
+				h = h + (self.uH + self.font:getHeight(v)) + 2
+				if self.border then
+					w = w + self.optionsPaddingLeft + 2 + self.optionsPaddingRight
+					h = h + self.optionsPaddingTop + 2 + self.optionsPaddingBottom
+				end
+			end
+			if self.vertical then 
+				if self.border then
+					self.w = self.uW + 2
+				else
+					self.w = self.uW
+				end
+				self.h = h
+			else 
+				self.w = w
+				if self.border then
+					self.h = self.uH + 2
+				else
+					self.h = self.uH
+				end
 			end
 		end
 	end
 	
 	function c:disable()
-		self.hidden = true
+		self.uHidden = true
 	end
 	
 	function c:draw()
@@ -268,21 +300,33 @@ function checkbox:new(n, p)
 					else
 						lg.setColor(self.borderColor)
 					end
-					lg.rectangle("line", v.x - 1, v.y - 1, v.w + 2, v.h + 2)
+					if self.round then
+						lg.rectangle("line", v.x - 1, v.y - 1, v.w + 2, v.h + 2, self.roundRadius, self.roundRadius)
+					else	
+						lg.rectangle("line", v.x - 1, v.y - 1, v.w + 2, v.h + 2)
+					end
 				end
 				if self.parent and checkbox.guis[self.parent].use255 then
 					lg.setColor(love.math.colorFromBytes(self.color))
 				else
 					lg.setColor(self.color)
 				end
-				lg.rectangle("fill", v.x, v.y, v.w, v.h)
+				if self.round then
+					lg.rectangle("fill", v.x, v.y, v.w, v.h, self.roundRadius, self.roundRadius)
+				else
+					lg.rectangle("fill", v.x, v.y, v.w, v.h)
+				end
 				if self.selected[k] then
 					lg.setColor(self.overlayColor)
-					lg.rectangle("fill", v.x, v.y, v.w, v.h)
+					if self.round then
+						lg.rectangle("fill", v.x, v.y, v.w, v.h, self.roundRadius, self.roundRadius)
+					else
+						lg.rectangle("fill", v.x, v.y, v.w, v.h)
+					end
 					lg.setColor(self.color)
 				end
 				lg.setColor(self.optionsColor)
-				lg.print(v.text, v.x + self.optionsPaddingRight, v.y  + self.optionsPaddingTop)
+				lg.print(v.text, v.x + self.optionsPaddingRight / 2, v.y + self.optionsPaddingTop / 2)
 				lg.pop()
 			end
 		end
@@ -292,12 +336,12 @@ function checkbox:new(n, p)
 	end
 	
 	function c:enable()
-		self.hidden = false
+		self.uHidden = false
 	end
 	
 	function c:fadeIn()
 		if self.beforeFadeIn then self:beforeFadeIn() end
-		self.hidden = false
+		self.uHidden = false
 		if self.faded then
 			self.animateColor = true
 			self.animatePosition = true
@@ -330,18 +374,28 @@ function checkbox:new(n, p)
 		self.font = f
 	end
 	
+	function c:setHeight(h)
+		assert(h, "[" .. self.name .. "] FAILURE: checkbox:setHeight() :: Missing param[height]")
+		assert(type(h) == "number", "[" .. self.name .. "] FAILURE: checkbox:setHeight() :: Incorrect param[height] - expecting number and got " .. type(h))
+		self.h = h
+	end
+	
+	function c:getHeight(h)
+		return self.h
+	end
+	
 	function c:setHollow(h)
 		assert(h ~= nil, "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Missing param[hollow]")
 		assert(type(h) == "boolean", "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(h))
-		self.hollow = h
+		self.uHollow = h
 	end
 	
 	function c:isHollow()
-		return self.hollow
+		return self.uHollow
 	end
 	
 	function c:isHovered()
-		return self.hovered
+		return self.uHovered
 	end
 	
 	function c:setLabel(l)
@@ -382,16 +436,19 @@ function checkbox:new(n, p)
 	
 	function c:mousepressed(x, y, button, istouch, presses)
 		if button == 1 then
-			print(1)
 			for k,v in ipairs(self.options) do
 				if x >= v.x and x <= v.x + v.w and y >= v.y and y <= v.y + v.h then
 					if self.selected[k] then
-						print(1)
 						self.selected[k] = nil
 					else
-						print(2)
-						self.selected[k] = v
+						if self.single then
+							self.selected = {}
+							self.selected[k] = v
+						else
+							self.selected[k] = v
+						end
 					end
+					if self.onOptionChange then self:onOptionChange(self.options[k], {x, y, button, istouch, presses}) end
 				end
 			end
 		end
@@ -463,7 +520,7 @@ function checkbox:new(n, p)
 				self.inAnimation = false
 				self.animateColor = false
 				self.animatePosition = false
-				if self.animateOpacity and self.faded then self.hidden = true end
+				if self.animateOpacity and self.faded then self.uHidden = true end
 				self.animateOpacity = false
 			end
 		end
@@ -561,18 +618,28 @@ function checkbox:new(n, p)
 	end
 	
 	function c:touchmoved(id, x, y, dx, dy, pressure)
-		if (x >= self.pos.x and x <= self.pos.x + self.w) and (y >= self.pos.y and y <= self.pos.y + self.h) then
-			if not self.hovered then
+		if (x >= self.pos.x and x <= self.pos.x + self.uW) and (y >= self.pos.y and y <= self.pos.y + self.uH) then
+			if not self.uHovered then
 				if self.onHoverEnter then self:onHoverEnter() end
-				self.hovered = true 
+				self.uHovered = true 
 			end
-			if self.whileHovering then self:whileHovering() end
+			if self.uWhileHovering then self:whileHovering() end
 		else
-			if self.hovered then 
+			if self.uHovered then 
 				if self.onHoverExit then self:onHoverExit() end
-				self.hovered = false 
+				self.uHovered = false 
 			end
 		end
+	end
+	
+	function c:setWidth(w)
+		assert(w, "[" .. self.name .. "] FAILURE: checkbox:setWidth() :: Missing param[width]")
+		assert(type(w) == "number", "[" .. self.name .. "] FAILURE: checkbox:setWidth() :: Incorrect param[width] - expecting number and got " .. type(w))
+		self.w = w
+	end
+	
+	function c:getWidth()
+		return self.w
 	end
 	
 	function c:setX(x)

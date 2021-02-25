@@ -267,7 +267,7 @@ function gui:mousepressed(x, y, button, istouch, presses)
 				if (x >= i.pos.x + i.paddingLeft and x <= (i.pos.x + i.w) - i.paddingRight) and 
 				(y >= i.pos.y + i.paddingTop and y <= (i.pos.y + i.h) - i.paddingBottom) then
 					if not hitTarget then
-						if i.mousepressed then print(1) i:mousepressed(x, y, button, istouch, presses) end
+						if i.mousepressed then i:mousepressed(x, y, button, istouch, presses) end
 						if i.onClick then i:onClick(x, y, button, istouch, presses) end
 						if not i.hollow then
 							hitTarget = true
