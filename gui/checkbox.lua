@@ -78,10 +78,10 @@ function checkbox:new(n, p)
 	c.single = false
 	c.fixPadding = false
 	c.options = {}
-	c.optionsPaddingLeft = 0
-	c.optionsPaddingRight = 0
-	c.optionsPaddingTop = 0
-	c.optionsPaddingBottom = 0
+	c.paddingLeft = 0
+	c.paddingRight = 0
+	c.paddingTop = 0
+	c.paddingBottom = 0
 	c.selected = {}
 	c.font = lg.getFont()
 	c.inAnimation = false
@@ -221,12 +221,12 @@ function checkbox:new(n, p)
 		end
 		if d.padding then
 			if d.padding.top or d.padding.paddingTop then
-				self.optionsPaddingTop = d.padding.paddingTop or d.padding.top
-				self.optionsPaddingRight = d.padding.paddingRight or d.padding.right or self.optionsPaddingRight
-				self.optionsPaddingBottom = d.padding.paddingBottom or d.padding.bottom or self.optionsPaddingBottom
-				self.optionsPaddingLeft = d.padding.paddingLeft or d.padding.left or self.optionsPaddingLeft
+				self.paddingTop = d.padding.paddingTop or d.padding.top
+				self.paddingRight = d.padding.paddingRight or d.padding.right or self.paddingRight
+				self.paddingBottom = d.padding.paddingBottom or d.padding.bottom or self.paddingBottom
+				self.paddingLeft = d.padding.paddingLeft or d.padding.left or self.paddingLeft
 			else
-				self.optionsPaddingTop, self.optionsPaddingRight, self.optionsPaddingBottom, self.optionsPaddingLeft = unpack(d.padding)
+				self.paddingTop, self.paddingRight, self.paddingBottom, self.paddingLeft = unpack(d.padding)
 			end
 		end
 		self.pos.x = d.x or self.pos.x
@@ -250,46 +250,53 @@ function checkbox:new(n, p)
 			local w, h = 0, 0
 			for k,v in ipairs(d.options) do
 				if k == 1 then
-					self.options[k] = {text = v, x = self.optionsPaddingLeft + self.pos.x + self.font:getWidth(v) + self.optionsPaddingRight, y = self.optionsPaddingTop + self.pos.y + self.optionsPaddingBottom, w = self.uW + self.font:getWidth(v), h = self.font:getHeight()}
+					self.options[k] = {
+						text = v, 
+						x = self.pos.x, 
+						y = self.pos.y,
+						w = self.paddingLeft + self.uW + self.paddingRight,
+						h = self.paddingTop + self.uH + self.paddingBottom
+					}
 					if self.fixPadding then
-						self.options[k].x = self.pos.x + self.font:getWidth(v) + self.optionsPaddingRight
-						self.options[k].y = self.pos.y + self.optionsPaddingBottom
+						self.options[k].x = self.pos.x
 					end
 				else
-					self.options[k] = {text = v, x = self.options[k - 1].x + self.uW + self.optionsPaddingLeft + self.font:getWidth(v) + self.optionsPaddingRight, 
-					y = self.optionsPaddingTop + self.pos.y + self.optionsPaddingBottom, w = self.uW + self.font:getWidth(v), h = self.font:getHeight()}
+					self.options[k] = {
+						text = v, 
+						x = self.options[k - 1].x + 4 + (self.paddingLeft * 2) + self.uW + self.paddingRight, 
+						y = self.paddingTop + self.pos.y + self.paddingBottom,
+						w = self.paddingLeft + self.uW + self.paddingRight,
+						h = self.paddingTop + self.uH + self.paddingBottom
+					}
 					if d.verticalOptions then
 						self.vertical = true
-						self.options[k].x = self.pos.x
+						self.options[k].x = self.pos.x + self.paddingRight
 						self.options[k].y = self.options[k - 1].y + self.font:getHeight(v)
+					else
+						self.options[k].y = self.pos.y
 					end
 				end
-				w = w + (self.uW + self.font:getWidth(v))
-				h = h + (self.uH + self.font:getHeight(v)) + 2
+				w = self.paddingLeft + w + (self.uW + self.font:getWidth(v)) + self.paddingRight
+				h = self.paddingTop + h + (self.uH + self.font:getHeight(v)) + 2 + self.paddingBottom
+				print(h)
 				if self.border then
-					w = w + self.optionsPaddingLeft + 2 + self.optionsPaddingRight
-					h = h + self.optionsPaddingTop + 2 + self.optionsPaddingBottom
+					w = w + 2
+					h = h + 2
 				end
-				--[[if k == #d.options then
-					if self.fixPadding then
-						self.options[k].x = self.optionsPaddingLeft + self.options[k - 1].x + self.uW + self.font:getWidth(v)
-						self.options[k].y = self.optionsPaddingTop + self.pos.y
-					end
-				end--]]
 			end
 			if self.vertical then 
 				if self.border then
-					self.w = self.uW + 2
+					self.w = self.paddingLeft + self.uW + 2 + self.paddingRight
 				else
-					self.w = self.uW
+					self.w = self.paddingLeft + self.uW + self.paddingRight
 				end
 				self.h = h
 			else 
 				self.w = w
 				if self.border then
-					self.h = self.uH + 2
+					self.h = self.paddingTop + self.uH + 2 + self.paddingBottom
 				else
-					self.h = self.uH
+					self.h = self.paddingTop + self.uH + self.paddingBottom
 				end
 			end
 		end
@@ -338,7 +345,11 @@ function checkbox:new(n, p)
 					lg.setColor(self.color)
 				end
 				lg.setColor(self.optionsColor)
-				lg.print(v.text, v.x + self.optionsPaddingRight / 2, v.y + self.optionsPaddingTop / 2)
+				if self.border then
+					lg.print(v.text, (self.paddingLeft / 2) + v.x + (self.paddingRight / 2) + 1, (self.paddingTop / 2) + v.y + (self.paddingBottom / 2) - 2)
+				else
+					lg.print(v.text, (self.paddingLeft / 2) + v.x + (self.paddingRight / 2), (self.paddingTop / 2) + v.y + (self.paddingBotoom / 2))
+				end
 				lg.pop()
 			end
 		end
@@ -463,6 +474,7 @@ function checkbox:new(n, p)
 	function c:mousepressed(x, y, button, istouch, presses)
 		if button == 1 then
 			for k,v in ipairs(self.options) do
+				print(v.name, "x " .. tostring(x), v.x, v.x + v.w, "y " .. tostring(y), v.y, v.y + v.h)
 				if x >= v.x and x <= v.x + v.w and y >= v.y and y <= v.y + v.h then
 					if self.selected[k] then
 						self.selected[k] = nil
@@ -482,8 +494,8 @@ function checkbox:new(n, p)
 	
 	function c:update(dt)
 		local x,y = love.mouse.getPosition()
-		if (x >= self.pos.x + self.paddingLeft and x <= self.pos.x + self.w + self.paddingRight) and 
-		(y >= self.pos.y + self.paddingTop and y <= self.pos.y + self.h + self.paddingBottom) then
+		if (x >= self.pos.x and x <= self.pos.x + self.w) and 
+		(y >= self.pos.y and y <= self.pos.y + self.h) then
 			if not self.hovered then
 				if self.onHoverEnter then self:onHoverEnter() end
 				self.hovered = true 
