@@ -74,7 +74,7 @@ function love.load()
 	myCheckbox:setData({
 		w = 10, h = 10, x = 250, y = 150, z = 1, 
 		label = "Favorite Number?", labelColor = colors("black"), labelPos = {265, 125, 1}, 
-		padding = {0,10,0,10}, 
+		padding = {0,10,0,10}, fixPadding = true, 
 		options = {"1", "2", "3"}, optionColor = colors("blue"), singleSelection = true,
 		color = colors("eggshell"), 
 		useBorder = true, borderColor = colors("red"),

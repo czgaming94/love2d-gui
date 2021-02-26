@@ -76,6 +76,7 @@ function checkbox:new(n, p)
 	c.round = false
 	c.hollow = false
 	c.single = false
+	c.fixPadding = false
 	c.options = {}
 	c.optionsPaddingLeft = 0
 	c.optionsPaddingRight = 0
@@ -241,6 +242,7 @@ function checkbox:new(n, p)
 		self.round = d.round and d.round or self.round
 		self.roundRadius = (d.radius and d.radius) or (d.roundRadius and d.roundRadius) or self.roundRadius
 		self.single = (d.singleSelection and d.singleSelection) or (d.single and d.single) or self.single
+		self.fixPadding = (d.fixPadding and d.fixPadding) or (d.fix and d.fix) or self.fixPadding
 		if d.options then
 			if not d.keepOptions then
 				self.options = {}
@@ -248,7 +250,11 @@ function checkbox:new(n, p)
 			local w, h = 0, 0
 			for k,v in ipairs(d.options) do
 				if k == 1 then
-					self.options[k] = {text = v, x = self.pos.x + self.optionsPaddingLeft + self.font:getWidth(v) + self.optionsPaddingRight, y = self.optionsPaddingTop + self.pos.y + self.optionsPaddingBottom, w = self.uW + self.font:getWidth(v), h = self.font:getHeight()}
+					self.options[k] = {text = v, x = self.optionsPaddingLeft + self.pos.x + self.font:getWidth(v) + self.optionsPaddingRight, y = self.optionsPaddingTop + self.pos.y + self.optionsPaddingBottom, w = self.uW + self.font:getWidth(v), h = self.font:getHeight()}
+					if self.fixPadding then
+						self.options[k].x = self.pos.x + self.font:getWidth(v) + self.optionsPaddingRight
+						self.options[k].y = self.pos.y + self.optionsPaddingBottom
+					end
 				else
 					self.options[k] = {text = v, x = self.options[k - 1].x + self.uW + self.optionsPaddingLeft + self.font:getWidth(v) + self.optionsPaddingRight, 
 					y = self.optionsPaddingTop + self.pos.y + self.optionsPaddingBottom, w = self.uW + self.font:getWidth(v), h = self.font:getHeight()}
@@ -264,6 +270,12 @@ function checkbox:new(n, p)
 					w = w + self.optionsPaddingLeft + 2 + self.optionsPaddingRight
 					h = h + self.optionsPaddingTop + 2 + self.optionsPaddingBottom
 				end
+				--[[if k == #d.options then
+					if self.fixPadding then
+						self.options[k].x = self.optionsPaddingLeft + self.options[k - 1].x + self.uW + self.font:getWidth(v)
+						self.options[k].y = self.optionsPaddingTop + self.pos.y
+					end
+				end--]]
 			end
 			if self.vertical then 
 				if self.border then
@@ -368,10 +380,24 @@ function checkbox:new(n, p)
 		if self.onFadeOut then self:onFadeOut() end
 	end
 	
+	function c:fixPadding(f)
+		assert(f ~= nil, "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Missing param[hollow]")
+		assert(type(f) == "boolean", "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(f))
+		self.fixPadding = f
+	end
+	
+	function c:getFixPadding()
+		return self.fixPadding
+	end
+	
 	function c:setFont(f)
 		assert(f, "[" .. self.name .. "] FAILURE: checkbox:setFont() :: Missing param[font]")
 		assert(type(f) == "userdata", "[" .. self.name .. "] FAILURE: checkbox:setFont() :: Incorrect param[font] - expecting font userdata and got " .. type(f))
 		self.font = f
+	end
+	
+	function c:getFont()
+		return self.font
 	end
 	
 	function c:setHeight(h)
@@ -455,6 +481,21 @@ function checkbox:new(n, p)
 	end
 	
 	function c:update(dt)
+		local x,y = love.mouse.getPosition()
+		if (x >= self.pos.x + self.paddingLeft and x <= self.pos.x + self.w + self.paddingRight) and 
+		(y >= self.pos.y + self.paddingTop and y <= self.pos.y + self.h + self.paddingBottom) then
+			if not self.hovered then
+				if self.onHoverEnter then self:onHoverEnter() end
+				self.hovered = true 
+			end
+			if self.whileHovering then self:whileHovering() end
+		else
+			if self.hovered then 
+				if self.onHoverExit then self:onHoverExit() end
+				self.hovered = false 
+			end
+		end
+		
 		if self.inAnimation then
 			local allColorsMatch = true
 			local allBorderColorsMatch = true
@@ -542,9 +583,9 @@ function checkbox:new(n, p)
 		local x,y
 		
 		if self.vertical then
-			x,y = self.pos.x, self.pos.y + self.font:getHeight(o)
+			x,y = self.paddingLeft + self.pos.x + self.paddingRight, self.paddingTop + self.pos.y + self.font:getHeight(o) + self.paddingBottom
 		else
-			x,y = self.options[#self.options].x + self.font:getWidth(o), self.pos.y
+			x,y = self.paddingLeft + self.options[#self.options].x + self.font:getWidth(o) + self.paddingRight, self.paddingTop + self.pos.y + self.paddingBottom
 		end
 		self.options[#self.options + 1] = {text = o, x = x, y = y}
 	end
