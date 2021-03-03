@@ -14,9 +14,10 @@ The checkbox is designed to be used for taking user input on choices. A top use<
 for the checkbox is for Poll option selection. Checkboxes can accept multiple<br>
 selections, or be limited to a single selection.
 ### [Dropdown](https://github.com/czgaming94/love2d-gui/blob/main/docs/Dropdown.md)
+__Coming Soon__
 The dropdown is just as it sounds; A menu of options that drops down when clicked on.<br>
 This is commonly used for toggling between user input options, form submissions, etc.
 ### [Textfield](https://github.com/czgaming94/love2d-gui/blob/main/docs/Textfield.md)
-Coming Soon
+__Coming Soon__
 ### [Toggle](https://github.com/czgaming94/love2d-gui/blob/main/docs/Toggle.md)
-Coming Soon
+__Coming Soon__
