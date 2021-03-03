@@ -232,7 +232,6 @@ function box:new(n, p)
 			end
 			lg.rectangle("line", self.pos.x - 1, self.pos.y - 1, self.paddingLeft + self.w + self.paddingRight + 2, self.paddingTop + self.h + self.paddingBottom + 2)
 		end
-		
 		if self.parent and box.guis[self.parent].use255 then
 			lg.setColor(love.math.colorFromBytes(self.color))
 		else
@@ -292,6 +291,16 @@ function box:new(n, p)
 	
 	function b:isHovered()
 		return self.hovered
+	end
+	
+	function c:setHollow(h)
+		assert(h ~= nil, "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Missing param[hollow]")
+		assert(type(h) == "boolean", "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(h))
+		self.hollow = h
+	end
+	
+	function c:isHollow()
+		return self.hollow
 	end
 	
 	function b:setImage(i)
@@ -465,7 +474,7 @@ function box:new(n, p)
 		return self.color[4]
 	end
 	
-	function b:parent()
+	function b:getParent()
 		return box.guis[self.parent]
 	end
 	

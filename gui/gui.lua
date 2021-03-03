@@ -48,6 +48,7 @@ local colors = {
 gui.items = {}
 gui.z = 0
 gui.use255 = false
+gui.id = 1
 
 
 gui.images = {}

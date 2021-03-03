@@ -23,7 +23,19 @@ clickable
 image
 moveable
 opacity
-padding
+padding [top, right, bottom, left]
+```
+### API Callbacks
+```lua
+:onClick()
+:onHoverEnter()
+:onHoverExit()
+:beforeFadeIn()
+:onFadeIn()
+:afterFadeIn()
+:beforeFadeOut()
+:onFadeOut()
+:afterFadeOut()
 ```
 ### Data Handling
 ```lua
@@ -42,15 +54,15 @@ padding
 :setImage(userdata image OR string imageName)
 :getImage()
 :setPadding(table padding) [top, right, bottom, left]
-:setPaddingBottom
-:setPaddingLeft
-:setPaddingRight
-:setPaddingTop
+:setPaddingBottom(number padding)
+:setPaddingLeft(number padding)
+:setPaddingRight(number padding)
+:setPaddingTop(number padding)
 :setMoveable(boolean canMove)
 :getMoveable()
 :setOpacity(number opacity)
 :getOpacity()
-:parent() -- returns parent GUI object
+:getParent() -- returns parent GUI object
 :setUseBorder(boolean useBorder)
 :getUseBorder()
 :setWidth(number width)

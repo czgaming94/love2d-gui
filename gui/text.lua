@@ -194,6 +194,7 @@ function text:new(n, p)
 	
 	function t:draw()
 		lg.push()		
+		lg.setFont(self.font)
 		if self.typewriter then
 			if self.fancy then
 				for k,v in ipairs(self.typewriterText) do
@@ -233,10 +234,10 @@ function text:new(n, p)
 					end
 				end
 			else
-				lg.print({self.color, self.typewriterPrint}, self.font, self.pos.x, self.pos.y)
+				lg.print({self.color, self.typewriterPrint}, self.pos.x, self.pos.y)
 			end
 		else
-			lg.print({self.color, self.text}, self.font, self.pos.x, self.pos.y)
+			lg.print({self.color, self.text}, self.pos.x, self.pos.y)
 		end
 		
 		lg.setColor(1,1,1,1)
@@ -330,7 +331,6 @@ function text:new(n, p)
 				for k,v in ipairs(self.typewriterText) do
 					if v.text then
 						v.timeWaited = v.timeWaited + dt
-						print(v.delay, v.delayWaited)
 						if v.delay > 0 and v.delayWaited < v.delay then
 							v.delayWaited = v.delayWaited + dt
 							if v.delayWaited >= v.delay then
@@ -343,7 +343,6 @@ function text:new(n, p)
 							end
 							while v.timeWaited >= v.time and v.textPos <= #v.text do
 								v.timeWaited = v.timeWaited - v.time
-								print(v.toShow, v.textPos, v.text[v.textPos])
 								v.toShow = v.toShow .. v.text[v.textPos]
 								v.textPos = v.textPos + 1
 							end
@@ -448,7 +447,7 @@ function text:new(n, p)
 		return self.color[4]
 	end
 	
-	function t:parent()
+	function t:getParent()
 		return text.guis[self.parent]
 	end
 	

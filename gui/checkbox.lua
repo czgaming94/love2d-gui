@@ -279,7 +279,6 @@ function checkbox:new(n, p)
 				end
 				w = (self.paddingLeft * 2) + w + (self.uW + self.font:getWidth(v)) + self.paddingRight
 				h = self.paddingTop + h + (self.uH + self.font:getHeight(v)) + 2 + self.paddingBottom
-				print(h)
 				if self.border then
 					w = w + 2
 					h = h + 2
@@ -426,15 +425,15 @@ function checkbox:new(n, p)
 	function c:setHollow(h)
 		assert(h ~= nil, "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Missing param[hollow]")
 		assert(type(h) == "boolean", "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(h))
-		self.uHollow = h
+		self.hollow = h
 	end
 	
 	function c:isHollow()
-		return self.uHollow
+		return self.hollow
 	end
 	
 	function c:isHovered()
-		return self.uHovered
+		return self.hovered
 	end
 	
 	function c:setLabel(l)
@@ -594,21 +593,21 @@ function checkbox:new(n, p)
 		return self.overlayColor
 	end
 	
-	function c:parent()
+	function c:getParent()
 		return checkbox.guis[self.parent]
 	end
 	
 	function c:touchmoved(id, x, y, dx, dy, pressure)
 		if (x >= self.pos.x and x <= self.pos.x + self.uW) and (y >= self.pos.y and y <= self.pos.y + self.uH) then
-			if not self.uHovered then
+			if not self.hovered then
 				if self.onHoverEnter then self:onHoverEnter() end
-				self.uHovered = true 
+				self.hovered = true 
 			end
 			if self.uWhileHovering then self:whileHovering() end
 		else
-			if self.uHovered then 
+			if self.hovered then 
 				if self.onHoverExit then self:onHoverExit() end
-				self.uHovered = false 
+				self.hovered = false 
 			end
 		end
 	end

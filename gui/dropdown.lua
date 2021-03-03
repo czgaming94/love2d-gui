@@ -315,15 +315,15 @@ function dropdown:new(n, id)
 	function d:setHollow(h)
 		assert(h ~= nil, "[" .. self.name .. "] FAILURE: dropdown:setHollow() :: Missing param[hollow]")
 		assert(type(h) == "boolean", "[" .. self.name .. "] FAILURE: dropdown:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(h))
-		self.uHollow = h
+		self.hollow = h
 	end
 	
 	function d:isHollow()
-		return self.uHollow
+		return self.hollow
 	end
 	
 	function d:isHovered()
-		return self.uHovered
+		return self.hovered
 	end
 	
 	function d:mousepressed(x, y, button, istouch, presses)
@@ -425,21 +425,21 @@ function dropdown:new(n, id)
 		return self.overlayColor
 	end
 	
-	function d:parent()
+	function d:getParent()
 		return dropdown.guis[self.parent]
 	end
 	
 	function d:touchmoved(id, x, y, dx, dy, pressure)
 		if (x >= self.pos.x and x <= self.pos.x + self.uW) and (y >= self.pos.y and y <= self.pos.y + self.uH) then
-			if not self.uHovered then
+			if not self.hovered then
 				if self.onHoverEnter then self:onHoverEnter() end
-				self.uHovered = true 
+				self.hovered = true 
 			end
 			if self.uWhileHovering then self:whileHovering() end
 		else
-			if self.uHovered then 
+			if self.hovered then 
 				if self.onHoverExit then self:onHoverExit() end
-				self.uHovered = false 
+				self.hovered = false 
 			end
 		end
 	end
