@@ -39,6 +39,7 @@ local prefixes = {
 
 text.items = {}
 text.guis = {}
+text.fonts = {}
 
 function text:new(n, p)
 	local t = {}
@@ -99,7 +100,6 @@ function text:new(n, p)
 		assert(type(c) == "table", "[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
 		assert(#c == 4, "[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
 		s = s or 2
-		assert(s, "[" .. self.name .. "] FAILURE: text:animateToColor() :: Missing param[speed]")
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		self.colorToAnimateTo = c
 		self.colorAnimateSpeed = s
@@ -127,7 +127,6 @@ function text:new(n, p)
 		assert(o, "[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Missing param[o]")
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 		s = s or 1
-		assert(s, "[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Missing param[speed]")
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		self.opacityToAnimateTo = o
 		self.opacityAnimateTime = lt.getTime()
@@ -180,7 +179,11 @@ function text:new(n, p)
 		self.typewriterSpeed = d.s or d.speed or self.typewriterSpeed
 		self.pos.z = d.z or self.pos.z
 		self.color = d.color or self.color
-		self.font = d.font or self.font
+		if d.fonts then
+			for k,v in pairs(d.fonts) do
+				self.fonts[k] = v
+			end
+		end
 		self.clickable = d.clickable and d.clickable or self.clickable
 	end
 	
@@ -207,7 +210,7 @@ function text:new(n, p)
 							end
 						end
 						if v.font ~= "default" then
-							lg.setColor(v.font)
+							lg.setFont(self.fonts[v.font])
 						end
 						
 						if not v.y then
@@ -219,14 +222,12 @@ function text:new(n, p)
 								v.x = self.pos.x
 							else
 								v.x = self.typewriterText[k - 1].x + lg.getFont():getWidth(v.fullText)
-								
-								if self.width > 0 and v.x > self.pos.x + (self.width - lg.getFont():getWidth(v.fullText)) then
+								if self.w > 0 and v.x > self.pos.x + (self.w - lg.getFont():getWidth(v.fullText)) then
 									v.x = self.pos.x
 									v.y = self.typewriterText[k - 1].y + lg.getFont():getHeight(v.fullText) 
 								end
 							end
 						end
-						
 						lg.print(v.toShow, v.x, v.y)
 						lg.setColor(1,1,1,1)
 						lg.pop()
@@ -330,8 +331,13 @@ function text:new(n, p)
 			if self.fancy then
 				for k,v in ipairs(self.typewriterText) do
 					if v.text then
-						if v.delay > 0 and not delayWaited >= v.delay then
-							delayWaited = delayWaited + dt
+						v.timeWaited = v.timeWaited + dt
+						print(v.delay, v.delayWaited)
+						if v.delay > 0 and v.delayWaited < v.delay then
+							v.delayWaited = v.delayWaited + dt
+							if v.delayWaited >= v.delay then
+								v.needToWait = false
+							end
 						end
 						if not v.needToWait then
 							if not v.started then
@@ -339,6 +345,7 @@ function text:new(n, p)
 							end
 							while v.timeWaited >= v.time and v.textPos <= #v.text do
 								v.timeWaited = v.timeWaited - v.time
+								print(v.toShow, v.textPos, v.text[v.textPos])
 								v.toShow = v.toShow .. v.text[v.textPos]
 								v.textPos = v.textPos + 1
 							end
@@ -529,9 +536,9 @@ end
 function text:split(s)
 	local t={}
 	local f = false
-	if string.match(s, "{") then
+	if s:match("{") and s:match("}") then
 		f = true
-		for b in string.gmatch(str, ".-{") do
+		for b in s:gmatch(".-{") do
 			local id = #t + 1
 			t[id] = {}
 			t[id].text = {}
@@ -543,7 +550,7 @@ function text:split(s)
 			t[id].time = 0.5
 			t[id].started = false
 			t[id].finished = false
-			t[id].textPos = 0
+			t[id].textPos = 1
 			t[id].timeWaited = 0
 			t[id].toShow = ""
 			if string.match(b, "}") then
@@ -554,7 +561,7 @@ function text:split(s)
 							t[id].color = m:gsub("^" .. prefixes.color .. "=", "")
 						end
 						if string.sub(m,1,1) == prefixes.delay then
-							t[id].delay = m:gsub("^" .. prefixes.delay .. "=", "")
+							t[id].delay = tonumber((m:gsub("^" .. prefixes.delay .. "=", "")))
 							t[id].needToWait = true
 						end
 						if string.sub(m,1,1) == prefixes.font then

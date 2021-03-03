@@ -59,6 +59,7 @@ function gui.color(c)
 end
 
 function gui:new(item)
+	item = item or self
 	local new = self:generate(item)
 	new.id = #items
 	items[#items + 1] = new
@@ -165,7 +166,6 @@ function gui:animateToOpacity(obj, o, s)
 	assert(o, "FAILURE: gui:animateToOpacity() :: Missing param[o]")
 	assert(type(o) == "number", "FAILURE: gui:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 	s = s or 1
-	assert(s, "FAILURE: gui:animateToOpacity() :: Missing param[s]")
 	assert(type(s) == "number", "FAILURE: gui:animateToOpacity() :: Incorrect param[s] - expecting number and got " .. type(s))
 	obj.opacityToAnimateTo = o
 	obj.opacityAnimateTime = lt.getTime()
@@ -265,7 +265,7 @@ function gui:mousepressed(x, y, button, istouch, presses)
 		for k,i in ipairs(v.items) do
 			if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
 				if i.mousepressed then i:mousepressed(x, y, button, istouch, presses) end
-				if i.onClick then i:onClick(x, y, button, istouch, presses) end
+				if i.onClick then i:onClick({x=x, y=y, button=button, istouch=istouch, pressed=presses}) end
 				if not i.hollow then 
 					hitTarget = true 
 				end

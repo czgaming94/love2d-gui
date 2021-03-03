@@ -15,6 +15,8 @@ local myBox4 = myGui2:addBox("myBox4")
 
 local myText = myGui2:addText("continue")
 
+local myFont = lg.newFont("res/font/thicktext.otf", 32)
+
 local colors = GUI.color
 
 function love.load()
@@ -45,8 +47,8 @@ function love.load()
 	-- x            (number)
 	-- y            (number)
 	-- z            (number)
-	myBox:setData({w = 800, h = 600, x = 0, y = 0, z = 0, image = "background"})
-	-- This line can do the same as these 13. Order does not matter. Assosciative table required.
+	myBox:setData({ w = 800, h = 600, x = 0, y = 0, z = 0, image = "background"})
+	-- This function can do the same as these 13. Order does not matter. Assosciative table required.
 
 	--[[
 		myBox:setBorderColor({1,0,1,1})
@@ -68,20 +70,38 @@ function love.load()
 	-- Clicks will pass through this object.
 	myBox:setClickable(false)
 	
-	myBox2:setData({w = 50, h = lg.getHeight(), x = 1, y = 0, color = colors("green"), useBorder = true, borderColor = colors("black")})
-	boxes.myBox3:setData({w = 225, h = 65, x = 105, y = 485, color = colors("alphaRed"), useBorder = false})
-	myText:setData({x = 110, y = 490, z = 2, color = colors("yellow"), text = "Hello World!"})
+	myBox2:setData({
+		w = 50, h = lg.getHeight(), x = 1, y = 0, 
+		color = colors("green"), 
+		useBorder = true, borderColor = colors("black")
+	})
+	boxes.myBox3:setData({
+		w = 225, h = 65, x = 105, y = 485, 
+		color = colors("alphaRed"), 
+		useBorder = false
+	})
+	myText:setData({
+		x = 110, y = 490, z = 2, 
+		color = colors("yellow"), 
+		text = "Hello {c=red,d=1,f=myFont}World!{/}",
+		typewriter = true, speed = 0.5,
+		fonts = {myFont = myFont}
+	})
 	myCheckbox:setData({
 		w = 10, h = 10, x = 250, y = 150, z = 1, 
-		label = "Favorite Number?", labelColor = colors("black"), labelPos = {265, 125, 1}, 
+		label = "Favorite Color?", labelColor = colors("black"), labelFont = myFont, labelPos = {290, 105, 1},
 		padding = {10,10,10,10}, fixPadding = true, 
-		options = {"1", "2", "3"}, optionColor = colors("blue"), singleSelection = true,
+		options = {"Red", "Blue", "Green", "Yellow"}, optionColor = colors("blue"), singleSelection = true,
 		color = colors("eggshell"), 
 		useBorder = true, borderColor = colors("red"),
 		round = true, radius = 3,
 		overlayColor = colors("alphaRed")
 	})
-	myBox4:setData({w = 50, h = 250, x = 105, y = 200, color = colors("purple"), useBorder = true, borderColor = colors("black")})
+	myBox4:setData({
+		w = 50, h = 250, x = 105, y = 200, 
+		color = colors("purple"), 
+		useBorder = true, borderColor = colors("black")
+	})
 	
 	
 	-- You can change the Z index of an entire GUI container, or just a single object
@@ -104,11 +124,12 @@ function love.load()
 		boxes.myBox3:animateToColor(colors("red"))
 	end
 	
-	function boxes.myBox3:onClick()
+	function boxes.myBox3:onClick(evt)
 		-- disable object click detection - boolean
 		-- disable object animation to instantly fade - boolean
 		-- :fadeIn() will automatically restore an object to update status
 		boxes.myBox3:fadeOut(true, true)
+		print(evt.button)
 	end
 	
 	-- You can define onFadeOut callbacks for your GUI elements
@@ -134,8 +155,8 @@ function love.load()
 	end
 	
 	-- You can define onOptionChange callbacks for your GUI elements
-	function myCheckbox:onOptionChange(option)
-		print(option.text)
+	function myCheckbox:onOptionChange(option, evt)
+		myBox2:setColor(colors(option.text:lower()))
 	end
 end
 
@@ -156,9 +177,11 @@ end
 
 -- For mobile
 function love.touchpressed(id, x, y, dx, dy, pressure)
+	-- Use global source for callbacks
 	GUI:touchpressed(id, x, y, dx, dy, pressure)
 end
 
 function love.touchmoved(id, x, y, dx, dy, pressure)
+	-- Use global source for callbacks
 	GUI:touchmoved(id, x, y, dx, dy, pressure)
 end

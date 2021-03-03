@@ -142,7 +142,6 @@ function box:new(n, p)
 		assert(o, "[" .. self.name .. "] FAILURE: box:animateToOpacity() :: Missing param[o]")
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: box:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 		s = s or 1
-		assert(s, "[" .. self.name .. "] FAILURE: box:animateToOpacity() :: Missing param[speed]")
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		if not self.fadedByFunc then
 			self.opacityToAnimateTo = o
