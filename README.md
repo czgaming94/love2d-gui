@@ -3,16 +3,16 @@ This API's goal is to make laying out your application GUI simple and efficient.
 The secondary goal of this API is to be as easy to grasp as possible for beginners.<br>
 There are a few different tools brought with this API...<br>
 ### [Boxes](https://github.com/czgaming94/love2d-gui/blob/main/docs/Box.md)
-![Box Image](https://github.com/czgaming94/love2d-gui/blob/main/docs/examples/box.png)
+![Box Image](https://github.com/czgaming94/love2d-gui/blob/main/docs/examples/box.png)<br>
 The goal of the box object is for backgrounds, buttons, and HUD containers. This is<br>
 the most commonly used type of object in a GUI.
 ### [Text](https://github.com/czgaming94/love2d-gui/blob/main/docs/Text.md)
-![Text Image](https://github.com/czgaming94/love2d-gui/blob/main/docs/examples/text.png)
+![Text Image](https://github.com/czgaming94/love2d-gui/blob/main/docs/examples/text.png)<br>
 The text object has a few abilities. It can be treated as regular static text, or<br>
 it can be treated as a typewriter, and given syntax coding to morph and affect how<br>
 the text is displayed.
 ### [Checkbox](https://github.com/czgaming94/love2d-gui/blob/main/docs/Checkbox.md)
-![Checkbox Image](https://github.com/czgaming94/love2d-gui/blob/main/docs/examples/checkbox.png)
+![Checkbox Image](https://github.com/czgaming94/love2d-gui/blob/main/docs/examples/checkbox.png)<br>
 The checkbox is designed to be used for taking user input on choices. A top use<br>
 for the checkbox is for Poll option selection. Checkboxes can accept multiple<br>
 selections, or be limited to a single selection.
