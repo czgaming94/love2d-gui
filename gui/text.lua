@@ -179,6 +179,7 @@ function text:new(n, p)
 		self.typewriterSpeed = d.s or d.speed or self.typewriterSpeed
 		self.pos.z = d.z or self.pos.z
 		self.color = d.color or self.color
+		self.font = d.font or self.font
 		if d.fonts then
 			for k,v in pairs(d.fonts) do
 				self.fonts[k] = v
@@ -192,10 +193,7 @@ function text:new(n, p)
 	end
 	
 	function t:draw()
-		lg.push()
-		lg.setColor(self.color)
-		lg.setFont(self.font)
-		
+		lg.push()		
 		if self.typewriter then
 			if self.fancy then
 				for k,v in ipairs(self.typewriterText) do
@@ -235,10 +233,10 @@ function text:new(n, p)
 					end
 				end
 			else
-				lg.print(self.typewriterPrint, self.pos.x, self.pos.y)
+				lg.print({self.color, self.typewriterPrint}, self.font, self.pos.x, self.pos.y)
 			end
 		else
-			lg.print(self.text, self.pos.x, self.pos.y)
+			lg.print({self.color, self.text}, self.font, self.pos.x, self.pos.y)
 		end
 		
 		lg.setColor(1,1,1,1)
@@ -448,6 +446,10 @@ function text:new(n, p)
 	
 	function t:getOpacity()
 		return self.color[4]
+	end
+	
+	function t:parent()
+		return text.guis[self.parent]
 	end
 	
 	function t:touchmoved(id, x, y, dx, dy, pressure)

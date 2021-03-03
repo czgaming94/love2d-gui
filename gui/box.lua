@@ -465,6 +465,10 @@ function box:new(n, p)
 		return self.color[4]
 	end
 	
+	function b:parent()
+		return box.guis[self.parent]
+	end
+	
 	function b:touchmoved(id, x, y, dx, dy, pressure)
 		if (x >= self.pos.x + self.paddingLeft and x <= self.pos.x + self.w + self.paddingRight) and 
 		(y >= self.pos.y + self.paddingTop and y <= self.pos.y + self.h + self.paddingBottom) then

@@ -425,6 +425,10 @@ function dropdown:new(n, id)
 		return self.overlayColor
 	end
 	
+	function d:parent()
+		return dropdown.guis[self.parent]
+	end
+	
 	function d:touchmoved(id, x, y, dx, dy, pressure)
 		if (x >= self.pos.x and x <= self.pos.x + self.uW) and (y >= self.pos.y and y <= self.pos.y + self.uH) then
 			if not self.uHovered then
