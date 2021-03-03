@@ -1,5 +1,5 @@
 # Box
-The goal of the box object is for backgrounds, buttons, and HUD containers. This is
+The goal of the box object is for backgrounds, buttons, and HUD containers. This is<br>
 the most commonly used type of object in a GUI.
 ## Object Creation
 ```lua
