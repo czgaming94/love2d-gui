@@ -54,6 +54,7 @@ function box:new(n, p)
 	b.clickable = true
 	b.held = false
 	b.moveable = false
+	b.hollow = false
 	b.faded = false
 	b.fadedByFunc = false
 	b.hidden = false
@@ -293,13 +294,13 @@ function box:new(n, p)
 		return self.hovered
 	end
 	
-	function c:setHollow(h)
+	function b:setHollow(h)
 		assert(h ~= nil, "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Missing param[hollow]")
 		assert(type(h) == "boolean", "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(h))
 		self.hollow = h
 	end
 	
-	function c:isHollow()
+	function b:isHollow()
 		return self.hollow
 	end
 	

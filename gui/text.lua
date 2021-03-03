@@ -62,6 +62,7 @@ function text:new(n, p)
 	t.fonts = {}
 	t.hovered = false
 	t.clicked = false
+	t.hollow = false
 	t.clickable = true
 	t.faded = false
 	t.fadedByFunc = false
@@ -291,6 +292,16 @@ function text:new(n, p)
 	
 	function t:isHovered()
 		return self.hovered
+	end
+	
+	function t:setHollow(h)
+		assert(h ~= nil, "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Missing param[hollow]")
+		assert(type(h) == "boolean", "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(h))
+		self.hollow = h
+	end
+	
+	function t:isHollow()
+		return self.hollow
 	end
 	
 	function t:setTypewriterSpeed(s)

@@ -69,6 +69,7 @@ function dropdown:new(n, id)
 	d.hovered = false
 	d.clicked = false
 	d.clickable = true
+	d.hollow = false
 	d.faded = false
 	d.fadedByFunc = false
 	d.hidden = false
