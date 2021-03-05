@@ -1,7 +1,7 @@
 # Checkbox
 The checkbox is designed to be used for taking user input on choices. A top use<br>
 for the checkbox is for Poll option selection. Checkboxes can accept multiple<br>
-selections, or be limited to a single selection.
+selections, or be limited to a single selection. 
 ## Object Creation
 ```lua
 local GUI = require("gui")
@@ -50,7 +50,7 @@ myCheckbox:setData({
 > Returns true/false depending on whether the object is in the process of any animation.
 ##### :setBorderColor(table color)
 ##### :getBorderColor()
-#####:setClickable(boolean clickable)
+#####:setClickable(boolean clickable
 #####:isClickable()
 #####:setColor(table color)
 #####:getColor()

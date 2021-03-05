@@ -9,22 +9,6 @@ local myBox = myGui:addBox("myBox")
 myBox:addImage(lg.newImage("res/img/background.png"), "background", true)
 myBox:setData({ w = 800, h = 600, x = 0, y = 0, z = 0})
 ```
-There are several options you can set in the `setData` function. Here is a list:
-```lua
-width | w
-height | h
-x
-y
-z
-useBorder
-borderColor
-color
-clickable
-image
-moveable
-opacity
-padding [top, right, bottom, left]
-```
 ## API Callbacks
 ##### :onClick(event) -- {x, y, button, istouch, presses}
 > Triggered when a user clicks on the object.
@@ -62,23 +46,12 @@ There are several options you can set in the `setData` function. Here is a list:
 > table                             borderColor
 > table                             color
 > boolean                           clickable
-> boolean                           fixPadding | fix
 > number                            height | h
 > userdata                          image
-> boolean                           keepOptions
-> string                            label | text
-> table                             labelColor
-> userdata                          labelFont
-> table                             labelPosition | labelPos
 > boolean                           moveable
 > number                            opacity
-> table                             options
-> table                             optionsColor
-> table                             overlayColor
-> table                             padding
 > boolean                           round
 > number                            roundRadius | radius
-> boolean                           singleSelection | single
 > boolean                           useBorder
 > number                            width | w
 > number                            x
