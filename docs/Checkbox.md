@@ -56,34 +56,21 @@ myCheckbox:setData({
 ##### :getColor()
 ##### :setData(table data)
 There are several options you can set in the `setData` function. Here is a list:
-var type | var name
----------|---------
-table | borderColor
-table | color
-boolean | clickable
-boolean | fixPadding / fix
-number | height / h
-userdata | image
-boolean | keepOptions
-string | label / text
-table | labelColor
-userdata | labelFont
-table | labelPosition / labelPos
-boolean | moveable
-number | opacity
-table | options
-table | optionsColor
-table | overlayColor
-table | padding
-boolean | round
-number | roundRadius / radius
-boolean | singleSelection / single
-boolean | useBorder
-number | width / w
-number | x
-number | y
-number | z
-boolean | vertical
+var type | var name | var type | var name
+---------|----------|----------|---------
+table | borderColor | table | color
+boolean | clickable | boolean | fixPadding / fix
+number | height / h | userdata | image
+boolean | keepOptions | string | label / text
+table | labelColor | userdata | labelFont
+table | labelPosition / labelPos | boolean | moveable
+number | opacity | table | options
+table | optionsColor | table | overlayColor
+table | padding | boolean | round
+number | roundRadius / radius | boolean | singleSelection / single
+boolean | useBorder | number | width / w
+number | x | number | y
+number | z | boolean | vertical
 ##### :fixPadding(boolean fix)
 > Adjusts padding to be ignored on the top of first line, and ignore left padding on first object.
 ##### :getFixPadding()

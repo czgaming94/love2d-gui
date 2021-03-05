@@ -258,6 +258,15 @@ function gui:draw()
 	end
 end
 
+function gui:child(n)
+	assert(n, "FAILURE: gui:child() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:child() :: Incorrect param[name] - expecting string and got " .. type(n))
+	for _,v in ipairs(self.items) do
+		if v.name == n then return v end
+	end
+	return nil
+end
+
 function gui:mousemoved(x, y, button, istouch, presses)
 	for _,v in ipairs(items) do 
 		for _,i in ipairs(v.items) do 
