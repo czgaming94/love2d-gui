@@ -37,11 +37,11 @@ myBox:setData({ w = 800, h = 600, x = 0, y = 0, z = 0})
 > Returns true/false depending on whether the object is in the process of any animation.
 ##### :setBorderColor(table color)
 ##### :getBorderColor()
-#####:setClickable(boolean clickable)
-#####:isClickable()
-#####:setColor(table color)
-#####:getColor()
-#####:setData(table data)
+##### :setClickable(boolean clickable)
+##### :isClickable()
+##### :setColor(table color)
+##### :getColor()
+##### :setData(table data)
 There are several options you can set in the `setData` function. Here is a list:
 > table                             borderColor
 > table                             color
