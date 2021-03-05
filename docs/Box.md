@@ -10,6 +10,8 @@ myBox:addImage(lg.newImage("res/img/background.png"), "background", true)
 myBox:setData({ w = 800, h = 600, x = 0, y = 0, z = 0})
 ```
 ## API Callbacks
+This API brings several user defined callbacks which allow you to customize what happens when a user interacts with your elements.<br>
+Any callback with an `event` paramter has a table provided to it with data accessible to the user.
 ##### :onClick(event) -- {x, y, button, istouch, presses}
 > Triggered when a user clicks on the object.
 ##### :onTouch(event) -- {id, x, y, dx, dy, pressure}
@@ -31,16 +33,24 @@ myBox:setData({ w = 800, h = 600, x = 0, y = 0, z = 0})
 ##### :afterFadeOut()
 > Triggered after an object fades out.
 ## Data Handling
+These functions provide the ability to directly modify many variables of your elements. The way these work currently may change.<br>
+The biggest change that may happen, is accepting additional parameter types. No old elements will be broken by updates.
 ##### :addImage(userdata image, string name, boolean automatic)
-> Add an image to the box object memory. These will be used with the :setImage() function
+> Add an image to the box object memory. These will be used with the :setImage() function.
 ##### :isAnimating()
 > Returns true/false depending on whether the object is in the process of any animation.
 ##### :setBorderColor(table color)
+> Set the border color of your element to a new color. Default is white.
 ##### :getBorderColor()
+> Returns a table of the current element border color.
 ##### :setClickable(boolean clickable)
+> Set whether the element will register as a clickable object.
 ##### :isClickable()
+> Returns whether the element is clickable.
 ##### :setColor(table color)
+> Set the color of your element as a new color. Default is white.
 ##### :getColor()
+> Returns a table of the current element color.
 ##### :setData(table data)
 There are several options you can set in the `setData` function. Here is a list:
 var type | var name
@@ -60,54 +70,51 @@ number | x
 number | y
 number | z
 boolean | vertical
-##### :fixPadding(boolean fix)
-> Adjusts padding to be ignored on the top of first line, and ignore left padding on first object.
-##### :getFixPadding()
-##### :setFont(userdata font OR string fontName)
-##### :getFont()
 ##### :setHeight(number height)
+> Set the height of the current element
 ##### :getHeight()
+> Get the height of the current element
 ##### :setHollow(boolean hollow)
-> When an object is hollow, it will allow the user to click through it, while also triggering its own onClick() function.
+> Sets whether an element is detected as hollow. When an element is hollow, it will allow the user to click through it,<br>
+> while also triggering its own onClick() function.
 ##### :getHollow()
+> Returns whether an element is hollow.
 ##### :isHovered()
-##### :setLabel(string label)
-##### :getLabel()
-##### :setLabelColor(table color)
-##### :getLabelColor()
-##### :setLabelFont(userdata font OR string fontName)
-##### :getLabelFont()
-##### :setLabelPosition(table pos)
-##### :getLabelPosition()
+> Returns whether an element is hovered.
 ##### :setMoveable(boolean canMove)
+> Set whether an element is moveable.<br>
 > Currently unfunctional.
 ##### :getMoveable()
+> Get whether the element is moveable.<br>
+> Currently unfunctional.
 ##### :setOpacity(number opacity)
+> Set the opacity of the current element
 ##### :getOpacity()
-##### :addOption(string option)
-##### :removeOption(string option)
-##### :setOptionColor(table color)
-##### :getOptionColor()
-##### :setOptionPadding(table padding) [top, right, bottom, left]
-##### :setOptionPaddingBottom(number padding)
-##### :setOptionPaddingLeft(number padding)
-##### :setOptionPaddingRight(number padding)
-##### :setOptionPaddingTop(number padding)
-##### :setOverlayColor(table color)
-##### :getOverlayColor()
+> Get the opacity of the current element
 ##### :getParent()
-> Returns the parent GUI object of the current object.
+> Returns the parent GUI object of the current element.
 ##### :setUseBorder(boolean useBorder)
+> Set whether the element should have a border.
 ##### :getUseBorder()
+> Get whether the element has a border.
 ##### :setWidth(number width)
+> Set the width of the current element.
 ##### :getWidth()
+> Get the width of the current element.
 ##### :setX(number x)
+> Set the X position of the current element.
 ##### :getX()
+> Get the X position of the current element.
 ##### :setY(number y)
+> Set the Y position of the current element.
 ##### :getY()
+> Get the Y position of the current element.
 ##### :setZ(number z)
+> Set the Z position of the current element.
 ##### :getZ()
+> Get the Z position of the current element.
 ## Object Manipulation
+These functions are used for animating, enabling, and disabling elements.
 ##### :animateToColor(table color, number speed)
 > Animate the current object to a new color, at the provided speed, or at 2s without a speed given.
 ##### :animateBorderToColor(table color, number speed)

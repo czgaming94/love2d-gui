@@ -76,51 +76,94 @@ number | z | boolean | vertical
 ##### :fixPadding(boolean fix)
 > Adjusts padding to be ignored on the top of first line, and ignore left padding on first object.
 ##### :getFixPadding()
-##### :setFont(userdata font OR string fontName)
+> Get whether the element is fixing its padding.
+##### :setFont(userdata font)
+> Set the font of the element. Userdata font will be stored as an element font.
 ##### :getFont()
+> Get the font of the element.
 ##### :setHeight(number height)
+> Set the height of the current element
 ##### :getHeight()
+> Get the height of the current element
 ##### :setHollow(boolean hollow)
-> When an object is hollow, it will allow the user to click through it, while also triggering its own onClick() function.
+> Sets whether an element is detected as hollow. When an element is hollow, it will allow the user to click through it,<br>
+> while also triggering its own onClick() function.
 ##### :getHollow()
+> Returns whether an element is hollow.
 ##### :isHovered()
+> Returns whether an element is hovered.
 ##### :setLabel(string label)
+> Set the label of the current checkbox.
 ##### :getLabel()
+> Get the label of the current checkbox.
 ##### :setLabelColor(table color)
+> Set the label color of the current checkbox to a new color. Default is white.
 ##### :getLabelColor()
-##### :setLabelFont(userdata font OR string fontName)
+> Get the label color of the current checkbox.
+##### :setLabelFont(userdata font)
+> Set the label font of the current checkbox.
 ##### :getLabelFont()
+> Get the label font of the current checkbox.
 ##### :setLabelPosition(table pos)
+> Set the label position of the current checkbox.
 ##### :getLabelPosition()
+> Get the label position of the current checkbox.
 ##### :setMoveable(boolean canMove)
+> Set whether an element is moveable.<br>
 > Currently unfunctional.
 ##### :getMoveable()
+> Get whether the element is moveable.<br>
+> Currently unfunctional.
 ##### :setOpacity(number opacity)
+> Set the opacity of the current element
 ##### :getOpacity()
+> Get the opacity of the current element
 ##### :addOption(string option)
+> Add an option to the list of options availabe on your checkbox.
 ##### :removeOption(string option)
+> Remove an option from the current checkbox.
 ##### :setOptionColor(table color)
+> Set the option color of the current checkbox.
 ##### :getOptionColor()
+> Get the option color of the current checkbox.
 ##### :setOptionPadding(table padding) [top, right, bottom, left]
+> Set the padding for the current checkbox options.
 ##### :setOptionPaddingBottom(number padding)
+> Set the bottom padding
 ##### :setOptionPaddingLeft(number padding)
+> Set the left padding
 ##### :setOptionPaddingRight(number padding)
+> Set the right padding
 ##### :setOptionPaddingTop(number padding)
+> Set the top padding
 ##### :setOverlayColor(table color)
+> Set the overlay color of the current checkbox.
 ##### :getOverlayColor()
+> Get the overlay color of the current checkbox.
 ##### :getParent()
-> Returns the parent GUI object of the current object.
+> Returns the parent GUI object of the current element.
 ##### :setUseBorder(boolean useBorder)
+> Set whether the element should have a border.
 ##### :getUseBorder()
+> Get whether the element has a border.
 ##### :setWidth(number width)
+> Set the width of the current element.
 ##### :getWidth()
+> Get the width of the current element.
 ##### :setX(number x)
+> Set the X position of the current element.
 ##### :getX()
+> Get the X position of the current element.
 ##### :setY(number y)
+> Set the Y position of the current element.
 ##### :getY()
+> Get the Y position of the current element.
 ##### :setZ(number z)
+> Set the Z position of the current element.
 ##### :getZ()
+> Get the Z position of the current element.
 ## Object Manipulation
+These functions are used for animating, enabling, and disabling elements.
 ##### :animateToColor(table color, number speed)
 > Animate the current object to a new color, at the provided speed, or at 2s without a speed given.
 ##### :animateBorderToColor(table color, number speed)
