@@ -1,7 +1,6 @@
 # Checkbox
-The checkbox is designed to be used for taking user input on choices. A top use<br>
-for the checkbox is for Poll option selection. Checkboxes can accept multiple<br>
-selections, or be limited to a single selection. 
+The checkbox is designed to be used for taking user input on choices. A top use for the checkbox is for<br>
+Poll option selection. Checkboxes can accept multiple selections, or be limited to a single selection. 
 ## Object Creation
 ```lua
 local GUI = require("gui")
@@ -48,15 +47,22 @@ Any callback with an `event` paramter has a table provided to it with data acces
 ##### :onOptionClick(option, event) -- {text, width, height, x, y}, {x, y, button, istouch, presses}
 > Triggered when a user clicks an option on a checkbox.
 ## Data Handling
+These functions provide the ability to directly modify many variables of your elements. The way these work currently may change.<br>
+The biggest change that may happen, is accepting additional parameter types. No old elements will be broken by updates.
 ##### :isAnimating()
 > Returns true/false depending on whether the object is in the process of any animation.
 ##### :setBorderColor(table color)
+> Set the border color of your element to a new color. Default is white.
 ##### :getBorderColor()
-##### :setClickable(boolean clickable
+> Returns a table of the current element border color.
+##### :setClickable(boolean clickable)
+> Set whether the element will register as a clickable object.
 ##### :isClickable()
+> Returns whether the element is clickable.
 ##### :setColor(table color)
+> Set the color of your element as a new color. Default is white.
 ##### :getColor()
-##### :setData(table data)
+> Returns a table of the current element color.
 There are several options you can set in the `setData` function. Here is a list:
 var type | var name | var type | var name
 ---------|----------|----------|---------
