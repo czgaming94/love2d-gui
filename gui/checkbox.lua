@@ -496,7 +496,7 @@ function checkbox:new(n, p)
 							self.selected[k] = v
 						end
 					end
-					if self.onOptionChange then self:onOptionChange(self.options[k], {x=x, y=y, button=button, istouch=istouch, presses=presses}) end
+					if self.onOptionClick then self:onOptionClick(self.options[k], {x=x, y=y, button=button, istouch=istouch, presses=presses}) end
 				end
 			end
 		end

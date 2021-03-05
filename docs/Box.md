@@ -122,8 +122,10 @@ boolean | vertical
 > Enable and show the object if it was hidden.
 ##### :fadeIn()
 > Fade the object in from X opacity to full 1.0 opacity.
-##### :fadeOut(boolean permanent, boolean hard)
+##### :fadeOut(boolean disableClick, boolean haltAnimations)
 > Fade the object out to 0 opacity.
+> <br>`disableClick` will prevent the API from performing click operations on the object while it is faded out.
+> <br>`haltAnimations` will stop the object in its animation state and fade out to 0 opacity.
 ##### :startAnimation()
 > Resumes any halted animations.
 ##### :stopAnimation()

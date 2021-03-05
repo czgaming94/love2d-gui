@@ -23,6 +23,8 @@ myCheckbox:setData({
 })
 ```
 ## API Callbacks
+This API brings several user defined callbacks which allow you to customize what happens when a user interacts with your elements.<br>
+Any callback with an `event` paramter has a table provided to it with data accessible to the user.
 ##### :onClick(event) -- {x, y, button, istouch, presses}
 > Triggered when a user clicks on the object.
 ##### :onTouch(event) -- {id, x, y, dx, dy, pressure}
@@ -43,7 +45,7 @@ myCheckbox:setData({
 > Triggered when an object is fading out.
 ##### :afterFadeOut()
 > Triggered after an object fades out.
-##### :onOptionChange()
+##### :onOptionClick(option, event) -- {text, width, height, x, y}, {x, y, button, istouch, presses}
 > Triggered when a user clicks an option on a checkbox.
 ## Data Handling
 ##### :isAnimating()
@@ -133,8 +135,10 @@ number | z | boolean | vertical
 > Enable and show the object if it was hidden.
 ##### :fadeIn()
 > Fade the object in from X opacity to full 1.0 opacity.
-##### :fadeOut(boolean permanent, boolean hard)
+##### :fadeOut(boolean disableClick, boolean haltAnimations)
 > Fade the object out to 0 opacity.
+> <br>`disableClick` will prevent the API from performing click operations on the object while it is faded out.
+> <br>`haltAnimations` will stop the object in its animation state and fade out to 0 opacity.
 ##### :startAnimation()
 > Resumes any halted animations.
 ##### :stopAnimation()

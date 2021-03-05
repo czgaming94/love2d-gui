@@ -154,34 +154,30 @@ function love.load()
 		myBox4:stopAnimation()
 	end
 	
-	-- You can define onOptionChange callbacks for your GUI elements
-	function myCheckbox:onOptionChange(option, evt)
+	-- You can define onOptionClick callbacks for your checkbox elements
+	function myCheckbox:onOptionClick(option, evt)
 		myBox2:setColor(colors(option.text:lower()))
 	end
 end
 
+-- Use global source for callbacks
 function love.update(dt)
-	-- Use global source for callbacks
 	GUI:update(dt)
 end
 
 function love.draw()
-	-- Use global source for callbacks
 	GUI:draw()
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
-	-- Use global source for callbacks
 	GUI:mousepressed(x, y, button, istouch, presses)
 end
 
 -- For mobile
 function love.touchpressed(id, x, y, dx, dy, pressure)
-	-- Use global source for callbacks
 	GUI:touchpressed(id, x, y, dx, dy, pressure)
 end
 
 function love.touchmoved(id, x, y, dx, dy, pressure)
-	-- Use global source for callbacks
 	GUI:touchmoved(id, x, y, dx, dy, pressure)
 end
