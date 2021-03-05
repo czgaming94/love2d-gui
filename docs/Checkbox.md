@@ -52,26 +52,28 @@ singleSelection | single
 fixPadding | fix
 ```
 ## API Callbacks
-##### :onClick()
-- Triggered when a user clicks on the object.
+##### :onClick(event) -- {x, y, button, istouch, presses}
+> Triggered when a user clicks on the object.
+##### :onTouch(event) -- {id, x, y, dx, dy, pressure}
+> Triggered when a user taps on the object on mobile.
 ##### :onHoverEnter()
-- Triggered when a user initially hovers over an object.
+> Triggered when a user initially hovers over an object.
 ##### :onHoverExit()
-- Triggered when a user initially stops hovering an object.
+> Triggered when a user initially stops hovering an object.
 ##### :beforeFadeIn()
-- Triggered when an object is about to fade in.
+> Triggered when an object is about to fade in.
 ##### :onFadeIn()
-- Triggered when an object is fading in.
+> Triggered when an object is fading in.
 ##### :afterFadeIn()
-- Triggered after an object fades in.
+> Triggered after an object fades in.
 ##### :beforeFadeOut()
-- Triggered when an object is about to fade out.
+> Triggered when an object is about to fade out.
 ##### :onFadeOut()
-- Triggered when an object is fading out.
+> Triggered when an object is fading out.
 ##### :afterFadeOut()
-- Triggered after an object fades out.
+> Triggered after an object fades out.
 ##### :onOptionChange()
-- Triggered when a user clicks an option on a checkbox.
+> Triggered when a user clicks an option on a checkbox.
 ## Data Handling
 ```lua
 :addImage(userdata image, string name, boolean automatic)
