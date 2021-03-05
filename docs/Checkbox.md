@@ -63,6 +63,7 @@ The biggest change that may happen, is accepting additional parameter types. No 
 > Set the color of your element as a new color. Default is white.
 ##### :getColor()
 > Returns a table of the current element color.
+##### :setData(table data)
 There are several options you can set in the `setData` function. Here is a list:
 var type | var name | var type | var name
 ---------|----------|----------|---------
