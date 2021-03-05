@@ -303,7 +303,7 @@ function checkbox:new(n, p)
 	end
 	
 	function c:disable()
-		self.uHidden = true
+		self.hidden = true
 	end
 	
 	function c:draw()
@@ -360,12 +360,12 @@ function checkbox:new(n, p)
 	end
 	
 	function c:enable()
-		self.uHidden = false
+		self.hidden = false
 	end
 	
 	function c:fadeIn()
 		if self.beforeFadeIn then self:beforeFadeIn() end
-		self.uHidden = false
+		self.hidden = false
 		if self.faded then
 			self.animateColor = true
 			self.animatePosition = true
@@ -693,7 +693,7 @@ function checkbox:new(n, p)
 				self.inAnimation = false
 				self.animateColor = false
 				self.animatePosition = false
-				if self.animateOpacity and self.faded then self.uHidden = true end
+				if self.animateOpacity and self.faded then self.hidden = true end
 				self.animateOpacity = false
 			end
 		end

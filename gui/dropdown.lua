@@ -253,7 +253,7 @@ function dropdown:new(n, id)
 	end
 	
 	function d:disable()
-		self.uHidden = true
+		self.hidden = true
 	end
 	
 	function d:draw()
@@ -261,12 +261,12 @@ function dropdown:new(n, id)
 	end
 	
 	function d:enable()
-		self.uHidden = false
+		self.hidden = false
 	end
 	
 	function d:fadeIn()
 		if self.beforeFadeIn then self:beforeFadeIn() end
-		self.uHidden = false
+		self.hidden = false
 		if self.faded then
 			self.animateColor = true
 			self.animatePosition = true
@@ -526,7 +526,7 @@ function dropdown:new(n, id)
 				self.inAnimation = false
 				self.animateColor = false
 				self.animatePosition = false
-				if self.animateOpacity and self.faded then self.uHidden = true end
+				if self.animateOpacity and self.faded then self.hidden = true end
 				self.animateOpacity = false
 			end
 		end
