@@ -25,19 +25,26 @@ moveable
 opacity
 padding [top, right, bottom, left]
 ```
-### API Callbacks
-```lua
-:onClick()
-:onHoverEnter()
-:onHoverExit()
-:beforeFadeIn()
-:onFadeIn()
-:afterFadeIn()
-:beforeFadeOut()
-:onFadeOut()
-:afterFadeOut()
-```
-### Data Handling
+## API Callbacks
+###### :onClick(event) -- {x, y, button, istouch, presses}
+Triggered when a user clicks on the object.
+##### :onHoverEnter()
+Triggered when a user initially hovers over an object.
+##### :onHoverExit()
+Triggered when a user initially stops hovering an object.
+##### :beforeFadeIn()
+Triggered when an object is about to fade in.
+##### :onFadeIn()
+Triggered when an object is fading in.
+##### :afterFadeIn()
+Triggered after an object fades in.
+##### :beforeFadeOut()
+Triggered when an object is about to fade out.
+##### :onFadeOut()
+Triggered when an object is fading out.
+##### :afterFadeOut()
+Triggered after an object fades out.
+## Data Handling
 ```lua
 :addImage(userdata image, string name, boolean automatic)
 :isAnimating()

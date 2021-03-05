@@ -97,10 +97,10 @@ function gui:generate(item, copies, skip)
 				if skip and orig_key == skip then
 					copy[skip] = {}
 				else
-					copy[self:generate(orig_key, copies)] = self:generate(orig_value, copies)
+					copy[self:generate(orig_key, copies, skip)] = self:generate(orig_value, copies, skip)
 				end
             end
-            setmetatable(copy, self:generate(getmetatable(item), copies))
+            setmetatable(copy, self:generate(getmetatable(item), copies, skip))
         end
     else
         copy = item
@@ -258,6 +258,16 @@ function gui:draw()
 	end
 end
 
+function gui:mousemoved(x, y, button, istouch, presses)
+	for _,v in ipairs(items) do 
+		for _,i in ipairs(v.items) do 
+			if not i.hidden then 
+				if i.mousemoved then i:mousemoved({x, y, button, istouch, presses}) end
+			end
+		end 
+	end
+end
+
 function gui:mousepressed(x, y, button, istouch, presses)
 	local objs = self:copy(items)
 	table.sort(objs, function(a, b) return a.z > b.z end)
@@ -265,11 +275,9 @@ function gui:mousepressed(x, y, button, istouch, presses)
 	for o,v in ipairs(objs) do
 		for k,i in ipairs(v.items) do
 			if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
-				if i.mousepressed then i:mousepressed(x, y, button, istouch, presses) end
+				if i.mousepressed then i:mousepressed({x=x, y=y, button=button, istouch=istouch, pressed=presses}) end
 				if i.onClick then i:onClick({x=x, y=y, button=button, istouch=istouch, pressed=presses}) end
-				if not i.hollow then 
-					hitTarget = true 
-				end
+				if not i.hollow then hitTarget = true end
 			end
 		end
 	end
@@ -280,7 +288,7 @@ function gui:touchmoved(id, x, y, dx, dy, pressure)
 	for _,v in ipairs(items) do 
 		for _,i in ipairs(v.items) do 
 			if not i.hidden then 
-				if i.touchmoved then i:touchmoved(id, x, y, dx, dy, pressure) end
+				if i.touchmoved then i:touchmoved({id, x, y, dx, dy, pressure}) end
 			end
 		end 
 	end
@@ -293,8 +301,8 @@ function gui:touchpressed(id, x, y, dx, dy, pressure)
 	for o,v in ipairs(objs) do
 		for k,i in ipairs(v.items) do
 			if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
-				if i.touchpressed then i:touchpressed(x, y, button, istouch, presses) end
-				if i.onClick then i:onClick(x, y, button, istouch, presses) end
+				if i.touchpressed then i:touchpressed({x, y, button, istouch, presses}) end
+				if i.onTouch then i:onTouch({x, y, button, istouch, presses}) end
 				if not i.hollow then hitTarget = true end
 			end
 		end
