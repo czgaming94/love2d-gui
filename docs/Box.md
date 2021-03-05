@@ -60,7 +60,6 @@ number | x
 number | y
 number | z
 boolean | vertical
-```
 ##### :fixPadding(boolean fix)
 > Adjusts padding to be ignored on the top of first line, and ignore left padding on first object.
 ##### :getFixPadding()
