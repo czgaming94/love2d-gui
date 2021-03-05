@@ -43,22 +43,23 @@ myBox:setData({ w = 800, h = 600, x = 0, y = 0, z = 0})
 ##### :getColor()
 ##### :setData(table data)
 There are several options you can set in the `setData` function. Here is a list:
-```
-table                             borderColor
-table                             color
-boolean                           clickable
-number                            height | h
-userdata                          image
-boolean                           moveable
-number                            opacity
-boolean                           round
-number                            roundRadius | radius
-boolean                           useBorder
-number                            width | w
-number                            x
-number                            y
-number                            z
-boolean                           vertical
+var type | var name
+---------|---------
+table | borderColor
+table | color
+boolean | clickable
+number | height / h
+userdata | image
+boolean | moveable
+number | opacity
+boolean | round
+number | roundRadius / radius
+boolean | useBorder
+number | width / w
+number | x
+number | y
+number | z
+boolean | vertical
 ```
 ##### :fixPadding(boolean fix)
 > Adjusts padding to be ignored on the top of first line, and ignore left padding on first object.
