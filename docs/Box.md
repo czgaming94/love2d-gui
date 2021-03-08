@@ -4,8 +4,7 @@ the most commonly used type of object in a GUI.
 ## Object Creation
 ```lua
 local GUI = require("gui")
-local myGui = GUI:new(GUI)
-local myBox = myGui:addBox("myBox")
+local myBox = GUI:addBox("myBox")
 myBox:addImage(lg.newImage("res/img/background.png"), "background", true)
 myBox:setData({ w = 800, h = 600, x = 0, y = 0, z = 0})
 ```
