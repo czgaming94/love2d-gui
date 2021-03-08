@@ -38,6 +38,7 @@ function box:new(n, p)
 	if not self.guis[p.id] then self.guis[p.id] = p end
 	b.name = n
 	b.id = #self.items + 1
+	b.type = "box"
 	if p and p.id then b.parent = p.id else b.parent = nil end
 	b.w = 0
 	b.h = 0
@@ -58,6 +59,7 @@ function box:new(n, p)
 	b.faded = false
 	b.fadedByFunc = false
 	b.hidden = false
+	b.events = {}
 	b.images = {}
 	b.image = nil
 	b.paddingLeft = 0
@@ -239,7 +241,7 @@ function box:new(n, p)
 			lg.setColor(self.color)
 		end
 		if self.image then 
-			assert(type(self.image) == "userdata", "[" .. self.name .. "] FAILURE: box:update(" .. self.name .. ") :: Incorrect param[image] - expecting image userdata and got " .. type(self.image))
+			assert(type(self.image) == "userdata", "[" .. self.name .. "] FAILURE: box:draw(" .. self.name .. ") :: Incorrect param[image] - expecting image userdata and got " .. type(self.image))
 			lg.draw(self.image, self.pos.x, self.pos.y)
 		else
 			lg.rectangle("fill", self.pos.x, self.pos.y, self.w, self.h)
@@ -368,93 +370,6 @@ function box:new(n, p)
 		self.inAnimation = false
 	end
 	
-	function b:update(dt)
-		local x,y = love.mouse.getPosition()
-		if (x >= self.pos.x + self.paddingLeft and x <= self.pos.x + self.w + self.paddingRight) and 
-		(y >= self.pos.y + self.paddingTop and y <= self.pos.y + self.h + self.paddingBottom) then
-			if not self.hovered then
-				if self.onHoverEnter then self:onHoverEnter() end
-				self.hovered = true 
-			end
-			if self.whileHovering then self:whileHovering() end
-		else
-			if self.hovered then 
-				if self.onHoverExit then self:onHoverExit() end
-				self.hovered = false 
-			end
-		end
-		
-		if self:isAnimating() then
-			local allColorsMatch = true
-			local allBorderColorsMatch = true
-			local inProperPosition = true
-			local atProperOpacity = true
-			
-			if self.animateColor then
-				for k,v in ipairs(self.colorToAnimateTo) do
-					if self.color[k] ~= v then
-						if v > self.color[k] then
-							self.color[k] = min(v, self.color[k] + (self.colorAnimateSpeed * dt))
-						else
-							self.color[k] = max(v, self.color[k] - (self.colorAnimateSpeed * dt))
-						end
-						allColorsMatch = false
-					end
-				end
-			end
-			
-			if self.animatePosition then
-				local t = math.min((lt.getTime() - self.positionAnimateTime) * (self.positionAnimateSpeed / 2), 1.0)
-				if self.pos.x ~= self.positionToAnimateTo.x or self.pos.y ~= self.positionToAnimateTo.y then
-					self.pos.x = self.lerp(self.positionToAnimateFrom.x, self.positionToAnimateTo.x, t)
-					self.pos.y = self.lerp(self.positionToAnimateFrom.y, self.positionToAnimateTo.y, t)
-					inProperPosition = false
-				end
-			end
-			
-			if self.animateOpacity then
-				if self.color[4] ~= self.opacityToAnimateTo then
-					if self.color[4] < self.opacityToAnimateTo then
-						self.color[4] = min(self.opacityToAnimateTo, self.color[4] + (self.opacityAnimateSpeed * dt))
-					else
-						self.color[4] = max(self.opacityToAnimateTo, self.color[4] - (self.opacityAnimateSpeed * dt))
-					end
-					atProperOpacity = false
-				else
-					if self.fadedByFunc then
-						if self.color[4] == 1 then
-							if self.afterFadeIn then self:afterFadeIn() end
-						elseif self.color[4] == 0 then
-							if self.afterFadeOut then self:afterFadeOut() end
-						end
-						self.fadedByFunc = false
-					end
-				end
-			end
-			
-			if self.animateBorderColor then
-				for k,v in ipairs(self.borderColorToAnimateTo) do
-					if self.borderColor[k] ~= v then
-						if v > self.borderColor[k] then
-							self.borderColor[k] = min(v, self.borderColor[k] + (self.borderColorAnimateSpeed * dt))
-						else
-							self.borderColor[k] = max(v, self.borderColor[k] - (self.borderColorAnimateSpeed * dt))
-						end
-						allBorderColorsMatch = false
-					end
-				end
-			end
-			
-			if allColorsMatch and inProperPosition and atProperOpacity and allBorderColorsMatch then
-				self.inAnimation = false
-				self.animateColor = false
-				self.animatePosition = false
-				if self.animateOpacity and self.faded then self.hidden = true end
-				self.animateOpacity = false
-			end
-		end
-	end
-	
 	function b:setMoveable(m)
 		assert(m ~= nil, "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Missing param[useBorder]")
 		assert(type(m) == "boolean", "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Incorrect param[useBorder] - expecting boolean and got " .. type(m))
@@ -479,6 +394,12 @@ function box:new(n, p)
 		return box.guis[self.parent]
 	end
 	
+	function b:registerEvent(n, f, t)
+		if not self.events[n] then self.events[n] = {} end
+		local id = #self.events[n] + 1
+		self.events[n][id] = {id = id, f = f, t = t}
+	end
+	
 	function b:touchmoved(id, x, y, dx, dy, pressure)
 		if (x >= self.pos.x + self.paddingLeft and x <= self.pos.x + self.w + self.paddingRight) and 
 		(y >= self.pos.y + self.paddingTop and y <= self.pos.y + self.h + self.paddingBottom) then
@@ -493,6 +414,10 @@ function box:new(n, p)
 				self.hovered = false 
 			end
 		end
+	end
+	
+	function b:update(dt)
+	
 	end
 	
 	function b:setUseBorder(uB)

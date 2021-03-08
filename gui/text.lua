@@ -47,6 +47,7 @@ function text:new(n, p)
 	
 	t.name = n
 	t.id = #self.items + 1
+	t.type = "text"
 	if p and p.id then t.parent = p.id else t.parent = nil end
 	t.text = ""
 	t.w = 0
@@ -62,11 +63,13 @@ function text:new(n, p)
 	t.fonts = {}
 	t.hovered = false
 	t.clicked = false
+	t.hidden = false
 	t.hollow = false
 	t.clickable = true
 	t.faded = false
 	t.fadedByFunc = false
 	t.fancy = false
+	t.events = {}
 	t.paddingLeft = 0
 	t.paddingRight = 0
 	t.paddingTop = 0
@@ -170,8 +173,6 @@ function text:new(n, p)
 		assert(type(d.x) == "number", "[" .. self.name .. "] FAILURE: text:setData() :: Incorrect param[x] - expecting number and got " .. type(d.x))
 		assert(d.y, "[" .. self.name .. "] FAILURE: text:setData() :: Missing param[data['y']")
 		assert(type(d.y) == "number", "[" .. self.name .. "] FAILURE: text:setData() :: Incorrect param[y] - expecting number and got " .. type(d.y))
-		self.w = d.w or d.width or self.w
-		self.h = d.h or d.height or self.h
 		self.text = d.t or d.text or self.text
 		self.typewriterText, self.fancy = text:split(self.text)
 		self.typewriter = d.tw and d.tw or d.typewriter and d.typewriter or self.typewriter
@@ -181,9 +182,52 @@ function text:new(n, p)
 		self.pos.z = d.z or self.pos.z
 		self.color = d.color or self.color
 		self.font = d.font or self.font
+		self.w = d.w or d.width or self.font:getWidth(self.text)
+		self.h = d.h or d.height or self.font:getHeight(self.text)
 		if d.fonts then
 			for k,v in pairs(d.fonts) do
 				self.fonts[k] = v
+			end
+		end
+		if self.typewriter then
+			local font = self.font
+			local lastFont = self.font
+			for k,v in ipairs(self.typewriterText) do
+				lastFont = font
+				if v.font ~= "default" then
+					font = self.fonts[v.font]
+				else
+					font = self.font
+				end
+				
+				if not v.y then
+					v.y = self.pos.y
+				end
+				
+				if not v.x then
+					if k == 1 then
+						v.x = self.pos.x
+					else
+						v.x = self.typewriterText[k - 1].x + lastFont:getWidth(self.typewriterText[k - 1].fullText)
+						if v.x > self.pos.x + (self.w - font:getWidth(v.fullText)) then
+							v.x = self.pos.x
+							v.y = self.typewriterText[k - 1].y + lastFont:getHeight(self.typewriterText[k - 1].fullText) 
+							self.h = self.h + font:getHeight(v.fullText)
+						end
+					end
+				end
+				
+				if v.x == self.pos.x then
+					self.w = math.max(self.w, font:getWidth(v.fullText))
+				else
+					self.w = self.w + font:getWidth(v.fullText)
+				end
+				
+				if v.y == self.pos.y then
+					self.h = math.max(self.h, font:getHeight(v.fullText))
+				else
+					self.h = self.h + font:getHeight(v.fullText)
+				end
 			end
 		end
 		self.clickable = d.clickable and d.clickable or self.clickable
@@ -211,22 +255,6 @@ function text:new(n, p)
 						end
 						if v.font ~= "default" then
 							lg.setFont(self.fonts[v.font])
-						end
-						
-						if not v.y then
-							v.y = self.pos.y
-						end
-						
-						if not v.x then
-							if k == 1 then
-								v.x = self.pos.x
-							else
-								v.x = self.typewriterText[k - 1].x + lg.getFont():getWidth(v.fullText)
-								if self.w > 0 and v.x > self.pos.x + (self.w - lg.getFont():getWidth(v.fullText)) then
-									v.x = self.pos.x
-									v.y = self.typewriterText[k - 1].y + lg.getFont():getHeight(v.fullText) 
-								end
-							end
 						end
 						lg.print(v.toShow, v.x, v.y)
 						lg.setColor(1,1,1,1)
@@ -322,20 +350,7 @@ function text:new(n, p)
 		self.inAnimation = false
 	end
 	
-	function t:update(dt)
-		local x,y = love.mouse.getPosition()
-		if (x >= self.pos.x and x <= self.pos.x + self.w) and (y >= self.pos.y and y <= self.pos.y + self.h) then
-			if not self.hovered then
-				if self.onHoverEnter then self:onHoverEnter() end
-				self.hovered = true 
-			end
-		else
-			if self.hovered then 
-				if self.onHoverExit then self:onHoverExit() end
-				self.hovered = false 
-			end
-		end
-		
+	function t:update(dt)		
 		if self.typewriter then
 			self.typewriterWaited = self.typewriterWaited + dt
 			if self.fancy then
@@ -376,76 +391,6 @@ function text:new(n, p)
 				end
 			end
 		end
-		
-		if self.inAnimation then
-			local allColorsMatch = true
-			local allBorderColorsMatch = true
-			local inProperPosition = true
-			local atProperOpacity = true
-			
-			if self.animateColor then
-				for k,v in ipairs(self.colorToAnimateTo) do
-					if self.color[k] ~= v then
-						if v > self.color[k] then
-							self.color[k] = min(v, self.color[k] + (self.colorAnimateSpeed * dt))
-						else
-							self.color[k] = max(v, self.color[k] - (self.colorAnimateSpeed * dt))
-						end
-						allColorsMatch = false
-					end
-				end
-			end
-			
-			if self.animatePosition then
-				local t = math.min((lt.getTime() - self.positionAnimateTime) * (self.positionAnimateSpeed / 2), 1.0)
-				if self.pos.x ~= self.positionToAnimateTo.x or self.pos.y ~= self.positionToAnimateTo.y then
-					self.pos.x = self.lerp(self.positionToAnimateFrom.x, self.positionToAnimateTo.x, t)
-					self.pos.y = self.lerp(self.positionToAnimateFrom.y, self.positionToAnimateTo.y, t)
-					inProperPosition = false
-				end
-			end
-			
-			if self.animateOpacity then
-				if self.color[4] ~= self.opacityToAnimateTo then
-					if self.color[4] < self.opacityToAnimateTo then
-						self.color[4] = min(self.opacityToAnimateTo, self.color[4] + (self.opacityAnimateSpeed * dt))
-					else
-						self.color[4] = max(self.opacityToAnimateTo, self.color[4] - (self.opacityAnimateSpeed * dt))
-					end
-					atProperOpacity = false
-				else
-					if self.fadedByFunc then
-						if self.color[4] == 1 then
-							if self.afterFadeIn then self:afterFadeIn() end
-						elseif self.color[4] == 0 then
-							if self.afterFadeOut then self:afterFadeOut() end
-						end
-						self.fadedByFunc = false
-					end
-				end
-			end
-			
-			if self.animateBorderColor then
-				for k,v in ipairs(self.borderColorToAnimateTo) do
-					if self.borderColor[k] ~= v then
-						if v > self.borderColor[k] then
-							self.borderColor[k] = min(v, self.borderColor[k] + (self.borderColorAnimateSpeed * dt))
-						else
-							self.borderColor[k] = max(v, self.borderColor[k] - (self.borderColorAnimateSpeed * dt))
-						end
-						allBorderColorsMatch = false
-					end
-				end
-			end
-			
-			if allColorsMatch and inProperPosition and atProperOpacity and allBorderColorsMatch then
-				self.inAnimation = false
-				self.animateColor = false
-				self.animatePosition = false
-				if self.animateOpacity and self.faded then self.hidden = true end
-				self.animateOpacity = false
-			end
-		end
 	end
 	
 	function t:setOpacity(o)
@@ -460,6 +405,12 @@ function text:new(n, p)
 	
 	function t:getParent()
 		return text.guis[self.parent]
+	end
+	
+	function t:registerEvent(n, f, t)
+		if not self.events[n] then self.events[n] = {} end
+		local id = #self.events[n] + 1
+		self.events[n][id] = {id = id, f = f, t = t}
 	end
 	
 	function t:touchmoved(id, x, y, dx, dy, pressure)

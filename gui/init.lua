@@ -1,2 +1,2 @@
 local gui = require("gui.gui")
-return gui
+return gui:new()

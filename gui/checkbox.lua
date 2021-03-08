@@ -39,6 +39,7 @@ function checkbox:new(n, p)
 	
 	c.name = n
 	c.id = #self.items + 1
+	c.type = "checkbox"
 	if p and p.id then c.parent = p.id else c.parent = nil end
 	c.w = 0
 	c.uW = 0
@@ -79,6 +80,7 @@ function checkbox:new(n, p)
 	c.hollow = false
 	c.single = false
 	c.fixPadding = false
+	c.events = {}
 	c.options = {}
 	c.optionPaddingLeft = 0
 	c.optionPaddingRight = 0
@@ -597,6 +599,13 @@ function checkbox:new(n, p)
 		return checkbox.guis[self.parent]
 	end
 	
+	function c:registerEvent(n, f, t)
+		if not self.events[n] then self.events[n] = {} end
+		local id = #self.events[n] + 1
+		print(t)
+		self.events[n][id] = {id = id, f = f, t = t}
+	end
+	
 	function c:touchmoved(id, x, y, dx, dy, pressure)
 		if (x >= self.pos.x and x <= self.pos.x + self.uW) and (y >= self.pos.y and y <= self.pos.y + self.uH) then
 			if not self.hovered then
@@ -613,90 +622,7 @@ function checkbox:new(n, p)
 	end
 	
 	function c:update(dt)
-		local x,y = love.mouse.getPosition()
-		if (x >= self.pos.x and x <= self.pos.x + self.w) and 
-		(y >= self.pos.y and y <= self.pos.y + self.h) then
-			if not self.hovered then
-				if self.onHoverEnter then self:onHoverEnter() end
-				self.hovered = true 
-			end
-			if self.whileHovering then self:whileHovering() end
-		else
-			if self.hovered then 
-				if self.onHoverExit then self:onHoverExit() end
-				self.hovered = false 
-			end
-		end
-		
-		if self.inAnimation then
-			local allColorsMatch = true
-			local allBorderColorsMatch = true
-			local inProperPosition = true
-			local atProperOpacity = true
-			
-			if self.animateColor then
-				for k,v in ipairs(self.colorToAnimateTo) do
-					if self.color[k] ~= v then
-						if v > self.color[k] then
-							self.color[k] = min(v, self.color[k] + (self.colorAnimateSpeed * dt))
-						else
-							self.color[k] = max(v, self.color[k] - (self.colorAnimateSpeed * dt))
-						end
-						allColorsMatch = false
-					end
-				end
-			end
-			
-			if self.animatePosition then
-				local t = math.min((lt.getTime() - self.positionAnimateTime) * (self.positionAnimateSpeed / 2), 1.0)
-				if self.pos.x ~= self.positionToAnimateTo.x or self.pos.y ~= self.positionToAnimateTo.y then
-					self.pos.x = self.lerp(self.positionToAnimateFrom.x, self.positionToAnimateTo.x, t)
-					self.pos.y = self.lerp(self.positionToAnimateFrom.y, self.positionToAnimateTo.y, t)
-					inProperPosition = false
-				end
-			end
-			
-			if self.animateOpacity then
-				if self.color[4] ~= self.opacityToAnimateTo then
-					if self.color[4] < self.opacityToAnimateTo then
-						self.color[4] = min(self.opacityToAnimateTo, self.color[4] + (self.opacityAnimateSpeed * dt))
-					else
-						self.color[4] = max(self.opacityToAnimateTo, self.color[4] - (self.opacityAnimateSpeed * dt))
-					end
-					atProperOpacity = false
-				else
-					if self.fadedByFunc then
-						if self.color[4] == 1 then
-							if self.afterFadeIn then self:afterFadeIn() end
-						elseif self.color[4] == 0 then
-							if self.afterFadeOut then self:afterFadeOut() end
-						end
-						self.fadedByFunc = false
-					end
-				end
-			end
-			
-			if self.animateBorderColor then
-				for k,v in ipairs(self.borderColorToAnimateTo) do
-					if self.borderColor[k] ~= v then
-						if v > self.borderColor[k] then
-							self.borderColor[k] = min(v, self.borderColor[k] + (self.borderColorAnimateSpeed * dt))
-						else
-							self.borderColor[k] = max(v, self.borderColor[k] - (self.borderColorAnimateSpeed * dt))
-						end
-						allBorderColorsMatch = false
-					end
-				end
-			end
-			
-			if allColorsMatch and inProperPosition and atProperOpacity and allBorderColorsMatch then
-				self.inAnimation = false
-				self.animateColor = false
-				self.animatePosition = false
-				if self.animateOpacity and self.faded then self.hidden = true end
-				self.animateOpacity = false
-			end
-		end
+	
 	end
 	
 	function c:setWidth(w)
