@@ -8,8 +8,7 @@ GUI:addColor({1,0,0,.5}, "alphaRed")
 GUI:addColor({.92,.97,.92,1}, "eggshell")
 local colors = GUI.color
 local myFont = lg.newFont("res/font/thicktext.otf", 32)
-local myGui = GUI:new(GUI)
-local myCheckbox = myGui:addCheckbox("myCheckbox")
+local myCheckbox = GUI:addCheckbox("myCheckbox")
 myCheckbox:setData({
 	w = 10, h = 10, x = 250, y = 150, z = 1, 
 	label = "Favorite Color?", labelColor = colors("black"), labelFont = myFont, labelPos = {290, 105, 1},
