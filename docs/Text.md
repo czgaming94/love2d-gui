@@ -4,8 +4,7 @@ typewriter, and given syntax coding to morph and affect how the text is displaye
 ## Object Creation
 ```lua
 local GUI = require("gui")
-local myGui = GUI:new(GUI)
-local myText = myGui2:addText("continue")
+local myText = GUI:addText("continue")
 local colors = GUI.color
 myText:setData({
 	x = 110, y = 490, z = 2, 
