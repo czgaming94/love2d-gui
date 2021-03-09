@@ -1,7 +1,7 @@
 # Text
 The text element has a few abilities. It can be treated as regular static text, or it can be treated as a typewriter,<br>
 and given syntax coding to morph and affect how the text is displayed.
-## element Creation
+## Object Creation
 ```lua
 local GUI = require("gui")
 local myText = GUI:addText("continue")

@@ -1,7 +1,7 @@
 # Checkbox
 The checkbox is designed to be used for taking user input on choices. A top use for the checkbox is for Poll option selection.<br>
 Checkboxes can accept multiple selections, or be limited to a single selection. 
-## element Creation
+## Object Creation
 ```lua
 local GUI = require("gui")
 GUI:addColor({1,0,0,.5}, "alphaRed")

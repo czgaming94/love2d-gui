@@ -1,6 +1,6 @@
 # Box
 The goal of the box element is for backgrounds, buttons, and HUD containers. This is the most commonly used type of element in a GUI.
-## element Creation
+## Object Creation
 ```lua
 local GUI = require("gui")
 local myBox = GUI:addBox("myBox")
