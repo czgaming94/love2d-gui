@@ -10,7 +10,9 @@ myBox:setData({w = 800, h = 600, x = 0, y = 0, z = 0, clickable = false})
 ## API Callbacks
 This API brings several user defined callbacks which allow you to customize what happens when a user interacts with your elements.<br>
 Any callback with an `event` paramter has a table provided to it with data accessible to the user. You can easily define these<br>
-with `myBox:registerEvent("onClick", function(target, event) print(target.name, event.x, event.y) end, yourTargetelement)`
+with `myBox:registerEvent("onClick", function(target, event) 
+  print(target.name, event.x, event.y) 
+end, yourTargetelement)`
 ##### :onClick(target, event) -- {x, y, button, istouch, presses}
 > Triggered when a user clicks on the element.
 ##### :onTouch(target, event) -- {id, x, y, dx, dy, pressure}
