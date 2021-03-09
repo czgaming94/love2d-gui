@@ -283,30 +283,48 @@ function text:new(n, p)
 	end
 	
 	function t:fadeIn()
-		if self.beforeFadeOut then self:beforeFadeOut() end
+		if self.events.beforeFadeIn then 
+			for _,v in ipairs(self.events.beforeFadeIn) do
+				e.fn(e.target)
+			end
+		end
 		self.hidden = false
+		self:animateToOpacity(1)
 		if self.faded then
 			self.animateColor = true
 			self.animatePosition = true
+			self.animateBorderColor = true
 		end
 		self.faded = false
 		self.fadedByFunc = true
-		self:animateToOpacity(1)
-		if self.onFadeIn then self:onFadeIn() end
+		if self.events.onFadeIn then
+			for _,v in ipairs(self.events.onFadeIn) do
+				e.fn(e.target)
+			end
+		end
 	end
 	
 	function t:fadeOut(p, h)
-		if self.beforeFadeOut then self:beforeFadeOut() end
+		if self.events.beforeFadeOut then
+			for _,v in ipairs(self.events.beforeFadeOut) do
+				e.fn(e.target)
+			end
+		end
+		self:animateToOpacity(0)
 		if p then 
 			self.faded = true
 			if h then
 				self.animateColor = false
 				self.animatePosition = false
+				self.animateBorderColor = false
 			end
 		end
 		self.fadedByFunc = true
-		self:animateToOpacity(0)
-		if self.onFadeOut then self:onFadeOut() end
+		if self.events.onFadeOut then
+			for _,v in ipairs(self.events.onFadeOut) do
+				e.fn(e.target)
+			end
+		end
 	end
 	
 	function t:addFont(f, n)
@@ -387,7 +405,7 @@ function text:new(n, p)
 						if k == #self.typewriterText then
 							if self.events.onTypewriterFinish then
 								for _,e in ipairs(self.events.onTypewriterFinish) do
-									e.f(e.t)
+									e.fn(e.target)
 								end
 							end
 							if self.typewriterRepeat then
@@ -435,7 +453,8 @@ function text:new(n, p)
 	function t:registerEvent(n, f, t)
 		if not self.events[n] then self.events[n] = {} end
 		local id = #self.events[n] + 1
-		self.events[n][id] = {id = id, f = f, t = t}
+		self.events[n][id] = {id = id, fn = f, target = t}
+		return self
 	end
 	
 	function t:touchmoved(id, x, y, dx, dy, pressure)

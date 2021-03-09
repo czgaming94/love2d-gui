@@ -257,7 +257,11 @@ function box:new(n, p)
 	end
 	
 	function b:fadeIn()
-		if self.beforeFadeIn then self:beforeFadeIn() end
+		if self.events.beforeFadeIn then 
+			for _,e in ipairs(self.events.beforeFadeIn) do
+				e.fn(e.target)
+			end
+		end
 		self.hidden = false
 		self:animateToOpacity(1)
 		if self.faded then
@@ -267,11 +271,19 @@ function box:new(n, p)
 		end
 		self.faded = false
 		self.fadedByFunc = true
-		if self.onFadeIn then self:onFadeIn() end
+		if self.events.onFadeIn then
+			for _,e in ipairs(self.events.onFadeIn) do
+				e.fn(e.target)
+			end
+		end
 	end
 	
 	function b:fadeOut(p, h)
-		if self.beforeFadeOut then self:beforeFadeOut() end
+		if self.events.beforeFadeOut then
+			for _,e in ipairs(self.events.beforeFadeOut) do
+				e.fn(e.target)
+			end
+		end
 		self:animateToOpacity(0)
 		if p then 
 			self.faded = true
@@ -282,7 +294,11 @@ function box:new(n, p)
 			end
 		end
 		self.fadedByFunc = true
-		if self.onFadeOut then self:onFadeOut() end
+		if self.events.onFadeOut then
+			for _,e in ipairs(self.events.onFadeOut) do
+				e.fn(e.target)
+			end
+		end
 	end
 	
 	function b:setHeight(h)
@@ -400,7 +416,8 @@ function box:new(n, p)
 	function b:registerEvent(n, f, t)
 		if not self.events[n] then self.events[n] = {} end
 		local id = #self.events[n] + 1
-		self.events[n][id] = {id = id, f = f, t = t}
+		self.events[n][id] = {id = id, fn = f, target = t}
+		return self
 	end
 	
 	function b:touchmoved(id, x, y, dx, dy, pressure)

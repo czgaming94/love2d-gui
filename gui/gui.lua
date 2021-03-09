@@ -272,7 +272,6 @@ function gui:update(dt)
 	for _,v in ipairs(items) do 
 		for _,i in ipairs(v.items) do 
 			if not i.hidden then 
-				i:update(dt)	
 				local x,y = love.mouse.getPosition()
 				local condition = x >= i.pos.x + i.paddingLeft and x <= i.pos.x + i.w + i.paddingRight and y >= i.pos.y + i.paddingTop and y <= i.pos.y + i.h + i.paddingBottom
 				if i.type == "text" then
@@ -374,7 +373,7 @@ function gui:update(dt)
 						i.animateOpacity = false
 					end
 				end
-				
+				i:update(dt)
 			end
 		end 
 	end
@@ -417,7 +416,7 @@ function gui:registerEvent(n, o, f, t)
 	assert(type(o) == "table", "FAILURE: gui:registerEvent() :: Incorrect param[object] - expecting GUI element table and got " .. type(o))
 	assert(f, "FAILURE: gui:registerEvent() :: Missing param[functiom]")
 	assert(type(f) == "function", "FAILURE: gui:registerEvent() :: Incorrect param[functiom] - expecting function and got " .. type(f))
-	o:registerEvent(n, f, t)
+	return o:registerEvent(n, f, t)
 end
 
 function gui:registerGlobalEvent(n, o, f, t)
@@ -430,7 +429,8 @@ function gui:registerGlobalEvent(n, o, f, t)
 	assert(type(f) == "function", "FAILURE: gui:registerEvent() :: Incorrect param[functiom] - expecting function and got " .. type(f))
 	if not events[n] then events[n] = {} end
 	local id = #events[n] + 1
-	events[n][id] = {id = id, o = o, f = f, t = t}
+	events[n][id] = {id = id, o = o, fn = f, t = t}
+	return self
 end
 
 function gui:mousemoved(x, y, button, istouch, presses)
@@ -444,7 +444,7 @@ function gui:mousemoved(x, y, button, istouch, presses)
 	end
 end
 
-function gui:mousepressed(x, y, button, istouch, presses)
+function gui:mousepressed(event)
 	if not self.enabled then return false end
 	local objs = self:copy(items)
 	table.sort(objs, function(a, b) return a.z > b.z end)
@@ -454,17 +454,16 @@ function gui:mousepressed(x, y, button, istouch, presses)
 		table.sort(obj.items, function(a,b) return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z end)
 		for k,i in ipairs(obj.items) do
 			if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
-				local evt = {x=x, y=y, button=button, istouch=istouch, pressed=presses}
-				if i.mousepressed then i:mousepressed(evt) end
+				if i.mousepressed then self:child(i.name):mousepressed(unpack(event)) end
 				if i.events.onClick then 
 					for j,e in ipairs(i.events.onClick) do
-						e.f(self:child(i.name).events.onClick[j].t, evt)
+						e.fn(self:child(i.name).events.onClick[j].target, event)
 					end
 				end
 				if events.onClick then
 					for _,e in ipairs(events.onClick) do
 						if e.o == i.type then
-							e.f(items[k], e.t, evt)
+							e.fn(items[k], e.target, event)
 						end
 					end
 				end
@@ -487,7 +486,7 @@ function gui:touchmoved(id, x, y, dx, dy, pressure)
 	end
 end
 
-function gui:touchpressed(id, x, y, dx, dy, pressure)
+function gui:touchpressed(event)
 	if not self.enabled then return false end
 	local objs = self:copy(items)
 	table.sort(objs, function(a, b) return a.z > b.z end)
@@ -497,17 +496,16 @@ function gui:touchpressed(id, x, y, dx, dy, pressure)
 		table.sort(obj.items, function(a,b) return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z end)
 		for k,i in ipairs(obj.items) do
 			if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
-				local evt = {id=id, x=x, y=y, dx=dx, dy=dy, pressure=pressure}
-				if i.touchpressed then i:touchpressed({x, y, button, istouch, presses}) end
+				if i.touchpressed then self:child(i.name):touchpressed(event) end
 				if i.events.onTouch then 
 					for j,e in ipairs(i.events.onTouch) do
-						e.f(self:child(i.name).events.onTouch[j].t, evt)
+						e.fn(self:child(i.name).events.onTouch[j].target, event)
 					end
 				end
 				if events.onTouch then
 					for j,e in ipairs(events.onTouch) do
 						if e.o == i.type then
-							e.f(items[k], events.onTouch[j].t, evt)
+							e.fn(items[k], events.onTouch[j].target, event)
 						end
 					end
 				end
@@ -523,7 +521,7 @@ function gui:remove(n)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:remove() :: Missing param[name]")
 	if type(n) ~= "string" and type(n) ~= "number" then
-		error("FAILURE: gui:remove() :: Incorrect param[name] - expecting string or number and got " .. type(n))
+		assert(type(n) == "string" or type(n) == "number", "FAILURE: gui:remove() :: Incorrect param[name] - expecting string or number and got " .. type(n))
 	end
 	
 	if type(n) == "string" then

@@ -116,9 +116,7 @@ function love.load()
 	
 	
 	-- You can define onOptionClick callbacks for your checkbox elements
-	function myCheckbox:onOptionClick(option, evt)
-		myBox2:setColor(colors(option.text:lower()))
-	end
+	myCheckbox:registerEvent("onOptionClick", function(option, target, evt) myGui:child("myBox2"):setColor(colors(option.text:lower())) end)
 end
 
 -- Use a single source for love callbacks
@@ -131,7 +129,7 @@ function love.draw()
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
-	myGui:mousepressed(x, y, button, istouch, presses)
+	myGui:mousepressed({x, y, button, istouch, presses})
 end
 
 -- For mobile

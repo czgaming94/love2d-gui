@@ -340,6 +340,7 @@ function checkbox:new(n, p)
 				else
 					lg.rectangle("fill", v.x, v.y, v.w, v.h)
 				end
+				
 				if self.selected[k] then
 					lg.setColor(self.overlayColor)
 					if self.round then
@@ -369,8 +370,13 @@ function checkbox:new(n, p)
 	end
 	
 	function c:fadeIn()
-		if self.beforeFadeIn then self:beforeFadeIn() end
+		if self.events.beforeFadeIn then 
+			for _,v in ipairs(self.events.beforeFadeIn) do
+				e.fn(e.target)
+			end
+		end
 		self.hidden = false
+		self:animateToOpacity(1)
 		if self.faded then
 			self.animateColor = true
 			self.animatePosition = true
@@ -378,12 +384,20 @@ function checkbox:new(n, p)
 		end
 		self.faded = false
 		self.fadedByFunc = true
-		self:animateToOpacity(1)
-		if self.onFadeIn then self:onFadeIn() end
+		if self.events.onFadeIn then
+			for _,v in ipairs(self.events.onFadeIn) do
+				e.fn(e.target)
+			end
+		end
 	end
 	
 	function c:fadeOut(p, h)
-		if self.beforeFadeOut then self:beforeFadeOut() end
+		if self.events.beforeFadeOut then
+			for _,v in ipairs(self.events.beforeFadeOut) do
+				e.fn(e.target)
+			end
+		end
+		self:animateToOpacity(0)
 		if p then 
 			self.faded = true
 			if h then
@@ -393,8 +407,11 @@ function checkbox:new(n, p)
 			end
 		end
 		self.fadedByFunc = true
-		self:animateToOpacity(0)
-		if self.onFadeOut then self:onFadeOut() end
+		if self.events.onFadeOut then
+			for _,v in ipairs(self.events.onFadeOut) do
+				e.fn(e.target)
+			end
+		end
 	end
 	
 	function c:fixPadding(f)
@@ -497,13 +514,14 @@ function checkbox:new(n, p)
 						if self.single then
 							self.selected = {}
 							self.selected[k] = v
+							print(k)
 						else
 							self.selected[k] = v
 						end
 					end
 					if self.events.onOptionClick then 
 						for _,e in ipairs(self.events.onOptionClick) do
-							e.f(self.options[k], e.t, {x=x, y=y, button=button, istouch=istouch, presses=presses})
+							e.fn(self.options[k], e.t, {x=x, y=y, button=button, istouch=istouch, presses=presses})
 						end
 					end
 				end
@@ -609,7 +627,8 @@ function checkbox:new(n, p)
 	function c:registerEvent(n, f, t)
 		if not self.events[n] then self.events[n] = {} end
 		local id = #self.events[n] + 1
-		self.events[n][id] = {id = id, f = f, t = t}
+		self.events[n][id] = {id = id, fn = f, target = t}
+		return self
 	end
 	
 	function c:touchmoved(id, x, y, dx, dy, pressure)
