@@ -33,8 +33,9 @@ dropdown.guis = {}
 
 function dropdown:new(n, id)
 	local d = {}
+	function d:__call(f, ...) f(self, args) end
+	setmetatable(d,d)
 	if not self.guis[p.id] then self.guis[p.id] = p end
-	
 	d.name = n
 	d.id = #self.items + 1
 	d.type = "dropdown"

@@ -36,6 +36,7 @@ local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
 
 local gui = {}
+setmetatable(gui, gui)
 local events = {}
 local items = {}
 
@@ -61,8 +62,12 @@ function gui.color(c)
 	return gui:copy(colors[c])
 end
 
+function gui:__call(f, ...)
+	f(self, ...)
+end
+
 function gui:new(item)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	item = item or self
 	local new = self:generate(item)
 	new.id = #items
@@ -71,7 +76,7 @@ function gui:new(item)
 end
 
 function gui:copy(item, skip)
-	if not self.enabled then return end
+	if not self.enabled then return false end
     local c
     if type(item) == "table" then
         c = {}
@@ -88,8 +93,12 @@ function gui:copy(item, skip)
     return c
 end
 
+function gui:duplicate(item, skip)
+	if not self.enabled then return false end
+end
+
 function gui:generate(item, copies, skip)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	local copies = copies or {}
     local copy
     if type(item) == 'table' then
@@ -114,14 +123,14 @@ function gui:generate(item, copies, skip)
 end
 
 function gui:setUse255(u)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(u ~= nil, "FAILURE: gui:setUse255() :: Missing param[use255]")
 	assert(type(o) == "boolean", "FAILURE: gui:setUse255() :: Incorrect param[use255] - expecting boolean and got " .. type(o))
 	self.use255 = u
 end
 
 function gui:animateToColor(o, c, s)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(o, "FAILURE: gui:animateToColor() :: Missing param[object]")
 	assert(type(o) == "table", "FAILURE: gui:animateToColor() :: Incorrect param[object] - expecting table and got " .. type(o))
 	assert(c, "FAILURE: gui:animateToColor() :: Missing param[color]")
@@ -137,7 +146,7 @@ function gui:animateToColor(o, c, s)
 end
 
 function gui:animateBorderToColor(o, c, s)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(o, "FAILURE: gui:animateToColor() :: Missing param[object]")
 	assert(type(o) == "table", "FAILURE: gui:animateToColor() :: Incorrect param[object] - expecting table and got " .. type(o))
 	assert(c, "FAILURE: gui:animateBorderToColor() :: Missing param[color]")
@@ -153,7 +162,7 @@ function gui:animateBorderToColor(o, c, s)
 end
 	
 function gui:animateToPosition(o, x, y, s)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(o, "FAILURE: gui:animateToPosition() :: Missing param[object]")
 	assert(type(o) == "table", "FAILURE: gui:animateToPosition() :: Incorrect param[object] - expecting table and got " .. type(o))
 	assert(x, "FAILURE: gui:animateToPosition() :: Missing param[x]")
@@ -171,7 +180,7 @@ function gui:animateToPosition(o, x, y, s)
 end
 
 function gui:animateToOpacity(obj, o, s)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(obj, "FAILURE: gui:animateToColor() :: Missing param[object]")
 	assert(type(obj) == "table", "FAILURE: gui:animateToColor() :: Incorrect param[object] - expecting table and got " .. type(obj))
 	assert(o, "FAILURE: gui:animateToOpacity() :: Missing param[o]")
@@ -186,7 +195,7 @@ function gui:animateToOpacity(obj, o, s)
 end
 
 function gui:addColor(c, n)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(c, "FAILURE: gui:addColor() :: Missing param[color]")
 	assert(type(c) == "table", "FAILURE: gui:addColor() :: Incorrect param[color] - expecting table and got " .. type(c))
 	assert(#c > 2, "FAILURE : gui:addColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
@@ -196,7 +205,7 @@ function gui:addColor(c, n)
 end
 
 function gui:addBox(n)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:addBox() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addBox() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
@@ -205,7 +214,7 @@ function gui:addBox(n)
 end
 
 function gui:addCheckbox(n)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:addCheckbox() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addCheckbox() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
@@ -214,7 +223,7 @@ function gui:addCheckbox(n)
 end
 
 function gui:addDropdown(n)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:addDropdown() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addDropdown() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
@@ -223,7 +232,7 @@ function gui:addDropdown(n)
 end
 
 function gui:addImage(i, n)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(i, "FAILURE: gui:addImage() :: Missing param[img]")
 	assert(type(i) == "userdata", "FAILURE: gui:addImage() :: Incorrect param[img] - expecting image userdata and got " .. type(i))
 	assert(n, "FAILURE gui:addImage() :: Missing param[name]")
@@ -232,7 +241,7 @@ function gui:addImage(i, n)
 end
 
 function gui:addTextfield(n)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:addTextfield() :: Missing param[name]")
 	assert(type(n) == "FAILURE: gui:addTextfield() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
@@ -241,7 +250,7 @@ function gui:addTextfield(n)
 end
 
 function gui:addToggle(n)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:addToggle() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addToggle() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
@@ -250,7 +259,7 @@ function gui:addToggle(n)
 end
 
 function gui:addText(n)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:addText() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addText() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
@@ -259,7 +268,7 @@ function gui:addText(n)
 end
 
 function gui:update(dt)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	for _,v in ipairs(items) do 
 		for _,i in ipairs(v.items) do 
 			if not i.hidden then 
@@ -380,7 +389,7 @@ function gui:disable()
 end
 
 function gui:draw()
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	table.sort(items, function(a, b) return a.z < b.z end)
 	for _,v in ipairs(items) do
 		table.sort(v.items, function(a, b) return a.pos.z < b.pos.z end)
@@ -391,7 +400,7 @@ function gui:draw()
 end
 
 function gui:child(n)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:child() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:child() :: Incorrect param[name] - expecting string and got " .. type(n))
 	for _,v in ipairs(self.items) do
@@ -401,7 +410,7 @@ function gui:child(n)
 end
 
 function gui:registerEvent(n, o, f, t)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:registerEvent() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:registerEvent() :: Incorrect param[name] - expecting string and got " .. type(n))
 	assert(o, "FAILURE: gui:registerEvent() :: Missing param[object]")
@@ -412,7 +421,7 @@ function gui:registerEvent(n, o, f, t)
 end
 
 function gui:registerGlobalEvent(n, o, f, t)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:registerEvent() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:registerEvent() :: Incorrect param[name] - expecting string and got " .. type(n))
 	assert(o, "FAILURE: gui:registerEvent() :: Missing param[type]")
@@ -425,7 +434,7 @@ function gui:registerGlobalEvent(n, o, f, t)
 end
 
 function gui:mousemoved(x, y, button, istouch, presses)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	for _,v in ipairs(items) do 
 		for _,i in ipairs(v.items) do 
 			if not i.hidden then 
@@ -436,7 +445,7 @@ function gui:mousemoved(x, y, button, istouch, presses)
 end
 
 function gui:mousepressed(x, y, button, istouch, presses)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	local objs = self:copy(items)
 	table.sort(objs, function(a, b) return a.z > b.z end)
 	local hitTarget = false
@@ -468,7 +477,7 @@ function gui:mousepressed(x, y, button, istouch, presses)
 end
 
 function gui:touchmoved(id, x, y, dx, dy, pressure)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	for _,v in ipairs(items) do 
 		for _,i in ipairs(v.items) do 
 			if not i.hidden then 
@@ -479,24 +488,39 @@ function gui:touchmoved(id, x, y, dx, dy, pressure)
 end
 
 function gui:touchpressed(id, x, y, dx, dy, pressure)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	local objs = self:copy(items)
 	table.sort(objs, function(a, b) return a.z > b.z end)
 	local hitTarget = false
 	for o,v in ipairs(objs) do
-		for k,i in ipairs(v.items) do
+		local obj = self:copy(v)
+		table.sort(obj.items, function(a,b) return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z end)
+		for k,i in ipairs(obj.items) do
 			if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
+				local evt = {id=id, x=x, y=y, dx=dx, dy=dy, pressure=pressure}
 				if i.touchpressed then i:touchpressed({x, y, button, istouch, presses}) end
-				if i.onTouch then i:onTouch({x, y, button, istouch, presses}) end
+				if i.events.onTouch then 
+					for _,e in ipairs(i.events.onTouch) do
+						e.f(e.t, evt)
+					end
+				end
+				if events.onTouch then
+					for k,e in ipairs(events.onTouch) do
+						if e.o == i.type then
+							e.f(i, e.t, evt)
+						end
+					end
+				end
 				if not i.hollow then hitTarget = true end
 			end
 		end
+		obj = nil
 	end
 	objs = nil
 end
 
 function gui:remove(n)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:remove() :: Missing param[name]")
 	if type(n) ~= "string" and type(n) ~= "number" then
 		error("FAILURE: gui:remove() :: Incorrect param[name] - expecting string or number and got " .. type(n))
@@ -514,7 +538,7 @@ function gui:remove(n)
 end
 
 function gui:setZ(z)
-	if not self.enabled then return end
+	if not self.enabled then return false end
 	assert(z, "FAILURE: gui:setZ() :: Missing param[z]")
 	assert(type(z) == "number", "FAILURE: gui:setZ() :: Incorrect param[z] - expecting number and got " .. type(z))
 	self.z = z

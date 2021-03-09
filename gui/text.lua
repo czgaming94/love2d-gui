@@ -37,14 +37,16 @@ local prefixes = {
 	time = "t"
 }
 
+
 text.items = {}
 text.guis = {}
 text.fonts = {}
 
 function text:new(n, p)
 	local t = {}
+	function t:__call(f, ...) f(self, args) end
+	setmetatable(t,t)
 	if p and p.id and not self.guis[p.id] then self.guis[p.id] = p end
-	
 	t.name = n
 	t.id = #self.items + 1
 	t.type = "text"

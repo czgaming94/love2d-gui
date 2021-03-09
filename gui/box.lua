@@ -35,6 +35,8 @@ box.guis = {}
 
 function box:new(n, p)
 	local b = {}
+	function b:__call(f, ...) f(self, args) end
+	setmetatable(b,b)
 	if not self.guis[p.id] then self.guis[p.id] = p end
 	b.name = n
 	b.id = #self.items + 1

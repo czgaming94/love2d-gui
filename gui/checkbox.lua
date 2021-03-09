@@ -33,10 +33,12 @@ local checkbox = {}
 checkbox.items = {}
 checkbox.guis = {}
 
+
 function checkbox:new(n, p)
 	local c = {}
+	function c:__call(f, ...) f(self, args) end
+	setmetatable(c,c)
 	if not self.guis[p.id] then self.guis[p.id] = p end
-	
 	c.name = n
 	c.id = #self.items + 1
 	c.type = "checkbox"
@@ -498,7 +500,11 @@ function checkbox:new(n, p)
 							self.selected[k] = v
 						end
 					end
-					if self.onOptionClick then self:onOptionClick(self.options[k], {x=x, y=y, button=button, istouch=istouch, presses=presses}) end
+					if self.events.onOptionClick then 
+						for _,e in ipairs(self.events.onOptionClick) do
+							e.f(self.options[k], e.t, {x=x, y=y, button=button, istouch=istouch, presses=presses}) end
+						end
+					end
 				end
 			end
 		end
