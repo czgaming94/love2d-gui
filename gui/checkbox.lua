@@ -502,7 +502,7 @@ function checkbox:new(n, p)
 					end
 					if self.events.onOptionClick then 
 						for _,e in ipairs(self.events.onOptionClick) do
-							e.f(self.options[k], e.t, {x=x, y=y, button=button, istouch=istouch, presses=presses}) end
+							e.f(self.options[k], e.t, {x=x, y=y, button=button, istouch=istouch, presses=presses})
 						end
 					end
 				end

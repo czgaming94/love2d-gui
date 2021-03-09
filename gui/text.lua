@@ -85,6 +85,7 @@ function text:new(n, p)
 	t.typewriterFinished = false
 	t.typewriterPaused = false
 	t.typewriterStopped = false
+	t.typewriterRepeat = false
 	t.typewriterRunCount = 0
 	t.inAnimation = false
 	t.animateColor = false
@@ -178,6 +179,7 @@ function text:new(n, p)
 		self.text = d.t or d.text or self.text
 		self.typewriterText, self.fancy = text:split(self.text)
 		self.typewriter = d.tw and d.tw or d.typewriter and d.typewriter or self.typewriter
+		self.typewriterRepeat = d.r and d.r or d.tRepeat and d.tRepeat or self.typewriterRepeat
 		self.pos.x = d.x or self.pos.x
 		self.pos.y = d.y or self.pos.y
 		self.typewriterSpeed = d.s or d.speed or self.typewriterSpeed
@@ -380,6 +382,23 @@ function text:new(n, p)
 						end
 					end
 					if not v.finished then break end
+					if k == #self.typewriterText then
+						if self.events.onTypewriterFinish then
+							for _,e in ipairs(self.events.onTypewriterFinish) do
+								e.f(e.t)
+							end
+						end
+						if self.typewriterRepeat then
+							for _,e in ipairs(self.typewriterText) do
+								v.timeWaited = 0
+								v.toShow = ""
+								v.textPos = 1
+								if v.delayWaited ~= 0 then
+									v.needToWait = true
+								end
+							end
+						end
+					end
 				end
 			else
 				while self.typewriterWaited >= self.typewriterSpeed and self.typewriterPos <= #self.typewriterText do
