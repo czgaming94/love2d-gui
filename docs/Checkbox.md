@@ -22,28 +22,29 @@ myCheckbox:setData({
 ```
 ## API Callbacks
 This API brings several user defined callbacks which allow you to customize what happens when a user interacts with your elements.<br>
-Any callback with an `event` paramter has a table provided to it with data accessible to the user.
-##### :onClick(event) -- {x, y, button, istouch, presses}
+Any callback with an `event` paramter has a table provided to it with data accessible to the user. You can easily define these<br>
+with `myBox:registerEvent("onClick", function(target, event) print(target.name, event.x, event.y) end, yourTargetObject)`
+##### :onClick(target, event) -- {x, y, button, istouch, presses}
 > Triggered when a user clicks on the object.
-##### :onTouch(event) -- {id, x, y, dx, dy, pressure}
+##### :onTouch(target, event) -- {id, x, y, dx, dy, pressure}
 > Triggered when a user taps on the object on mobile.
-##### :onHoverEnter()
+##### :onHoverEnter(target, event) -- {x, y}
 > Triggered when a user initially hovers over an object.
-##### :onHoverExit()
+##### :onHoverExit(target, event) -- {x, y}
 > Triggered when a user initially stops hovering an object.
-##### :beforeFadeIn()
+##### :beforeFadeIn(target)
 > Triggered when an object is about to fade in.
-##### :onFadeIn()
+##### :onFadeIn(target)
 > Triggered when an object is fading in.
-##### :afterFadeIn()
+##### :afterFadeIn(target)
 > Triggered after an object fades in.
-##### :beforeFadeOut()
+##### :beforeFadeOut(target)
 > Triggered when an object is about to fade out.
-##### :onFadeOut()
+##### :onFadeOut(target)
 > Triggered when an object is fading out.
-##### :afterFadeOut()
+##### :afterFadeOut(target)
 > Triggered after an object fades out.
-##### :onOptionClick(option, event) -- {text, width, height, x, y}, {x, y, button, istouch, presses}
+##### :onOptionClick(option, target, event) -- {text, width, height, x, y}, target, {x, y, button, istouch, presses}
 > Triggered when a user clicks an option on a checkbox.
 ## Data Handling
 These functions provide the ability to directly modify many variables of your elements. The way these work currently may change.<br>
