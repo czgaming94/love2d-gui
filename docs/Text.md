@@ -118,7 +118,7 @@ boolean | vertical
 > Set the Z position of the current element.
 ##### :getZ()
 > Get the Z position of the current element.
-## element Manipulation
+## Object Manipulation
 These functions are used for animating, enabling, and disabling elements.
 ##### :animateToColor(table color, number speed)
 > Animate the current element to a new color, at the provided speed, or at 2s without a speed given.
