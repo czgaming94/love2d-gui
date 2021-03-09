@@ -5,7 +5,7 @@ The goal of the box element is for backgrounds, buttons, and HUD containers. Thi
 local GUI = require("gui")
 local myBox = GUI:addBox("myBox")
 myBox:addImage(lg.newImage("res/img/background.png"), "background", true)
-myBox:setData({ w = 800, h = 600, x = 0, y = 0, z = 0})
+myBox:setData({w = 800, h = 600, x = 0, y = 0, z = 0, clickable = false})
 ```
 ## API Callbacks
 This API brings several user defined callbacks which allow you to customize what happens when a user interacts with your elements.<br>
