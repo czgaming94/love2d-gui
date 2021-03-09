@@ -1,7 +1,6 @@
 # Box
-The goal of the box object is for backgrounds, buttons, and HUD containers. This is<br>
-the most commonly used type of object in a GUI.
-## Object Creation
+The goal of the box element is for backgrounds, buttons, and HUD containers. This is the most commonly used type of element in a GUI.
+## element Creation
 ```lua
 local GUI = require("gui")
 local myBox = GUI:addBox("myBox")
@@ -11,40 +10,40 @@ myBox:setData({ w = 800, h = 600, x = 0, y = 0, z = 0})
 ## API Callbacks
 This API brings several user defined callbacks which allow you to customize what happens when a user interacts with your elements.<br>
 Any callback with an `event` paramter has a table provided to it with data accessible to the user. You can easily define these<br>
-with `myBox:registerEvent("onClick", function(target, event) print(target.name, event.x, event.y) end, yourTargetObject)`
+with `myBox:registerEvent("onClick", function(target, event) print(target.name, event.x, event.y) end, yourTargetelement)`
 ##### :onClick(target, event) -- {x, y, button, istouch, presses}
-> Triggered when a user clicks on the object.
+> Triggered when a user clicks on the element.
 ##### :onTouch(target, event) -- {id, x, y, dx, dy, pressure}
-> Triggered when a user taps on the object on mobile.
+> Triggered when a user taps on the element on mobile.
 ##### :onHoverEnter(target, event) -- {x, y}
-> Triggered when a user initially hovers over an object.
+> Triggered when a user initially hovers over an element.
 ##### :onHoverExit(target, event) -- {x, y}
-> Triggered when a user initially stops hovering an object.
+> Triggered when a user initially stops hovering an element.
 ##### :beforeFadeIn(target)
-> Triggered when an object is about to fade in.
+> Triggered when an element is about to fade in.
 ##### :onFadeIn(target)
-> Triggered when an object is fading in.
+> Triggered when an element is fading in.
 ##### :afterFadeIn(target)
-> Triggered after an object fades in.
+> Triggered after an element fades in.
 ##### :beforeFadeOut(target)
-> Triggered when an object is about to fade out.
+> Triggered when an element is about to fade out.
 ##### :onFadeOut(target)
-> Triggered when an object is fading out.
+> Triggered when an element is fading out.
 ##### :afterFadeOut(target)
-> Triggered after an object fades out.
+> Triggered after an element fades out.
 ## Data Handling
 These functions provide the ability to directly modify many variables of your elements. The way these work currently may change.<br>
 The biggest change that may happen, is accepting additional parameter types. No old elements will be broken by updates.
 ##### :addImage(userdata image, string name, boolean automatic)
-> Add an image to the box object memory. These will be used with the :setImage() function.
+> Add an image to the box element memory. These will be used with the :setImage() function.
 ##### :isAnimating()
-> Returns true/false depending on whether the object is in the process of any animation.
+> Returns true/false depending on whether the element is in the process of any animation.
 ##### :setBorderColor(table color)
 > Set the border color of your element to a new color. Default is white.
 ##### :getBorderColor()
 > Returns a table of the current element border color.
 ##### :setClickable(boolean clickable)
-> Set whether the element will register as a clickable object.
+> Set whether the element will register as a clickable element.
 ##### :isClickable()
 > Returns whether the element is clickable.
 ##### :setColor(table color)
@@ -92,7 +91,7 @@ boolean | vertical
 ##### :getOpacity()
 > Get the opacity of the current element
 ##### :getParent()
-> Returns the parent GUI object of the current element.
+> Returns the parent GUI element of the current element.
 ##### :setUseBorder(boolean useBorder)
 > Set whether the element should have a border.
 ##### :getUseBorder()
@@ -113,26 +112,26 @@ boolean | vertical
 > Set the Z position of the current element.
 ##### :getZ()
 > Get the Z position of the current element.
-## Object Manipulation
+## element Manipulation
 These functions are used for animating, enabling, and disabling elements.
 ##### :animateToColor(table color, number speed)
-> Animate the current object to a new color, at the provided speed, or at 2s without a speed given.
+> Animate the current element to a new color, at the provided speed, or at 2s without a speed given.
 ##### :animateBorderToColor(table color, number speed)
-> Animate the current object to a new border color, at the provided speed, or at 2s without a speed given.
+> Animate the current element to a new border color, at the provided speed, or at 2s without a speed given.
 ##### :animateToPosition(number x, number y, number speed)
-> Animate the current object to a new position, at the provided speed, or at 2s without a speed given.
+> Animate the current element to a new position, at the provided speed, or at 2s without a speed given.
 ##### :animateToOpacity(number opacity, number speed)
-> Animate the current object to a new opacity, at the provided speed, or at 2s without a speed given.
+> Animate the current element to a new opacity, at the provided speed, or at 2s without a speed given.
 ##### :disable()
-> Fully disable and hide the object.
+> Fully disable and hide the element.
 ##### :enable()
-> Enable and show the object if it was hidden.
+> Enable and show the element if it was hidden.
 ##### :fadeIn()
-> Fade the object in from X opacity to full 1.0 opacity.
+> Fade the element in from X opacity to full 1.0 opacity.
 ##### :fadeOut(boolean disableClick, boolean haltAnimations)
-> Fade the object out to 0 opacity.
-> <br>`disableClick` will prevent the API from performing click operations on the object while it is faded out.
-> <br>`haltAnimations` will stop the object in its animation state and fade out to 0 opacity.
+> Fade the element out to 0 opacity.
+> <br>`disableClick` will prevent the API from performing click operations on the element while it is faded out.
+> <br>`haltAnimations` will stop the element in its animation state and fade out to 0 opacity.
 ##### :startAnimation()
 > Resumes any halted animations.
 ##### :stopAnimation()
