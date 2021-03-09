@@ -394,7 +394,7 @@ function gui:draw()
 	for _,v in ipairs(items) do
 		table.sort(v.items, function(a, b) return a.pos.z < b.pos.z end)
 		for _,i in ipairs(v.items) do 
-			i:draw(dt) 
+			if not i.hidden then i:draw(dt) end
 		end
 	end
 end
@@ -452,19 +452,19 @@ function gui:mousepressed(x, y, button, istouch, presses)
 	for _,v in ipairs(objs) do
 		local obj = self:copy(v)
 		table.sort(obj.items, function(a,b) return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z end)
-		for _,i in ipairs(obj.items) do
+		for k,i in ipairs(obj.items) do
 			if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
 				local evt = {x=x, y=y, button=button, istouch=istouch, pressed=presses}
 				if i.mousepressed then i:mousepressed(evt) end
 				if i.events.onClick then 
-					for _,e in ipairs(i.events.onClick) do
-						e.f(e.t, evt)
+					for j,e in ipairs(i.events.onClick) do
+						e.f(self:child(i.name).events.onClick[j].t, evt)
 					end
 				end
 				if events.onClick then
-					for k,e in ipairs(events.onClick) do
+					for _,e in ipairs(events.onClick) do
 						if e.o == i.type then
-							e.f(i, e.t, evt)
+							e.f(items[k], e.t, evt)
 						end
 					end
 				end
@@ -492,7 +492,7 @@ function gui:touchpressed(id, x, y, dx, dy, pressure)
 	local objs = self:copy(items)
 	table.sort(objs, function(a, b) return a.z > b.z end)
 	local hitTarget = false
-	for o,v in ipairs(objs) do
+	for _,v in ipairs(objs) do
 		local obj = self:copy(v)
 		table.sort(obj.items, function(a,b) return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z end)
 		for k,i in ipairs(obj.items) do
@@ -500,14 +500,14 @@ function gui:touchpressed(id, x, y, dx, dy, pressure)
 				local evt = {id=id, x=x, y=y, dx=dx, dy=dy, pressure=pressure}
 				if i.touchpressed then i:touchpressed({x, y, button, istouch, presses}) end
 				if i.events.onTouch then 
-					for _,e in ipairs(i.events.onTouch) do
-						e.f(e.t, evt)
+					for j,e in ipairs(i.events.onTouch) do
+						e.f(self:child(i.name).events.onTouch[j].t, evt)
 					end
 				end
 				if events.onTouch then
-					for k,e in ipairs(events.onTouch) do
+					for j,e in ipairs(events.onTouch) do
 						if e.o == i.type then
-							e.f(i, e.t, evt)
+							e.f(items[k], events.onTouch[j].t, evt)
 						end
 					end
 				end

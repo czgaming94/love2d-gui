@@ -235,6 +235,7 @@ function text:new(n, p)
 			end
 		end
 		self.clickable = d.clickable and d.clickable or self.clickable
+		return self
 	end
 	
 	function t:disable()
@@ -359,42 +360,45 @@ function text:new(n, p)
 			self.typewriterWaited = self.typewriterWaited + dt
 			if self.fancy then
 				for k,v in ipairs(self.typewriterText) do
-					if v.text then
-						v.timeWaited = v.timeWaited + dt
-						if v.delay > 0 and v.delayWaited < v.delay then
-							v.delayWaited = v.delayWaited + dt
-							if v.delayWaited >= v.delay then
-								v.needToWait = false
+					if not v.finished then
+						if v.text then
+							v.timeWaited = v.timeWaited + dt
+							if v.delay > 0 and v.delayWaited < v.delay then
+								v.delayWaited = v.delayWaited + dt
+								if v.delayWaited >= v.delay then
+									v.needToWait = false
+								end
+							end
+							if not v.needToWait then
+								if not v.started then
+									v.started = true
+								end
+								while v.timeWaited >= v.time and v.textPos <= #v.text do
+									v.timeWaited = v.timeWaited - v.time
+									v.toShow = v.toShow .. v.text[v.textPos]
+									v.textPos = v.textPos + 1
+								end
+								if v.textPos >= #v.text then
+									v.finished = true
+								end
 							end
 						end
-						if not v.needToWait then
-							if not v.started then
-								v.started = true
+						if not v.finished then break end
+						if k == #self.typewriterText then
+							if self.events.onTypewriterFinish then
+								for _,e in ipairs(self.events.onTypewriterFinish) do
+									e.f(e.t)
+								end
 							end
-							while v.timeWaited >= v.time and v.textPos <= #v.text do
-								v.timeWaited = v.timeWaited - v.time
-								v.toShow = v.toShow .. v.text[v.textPos]
-								v.textPos = v.textPos + 1
-							end
-							if v.textPos >= #v.text then
-								v.finished = true
-							end
-						end
-					end
-					if not v.finished then break end
-					if k == #self.typewriterText then
-						if self.events.onTypewriterFinish then
-							for _,e in ipairs(self.events.onTypewriterFinish) do
-								e.f(e.t)
-							end
-						end
-						if self.typewriterRepeat then
-							for _,e in ipairs(self.typewriterText) do
-								v.timeWaited = 0
-								v.toShow = ""
-								v.textPos = 1
-								if v.delayWaited ~= 0 then
-									v.needToWait = true
+							if self.typewriterRepeat then
+								for _,e in ipairs(self.typewriterText) do
+									v.timeWaited = 0
+									v.toShow = ""
+									v.finished = false
+									v.textPos = 1
+									if v.delayWaited ~= 0 then
+										v.needToWait = true
+									end
 								end
 							end
 						end

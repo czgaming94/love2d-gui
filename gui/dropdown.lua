@@ -253,6 +253,7 @@ function dropdown:new(n, id)
 				
 			end
 		end
+		return self
 	end
 	
 	function d:disable()
@@ -436,7 +437,6 @@ function dropdown:new(n, id)
 	function d:registerEvent(n, f, t)
 		if not self.events[n] then self.events[n] = {} end
 		local id = #self.events[n] + 1
-		print(t)
 		self.events[n][id] = {id = id, f = f, t = t}
 	end
 	

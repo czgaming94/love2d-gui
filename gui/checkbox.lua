@@ -304,6 +304,7 @@ function checkbox:new(n, p)
 				end
 			end
 		end
+		return self
 	end
 	
 	function c:disable()
@@ -608,7 +609,6 @@ function checkbox:new(n, p)
 	function c:registerEvent(n, f, t)
 		if not self.events[n] then self.events[n] = {} end
 		local id = #self.events[n] + 1
-		print(t)
 		self.events[n][id] = {id = id, f = f, t = t}
 	end
 	

@@ -108,7 +108,7 @@ function love.load()
 	myGui2:setZ(1)
 	
 	-- You can define onClick callbacks for your GUI elements
-	myGui:registerGlobalEvent("onClick", "box", function(obj, target, evt) print(obj.name) end)
+	myGui:registerGlobalEvent("onClick", "box", function(obj, target, evt) end)
 	myGui:child("myBox2"):registerEvent("onClick", function(a) a:fadeOut(true, true) end, myBox3)
 	myBox3:registerEvent("onFadeOut", function() print("Faded") end)
 	myGui:registerEvent("onClick", myGui:child("myBox2"), function() myGui:child("myBox2"):animateBorderToColor(colors("red")) end)

@@ -219,6 +219,7 @@ function box:new(n, p)
 			self.paddingTop, self.paddingRight, self.paddingBottom, self.paddingLeft = unpack(t.padding)
 		end
 		self.moveable = t.moveable and t.moveable or self.moveable
+		return self
 	end
 	
 	function b:disable()
