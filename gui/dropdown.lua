@@ -40,8 +40,10 @@ function dropdown:new(n, p)
 	d.type = "dropdown"
 	if p and p.id then d.parent = p.id else d.parent = nil end
 	d.w = 0
+	d.dW = 0
 	d.uW = 0
 	d.h = 0
+	d.dH = 0
 	d.uH = 0
 	d.pos = {
 		x = 0,
@@ -72,6 +74,7 @@ function dropdown:new(n, p)
 	d.clickable = true
 	d.hollow = false
 	d.open = false
+	d.closeOnUnfocus = false
 	d.faded = false
 	d.fadedByFunc = false
 	d.hidden = false
@@ -213,6 +216,7 @@ function dropdown:new(n, p)
 		assert(type(t.y) == "number", "[" .. self.name .. "] FAILURE: dropdown:setData() :: Incorrect param[data['y']] - expecting number and got " .. type(t.y))
 		self.uW = t.w or t.width or self.uW
 		self.uH = t.h or t.height or self.uH
+		self.w, self.h = self.uW, self.uH
 		self.label = t.label or t.text or self.label
 		self.labelColor = t.labelColor or self.labelColor
 		self.labelFont = t.labelFont or self.labelFont
@@ -234,6 +238,17 @@ function dropdown:new(n, p)
 				self.paddingTop, self.paddingRight, self.paddingBottom, self.paddingLeft = unpack(t.padding)
 			end
 		end
+		if t.optionPadding then
+			if t.optionPadding.top or t.optionPadding.optionPaddingTop then
+				self.optionPaddingTop = t.optionPadding.optionPaddingTop or t.optionPadding.top
+				self.optionPaddingRight = t.optionPadding.optionPaddingRight or t.optionPadding.right or self.optionPaddingRight
+				self.optionPaddingBottom = t.optionPadding.optionPaddingBottom or t.optionPadding.bottom or self.optionPaddingBottom
+				self.optionPaddingLeft = t.optionPadding.optionPaddingLeft or t.optionPadding.left or self.optionPaddingLeft
+			else
+				self.optionPaddingTop, self.optionPaddingRight, self.optionPaddingBottom, self.optionPaddingLeft = unpack(t.optionPadding)
+			end
+		end
+		self.fixPadding = (t.fixPadding and t.fixPadding) or (t.fix and t.fix) or self.fixPadding
 		self.pos.x = t.x or self.pos.x
 		self.pos.y = t.y or self.pos.y
 		self.pos.z = t.z or self.pos.z
@@ -246,30 +261,43 @@ function dropdown:new(n, p)
 		self.clickable = t.clickable and t.clickable or self.clickable
 		self.round = t.round and t.round or self.round
 		self.roundRadius = (t.roundRadius and t.roundRadius) or (t.radius and t.radius) or self.roundRadius
+		self.closeOnUnfocus = t.closeOnUnfocus and t.closeOnUnfocus or self.closeOnUnfocus
 		if t.options then
 			if not t.keepOptions then
 				self.options = {}
 			end
-			local w, h = 0, 0
+			local w, h = self.uW, 0
 			for k,v in ipairs(t.options) do
 				if k == 1 then
 					self.options[k] = {
 						text = v, 
-						x = self.pos.x, 
-						y = self.pos.y,
-						w = self.paddingLeft + self.uW + self.font:getWidth(v) + self.paddingRight,
-						h = self.paddingTop + self.uH + self.paddingBottom
+						x = self.optionPaddingLeft + self.pos.x, 
+						y = self.optionPaddingTop + self.pos.y + self.uH + self.optionPaddingBottom,
+						w = self.optionPaddingLeft + self.optionFont:getWidth(v) + self.optionPaddingRight,
+						h = self.optionPaddingTop + self.uH + self.optionFont:getHeight(v) + self.optionPaddingBottom
 					}
+					if self.fixPadding then
+						self.options[k].y = self.pos.y + self.uH + self.optionPaddingBottom
+					end
+					if self.border then self.options[k].y = self.options[k].y + 7 end
 				else
 					self.options[k] = {
 						text = v, 
-						x = self.pos.x + self.paddingRight,
-						y = self.options[k - 1].y + self.font:getHeight(v),
-						w = self.paddingLeft + self.uW + self.font:getWidth(v) + self.paddingRight,
-						h = self.paddingTop + self.uH + self.paddingBottom
+						x = self.optionPaddingLeft + self.pos.x,
+						y = self.options[k - 1].y + self.options[k - 1].h,
+						w = self.optionPaddingLeft + self.optionFont:getWidth(v) + self.optionPaddingRight,
+						h = self.optionPaddingTop + self.uH + self.optionFont:getHeight(v) + self.optionPaddingBottom
 					}
 				end
+				if self.border then 
+					self.options[k].x = self.options[k].x - 5	
+				end
+				h = h + self.options[k].h
+				w = max(w, self.options[k].w)
 			end
+			for k,v in ipairs(self.options) do v.w = w end
+			self.dW = w
+			self.dH = h
 		end
 		if t.default then
 			for k,v in ipairs(self.options) do 
@@ -291,6 +319,11 @@ function dropdown:new(n, p)
 		lg.setFont(self.font)
 		
 		lg.rectangle("fill", self.pos.x, self.pos.y, self.uW, self.uH)
+		if self.open then
+			lg.setColor(0,0,0,.2)
+			lg.rectangle("fill", self.pos.x, self.pos.y, self.uW, self.uH)
+			lg.setColor(self.color)
+		end
 		if self.border then
 			lg.setColor(self.borderColor)
 			lg.rectangle("line", self.pos.x - 1, self.pos.y - 1, self.uW + 2, self.uH + 2)
@@ -298,6 +331,45 @@ function dropdown:new(n, p)
 		lg.setColor(self.optionsColor)
 		lg.setFont(self.optionFont)
 		if self.selected then lg.print(self.options[self.selected].text, self.pos.x + self.paddingLeft, self.pos.y + self.paddingTop) end
+		if self.open then
+			if self.border then
+				if self.fixPadding then
+					lg.setColor(self.borderColor)
+					lg.rectangle("line", self.pos.x, self.pos.y + self.uH + 2, self.optionPaddingLeft + self.dW + self.optionPaddingRight + 2, self.dH + 2)
+					lg.setColor(self.color)
+					lg.rectangle("fill", self.pos.x + 1, self.pos.y + self.uH + 3, self.optionPaddingLeft + self.dW + self.optionPaddingRight, self.dH)
+				else
+					lg.setColor(self.borderColor)
+					lg.rectangle("line", self.pos.x, self.pos.y + self.uH + 2, self.optionPaddingLeft + self.dW + self.optionPaddingRight + 2, self.optionPaddingTop + self.dH + self.paddingBottom + 2)
+					lg.setColor(self.color)
+					lg.rectangle("fill", self.pos.x + 1, self.pos.y + self.uH + 3, self.optionPaddingLeft + self.dW + self.optionPaddingRight, self.optionPaddingTop + self.dH + self.paddingBottom)
+				end
+			else
+				lg.setColor(self.color)
+				if self.fixPadding then
+					lg.rectangle("fill", self.pos.x, self.pos.y + self.uH, self.optionPaddingLeft + self.dW + self.optionPaddingRight, self.dH)
+				else
+					lg.rectangle("fill", self.pos.x, self.pos.y + self.uH, self.optionPaddingLeft + self.dW + self.optionPaddingRight, self.optionPaddingTop + self.dH + self.paddingBottom)
+				end
+			end
+			for k,v in ipairs(self.options) do
+				if v.hovered then
+					lg.setColor(0,0,0,.2)
+					if self.border then
+						lg.rectangle("fill",v.x - (self.optionPaddingLeft / 2) + 1,v.y - self.optionPaddingTop - self.optionPaddingBottom,v.w + self.optionPaddingLeft + self.optionPaddingRight,v.h)
+					else
+						lg.rectangle("fill",v.x - self.optionPaddingLeft / 2,v.y,v.w + self.optionPaddingLeft + self.optionPaddingRight,v.h)
+					end
+				end
+				lg.setColor(self.optionsColor)
+				lg.setFont(self.optionFont)
+				lg.print(v.text, v.x, v.y + self.optionPaddingTop)
+				if k ~= #self.options then
+					lg.setColor(0,0,0,.2)
+					lg.line(v.x - self.optionPaddingLeft / 2, v.y + ((v.h - self.optionPaddingTop) - self.optionPaddingBottom), v.x + v.w + self.optionPaddingLeft, v.y + ((v.h - self.optionPaddingTop) - self.optionPaddingBottom))
+				end
+			end
+		end
 		
 		lg.setColor(self.labelColor)
 		lg.setFont(self.labelFont)
@@ -388,10 +460,24 @@ function dropdown:new(n, p)
 		return self.hovered
 	end
 	
-	function d:mousepressed(x, y, button, istouch, presses)
+	function d:mousepressed(event)
+		local x, y, button = event.x, event.y, event.button
 		if button == 1 then
-			if self.hovered and not self.open then
-				self.open = true
+			if self.hovered then 
+				if self.open then
+					local hitTarget = false
+					for k,v in ipairs(self.options) do
+						if v.hovered then
+							self.selected = k
+							hitTarget = true
+						end
+					end
+					if not hitTarget then
+						self.open = false
+					end
+				else
+					self.open = true
+				end
 			else
 				self.open = false
 			end
@@ -516,7 +602,19 @@ function dropdown:new(n, p)
 	end
 	
 	function d:update(dt)
-		
+		if self.open then
+			local x,y = love.mouse.getPosition()
+			for k,v in ipairs(self.options) do
+				if x >= v.x - self.optionPaddingLeft / 2 and x <= v.x + v.w + self.optionPaddingLeft and y >= v.y - self.optionPaddingTop - self.optionPaddingBottom and y <= v.y + v.h - self.optionPaddingTop - self.optionPaddingBottom then
+					if not v.hovered then v.hovered = true end
+				else
+					if v.hovered then v.hovered = false end
+				end
+				--if v.hovered and love.mouse.isDown(1) then
+				--	if self.selected ~= k then self.selected = k end
+				--end
+			end
+		end
 	end
 	
 	function d:setWidth(w)

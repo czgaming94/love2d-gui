@@ -512,7 +512,8 @@ function checkbox:new(n, p)
 		return self.labelPosition
 	end
 	
-	function c:mousepressed(x, y, button, istouch, presses)
+	function c:mousepressed(event)
+		local x, y, button = event.x, event.y, event.button
 		if button == 1 then
 			for k,v in ipairs(self.options) do
 				if x >= v.x and x <= v.x + v.w and y >= v.y and y <= v.y + v.h then

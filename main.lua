@@ -100,13 +100,14 @@ function love.load()
 		overlayColor = colors("alphaRed")
 	})
 	myDropdown:setData({
-		w = 150, h = 25, x = 300, y = 300, z = 2,
-		label = "Window Size", labelColor = colors("red"), labelFont = myFont, labelPos = {300, 250, 2},
+		w = 150, h = 25, x = 400, y = 300, z = 2,
+		label = "Window Size", labelColor = colors("red"), labelFont = myFont, labelPos = {400, 250, 2},
 		padding = {5,5,5,5}, fixPadding = true,
-		options = {"800x600","1024x640","1280x720","1960x1080"}, optionColor = colors("black"), default = "800x600",
+		options = {"800x600","1024x640","1280x720","1960x1080"}, optionColor = colors("black"), default = "800x600", optionPadding = {5,5,5,10},
 		color = colors("eggshell"),
 		useBorder = true, borderColor = colors("yellow"),
-		round = true, radius = 6
+		round = true, radius = 6,
+		closeOnUnfocus = true
 	})
 	myBox4:setData({
 		w = 50, h = 250, x = 105, y = 200, 

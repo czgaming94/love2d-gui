@@ -268,11 +268,13 @@ function gui:update(dt)
 		for _,i in ipairs(v.items) do 
 			if not i.hidden then 
 				local x,y = love.mouse.getPosition()
-				local condition = x >= i.pos.x + i.paddingLeft and x <= i.pos.x + i.w + i.paddingRight and y >= i.pos.y + i.paddingTop and y <= i.pos.y + i.h + i.paddingBottom
+				local hover = (x >= i.pos.x + i.paddingLeft and x <= i.pos.x + i.w + i.paddingRight) and (y >= i.pos.y + i.paddingTop and y <= i.pos.y + i.h + i.paddingBottom)
 				if i.type == "text" then
-					condition = (x >= i.pos.x and x <= i.pos.x + i.w) and (y >= i.pos.y and y <= i.pos.y + i.h)
+					hover = (x >= i.pos.x and x <= i.pos.x + i.w) and (y >= i.pos.y and y <= i.pos.y + i.h)
+				elseif i.type == "dropdown" then
+					hover = i.open and (x >= i.pos.x and x <= i.pos.x + i.dW and y >= i.pos.y and y <= i.pos.y + i.h + i.dH) or (x >= i.pos.x and x <= i.pos.x + i.w and y >= i.pos.y and y <= i.pos.y + i.h)
 				end
-				if condition then
+				if hover then
 					if i.hovered then
 						if i.events.whileHovering then 
 							for _,v in ipairs(i.events.whileHovering) do	
@@ -451,24 +453,25 @@ function gui:mousepressed(x, y, button, istouch, presses)
 	local objs = self:copy(items)
 	table.sort(objs, function(a, b) return a.z > b.z end)
 	local hitTarget = false
-	for _,v in ipairs(objs) do
-		local obj = self:copy(v)
+	for _,o in ipairs(objs) do
+		local obj = self:copy(o)
 		table.sort(obj.items, function(a,b) return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z end)
-		for k,i in ipairs(obj.items) do
+		for k,v in ipairs(obj.items) do
+			local i = self:child(v.name)
 			if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
 				if i.moveable then
-					self:child(i.name).held = true
+					i.held = true
 				end
-				if i.mousepressed then self:child(i.name):mousepressed(unpack(event)) end
+				if i.mousepressed then i:mousepressed(event) end
 				if i.events.onClick then 
 					for j,e in ipairs(i.events.onClick) do
-						e.fn(self:child(i.name).events.onClick[j].target, event)
+						e.fn(e.target, event)
 					end
 				end
 				if events.onClick then
 					for _,e in ipairs(events.onClick) do
 						if e.o == i.type then
-							e.fn(self:child(i.name), e.target, event)
+							e.fn(i, e.target, event)
 						end
 					end
 				end
@@ -508,21 +511,22 @@ function gui:touchpressed(event)
 	local objs = self:copy(items)
 	table.sort(objs, function(a, b) return a.z > b.z end)
 	local hitTarget = false
-	for _,v in ipairs(objs) do
-		local obj = self:copy(v)
+	for _,o in ipairs(objs) do
+		local obj = self:copy(o)
 		table.sort(obj.items, function(a,b) return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z end)
-		for k,i in ipairs(obj.items) do
+		for k,v in ipairs(obj.items) do
+			local i = self:child(v.name)
 			if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
-				if i.touchpressed then self:child(i.name):touchpressed(event) end
+				if i.touchpressed then i:touchpressed(event) end
 				if i.events.onTouch then 
 					for j,e in ipairs(i.events.onTouch) do
-						e.fn(self:child(i.name).events.onTouch[j].target, event)
+						e.fn(e.target, event)
 					end
 				end
 				if events.onTouch then
 					for j,e in ipairs(events.onTouch) do
 						if e.o == i.type then
-							e.fn(items[k], events.onTouch[j].target, event)
+							e.fn(i, e.target, event)
 						end
 					end
 				end
@@ -542,9 +546,12 @@ function gui:remove(n)
 	end
 	
 	if type(n) == "string" then
-		for k,v in ipairs(self.items) do
-			if v.name == n then 
-				self.items[k] = nil
+		for _,v in ipairs(items) do
+			for k,t in ipairs(v.items) do
+				if t.name == n then 
+					self.items[k] = nil
+					return
+				end
 			end
 		end
 	else
