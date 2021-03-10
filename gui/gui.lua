@@ -31,7 +31,8 @@ local checkbox = require("gui.checkbox")
 local dropdown = require("gui.dropdown")
 local text = require("gui.text")
 local textfield = require("gui.textfield")
-local toggle = require("gui.toggle")
+local radial = require("gui.radial")
+local slider = require("gui.slider")
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
 
@@ -244,12 +245,12 @@ function gui:addTextfield(n)
 	return self.items[id]
 end
 
-function gui:addToggle(n)
+function gui:addRadial(n)
 	if not self.enabled then return false end
-	assert(n, "FAILURE: gui:addToggle() :: Missing param[name]")
-	assert(type(n) == "string", "FAILURE: gui:addToggle() :: Incorrect param[name] - expecting string and got " .. type(n))
+	assert(n, "FAILURE: gui:addRadial() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:addRadial() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
-	self.items[id] = toggle:new(n, self)
+	self.items[id] = radial:new(n, self)
 	return self.items[id]
 end
 

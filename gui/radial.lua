@@ -26,12 +26,12 @@
 
 
 
-local toggle = {}
+local radial = {}
 
-toggle.items = {}
+radial.items = {}
 
-function toggle:new(n, p)
+function radial:new(n, p)
 
 end
 
-return toggle
+return radial

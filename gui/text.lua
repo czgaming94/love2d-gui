@@ -250,7 +250,7 @@ function text:new(n, p)
 				for k,v in ipairs(self.typewriterText) do
 					if v.text then
 						lg.push()
-						
+						lg.setColor(self.color)
 						if v.color ~= "white" then
 							if self.parent then
 								lg.setColor(text.guis[self.parent].color(v.color))
@@ -380,7 +380,6 @@ function text:new(n, p)
 				for k,v in ipairs(self.typewriterText) do
 					if not v.finished then
 						if v.text then
-							v.timeWaited = v.timeWaited + dt
 							if v.delay > 0 and v.delayWaited < v.delay then
 								v.delayWaited = v.delayWaited + dt
 								if v.delayWaited >= v.delay then
@@ -388,13 +387,14 @@ function text:new(n, p)
 								end
 							end
 							if not v.needToWait then
+								v.timeWaited = v.timeWaited + dt
 								if not v.started then
 									v.started = true
 								end
 								while v.timeWaited >= v.time and v.textPos <= #v.text do
 									v.timeWaited = v.timeWaited - v.time
-									v.toShow = v.toShow .. v.text[v.textPos]
 									v.textPos = v.textPos + 1
+									v.toShow = v.toShow .. v.text[v.textPos]
 								end
 								if v.textPos >= #v.text then
 									v.finished = true
@@ -557,7 +557,7 @@ function text:split(s)
 			t[id].time = 0.5
 			t[id].started = false
 			t[id].finished = false
-			t[id].textPos = 1
+			t[id].textPos = 0
 			t[id].timeWaited = 0
 			t[id].toShow = ""
 			if string.match(b, "}") then

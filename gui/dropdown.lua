@@ -610,9 +610,6 @@ function dropdown:new(n, p)
 				else
 					if v.hovered then v.hovered = false end
 				end
-				--if v.hovered and love.mouse.isDown(1) then
-				--	if self.selected ~= k then self.selected = k end
-				--end
 			end
 		end
 	end
