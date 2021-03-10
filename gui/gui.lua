@@ -437,8 +437,8 @@ function gui:mousemoved(x, y, dx, dy, istouch)
 			if not i.hidden then 
 				if i.mousemoved then i:mousemoved({x, y, dx, dy, istouch}) end
 				if i.held then
-					i.pos.x = x
-					i.pos.y = y
+					i.pos.x = i.pos.x + 1 * dx
+					i.pos.y = i.pos.y + 1 * dy
 				end
 			end
 		end 
@@ -458,8 +458,6 @@ function gui:mousepressed(x, y, button, istouch, presses)
 			if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
 				if i.moveable then
 					self:child(i.name).held = true
-					self:child(i.name).pos.x = x
-					self:child(i.name).pos.y = y
 				end
 				if i.mousepressed then self:child(i.name):mousepressed(unpack(event)) end
 				if i.events.onClick then 
