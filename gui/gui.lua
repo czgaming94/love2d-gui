@@ -36,7 +36,6 @@ local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
 
 local gui = {}
-setmetatable(gui, gui)
 local events = {}
 local items = {}
 
@@ -60,10 +59,6 @@ function gui.color(c)
 	assert(c, "FAILURE: gui:color() :: Missing param[name]")
 	assert(type(c) == "string", "FAILURE: gui:color() :: Incorrect param[name] - expecting string and got " .. type(c))
 	return gui:copy(colors[c])
-end
-
-function gui:__call(f, ...)
-	f(self, ...)
 end
 
 function gui:new(item)
@@ -402,8 +397,10 @@ function gui:child(n)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:child() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:child() :: Incorrect param[name] - expecting string and got " .. type(n))
-	for _,v in ipairs(self.items) do
-		if v.name == n then return v end
+	for _,g in ipairs(items) do
+		for _,v in ipairs(g.items) do
+			if v.name == n then return v end
+		end
 	end
 	return nil
 end
@@ -433,19 +430,24 @@ function gui:registerGlobalEvent(n, o, f, t)
 	return self
 end
 
-function gui:mousemoved(x, y, button, istouch, presses)
+function gui:mousemoved(x, y, dx, dy, istouch)
 	if not self.enabled then return false end
 	for _,v in ipairs(items) do 
 		for _,i in ipairs(v.items) do 
 			if not i.hidden then 
-				if i.mousemoved then i:mousemoved({x, y, button, istouch, presses}) end
+				if i.mousemoved then i:mousemoved({x, y, dx, dy, istouch}) end
+				if i.held then
+					i.pos.x = x
+					i.pos.y = y
+				end
 			end
 		end 
 	end
 end
 
-function gui:mousepressed(event)
+function gui:mousepressed(x, y, button, istouch, presses)
 	if not self.enabled then return false end
+	local event = {x=x, y=y, button=button, istouch=istouch, presses=presses}
 	local objs = self:copy(items)
 	table.sort(objs, function(a, b) return a.z > b.z end)
 	local hitTarget = false
@@ -454,6 +456,11 @@ function gui:mousepressed(event)
 		table.sort(obj.items, function(a,b) return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z end)
 		for k,i in ipairs(obj.items) do
 			if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
+				if i.moveable then
+					self:child(i.name).held = true
+					self:child(i.name).pos.x = x
+					self:child(i.name).pos.y = y
+				end
 				if i.mousepressed then self:child(i.name):mousepressed(unpack(event)) end
 				if i.events.onClick then 
 					for j,e in ipairs(i.events.onClick) do
@@ -463,7 +470,7 @@ function gui:mousepressed(event)
 				if events.onClick then
 					for _,e in ipairs(events.onClick) do
 						if e.o == i.type then
-							e.fn(items[k], e.target, event)
+							e.fn(self:child(i.name), e.target, event)
 						end
 					end
 				end
@@ -473,6 +480,18 @@ function gui:mousepressed(event)
 		obj = nil
 	end
 	objs = nil
+end
+
+function gui:mousereleased(x, y, button, istouch, presses)
+	if not self.enabled then return false end
+	for _,v in ipairs(items) do
+		for _,i in ipairs(v.items) do
+			if i.held then 
+				i.held = false
+				return				
+			end
+		end
+	end
 end
 
 function gui:touchmoved(id, x, y, dx, dy, pressure)

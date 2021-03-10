@@ -44,8 +44,6 @@ text.fonts = {}
 
 function text:new(n, p)
 	local t = {}
-	function t:__call(f, ...) f(self, args) end
-	setmetatable(t,t)
 	if p and p.id and not self.guis[p.id] then self.guis[p.id] = p end
 	t.name = n
 	t.id = #self.items + 1
@@ -71,6 +69,8 @@ function text:new(n, p)
 	t.faded = false
 	t.fadedByFunc = false
 	t.fancy = false
+	t.moveable = false
+	t.held = false
 	t.events = {}
 	t.paddingLeft = 0
 	t.paddingRight = 0
@@ -284,7 +284,7 @@ function text:new(n, p)
 	
 	function t:fadeIn()
 		if self.events.beforeFadeIn then 
-			for _,v in ipairs(self.events.beforeFadeIn) do
+			for _,e in ipairs(self.events.beforeFadeIn) do
 				e.fn(e.target)
 			end
 		end
@@ -298,7 +298,7 @@ function text:new(n, p)
 		self.faded = false
 		self.fadedByFunc = true
 		if self.events.onFadeIn then
-			for _,v in ipairs(self.events.onFadeIn) do
+			for _,e in ipairs(self.events.onFadeIn) do
 				e.fn(e.target)
 			end
 		end
@@ -306,7 +306,7 @@ function text:new(n, p)
 	
 	function t:fadeOut(p, h)
 		if self.events.beforeFadeOut then
-			for _,v in ipairs(self.events.beforeFadeOut) do
+			for _,e in ipairs(self.events.beforeFadeOut) do
 				e.fn(e.target)
 			end
 		end
@@ -321,7 +321,7 @@ function text:new(n, p)
 		end
 		self.fadedByFunc = true
 		if self.events.onFadeOut then
-			for _,v in ipairs(self.events.onFadeOut) do
+			for _,e in ipairs(self.events.onFadeOut) do
 				e.fn(e.target)
 			end
 		end

@@ -9,6 +9,7 @@ local myGui2 = myGui:new()
 local myBox = myGui:addBox("myBox")
 myGui:addBox("myBox2")
 local myCheckbox = myGui:addCheckbox("myCheckbox")
+local myDropdown = myGui:addDropdown("myDropdown")
 local myBox3 = myGui2:addBox("myBox3")
 local myBox4 = myGui2:addBox("myBox4")
 
@@ -77,6 +78,7 @@ function love.load()
 	myBox3:setData({
 		w = 225, h = 65, x = 105, y = 485, z = 2,
 		color = colors("alphaRed"), 
+		moveable = true,
 		useBorder = false
 	})
 	myText:setData({
@@ -91,11 +93,20 @@ function love.load()
 		w = 10, h = 10, x = 250, y = 150, z = 1, 
 		label = "Favorite Color?", labelColor = colors("black"), labelFont = myFont, labelPos = {290, 105, 1},
 		padding = {10,10,10,10}, fixPadding = true, 
-		options = {"Red", "Blue", "Green", "Yellow"}, optionColor = colors("blue"), singleSelection = true,
+		options = {"Red", "Blue", "Green", "Yellow"}, optionColor = colors("blue"), singleSelection = true, default = "Green",
 		color = colors("eggshell"), 
 		useBorder = true, borderColor = colors("red"),
 		round = true, radius = 3,
 		overlayColor = colors("alphaRed")
+	})
+	myDropdown:setData({
+		w = 150, h = 25, x = 300, y = 300, z = 2,
+		label = "Window Size", labelColor = colors("red"), labelFont = myFont, labelPos = {300, 250, 2},
+		padding = {5,5,5,5}, fixPadding = true,
+		options = {"800x600","1024x640","1280x720","1960x1080"}, optionColor = colors("black"), default = "800x600",
+		color = colors("eggshell"),
+		useBorder = true, borderColor = colors("yellow"),
+		round = true, radius = 6
 	})
 	myBox4:setData({
 		w = 50, h = 250, x = 105, y = 200, 
@@ -129,7 +140,15 @@ function love.draw()
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
-	myGui:mousepressed({x, y, button, istouch, presses})
+	myGui:mousepressed(x, y, button, istouch, presses)
+end
+
+function love.mousereleased(x, y, button, istouch, presses)
+	myGui:mousereleased(x, y, button, istouch, presses)
+end
+
+function love.mousemoved(x, y, dx, dy, istouch)
+	myGui:mousemoved(x, y, dx, dy, istouch)
 end
 
 -- For mobile

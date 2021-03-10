@@ -30,7 +30,7 @@ local toggle = {}
 
 toggle.items = {}
 
-function toggle:new(n, id)
+function toggle:new(n, p)
 
 end
 

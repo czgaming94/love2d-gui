@@ -25,16 +25,15 @@
 --]]
 
 
-
+local lg, lt = love.graphics, love.timer
+local min, max = math.min, math.max
 local dropdown = {}
 
 dropdown.items = {}
 dropdown.guis = {}
 
-function dropdown:new(n, id)
+function dropdown:new(n, p)
 	local d = {}
-	function d:__call(f, ...) f(self, args) end
-	setmetatable(d,d)
 	if not self.guis[p.id] then self.guis[p.id] = p end
 	d.name = n
 	d.id = #self.items + 1
@@ -72,6 +71,7 @@ function dropdown:new(n, id)
 	d.clicked = false
 	d.clickable = true
 	d.hollow = false
+	d.open = false
 	d.faded = false
 	d.fadedByFunc = false
 	d.hidden = false
@@ -80,13 +80,15 @@ function dropdown:new(n, id)
 	d.hollow = false
 	d.single = false
 	d.fixPadding = false
+	d.moveable = false
+	d.held = false
 	d.events = {}
 	d.options = {}
 	d.optionPaddingLeft = 0
 	d.optionPaddingRight = 0
 	d.optionPaddingTop = 0
 	d.optionPaddingBottom = 0
-	d.selected = {}
+	d.selected = 0
 	d.font = lg.getFont()
 	d.inAnimation = false
 	d.animateColor = false
@@ -213,6 +215,7 @@ function dropdown:new(n, id)
 		self.uH = t.h or t.height or self.uH
 		self.label = t.label or t.text or self.label
 		self.labelColor = t.labelColor or self.labelColor
+		self.labelFont = t.labelFont or self.labelFont
 		if t.labelPosition or t.labelPos then
 			local i = t.labelPosition or t.labelPos
 			if i.x then
@@ -238,7 +241,6 @@ function dropdown:new(n, id)
 		self.border = t.useBorder and t.useBorder or self.border
 		self.borderColor = t.borderColor or self.borderColor
 		self.optionsColor = t.optionColor or self.optionsColor
-		self.overlayColor = t.overlayColor or self.overlayColor
 		self.font = t.font or self.font
 		self.optionFont = t.optionFont or self.optionFont
 		self.clickable = t.clickable and t.clickable or self.clickable
@@ -250,8 +252,31 @@ function dropdown:new(n, id)
 			end
 			local w, h = 0, 0
 			for k,v in ipairs(t.options) do
-				
+				if k == 1 then
+					self.options[k] = {
+						text = v, 
+						x = self.pos.x, 
+						y = self.pos.y,
+						w = self.paddingLeft + self.uW + self.font:getWidth(v) + self.paddingRight,
+						h = self.paddingTop + self.uH + self.paddingBottom
+					}
+				else
+					self.options[k] = {
+						text = v, 
+						x = self.pos.x + self.paddingRight,
+						y = self.options[k - 1].y + self.font:getHeight(v),
+						w = self.paddingLeft + self.uW + self.font:getWidth(v) + self.paddingRight,
+						h = self.paddingTop + self.uH + self.paddingBottom
+					}
+				end
 			end
+		end
+		if t.default then
+			for k,v in ipairs(self.options) do 
+				if v.text == t.default then
+					self.selected = k 
+				end 
+			end 
 		end
 		return self
 	end
@@ -261,7 +286,23 @@ function dropdown:new(n, id)
 	end
 	
 	function d:draw()
-	
+		lg.push()
+		lg.setColor(self.color)
+		lg.setFont(self.font)
+		
+		lg.rectangle("fill", self.pos.x, self.pos.y, self.uW, self.uH)
+		if self.border then
+			lg.setColor(self.borderColor)
+			lg.rectangle("line", self.pos.x - 1, self.pos.y - 1, self.uW + 2, self.uH + 2)
+		end
+		lg.setColor(self.optionsColor)
+		lg.setFont(self.optionFont)
+		if self.selected then lg.print(self.options[self.selected].text, self.pos.x + self.paddingLeft, self.pos.y + self.paddingTop) end
+		
+		lg.setColor(self.labelColor)
+		lg.setFont(self.labelFont)
+		lg.print(self.label, self.labelPosition.x, self.labelPosition.y)
+		lg.pop()
 	end
 	
 	function d:enable()
@@ -270,7 +311,7 @@ function dropdown:new(n, id)
 	
 	function d:fadeIn()
 		if self.events.beforeFadeIn then 
-			for _,v in ipairs(self.events.beforeFadeIn) do
+			for _,r in ipairs(self.events.beforeFadeIn) do
 				e.fn(e.target)
 			end
 		end
@@ -284,7 +325,7 @@ function dropdown:new(n, id)
 		self.faded = false
 		self.fadedByFunc = true
 		if self.events.onFadeIn then
-			for _,v in ipairs(self.events.onFadeIn) do
+			for _,r in ipairs(self.events.onFadeIn) do
 				e.fn(e.target)
 			end
 		end
@@ -292,7 +333,7 @@ function dropdown:new(n, id)
 	
 	function d:fadeOut(p, h)
 		if self.events.beforeFadeOut then
-			for _,v in ipairs(self.events.beforeFadeOut) do
+			for _,r in ipairs(self.events.beforeFadeOut) do
 				e.fn(e.target)
 			end
 		end
@@ -307,7 +348,7 @@ function dropdown:new(n, id)
 		end
 		self.fadedByFunc = true
 		if self.events.onFadeOut then
-			for _,v in ipairs(self.events.onFadeOut) do
+			for _,r in ipairs(self.events.onFadeOut) do
 				e.fn(e.target)
 			end
 		end
@@ -349,8 +390,10 @@ function dropdown:new(n, id)
 	
 	function d:mousepressed(x, y, button, istouch, presses)
 		if button == 1 then
-			for k,v in ipairs(self.options) do
-			
+			if self.hovered and not self.open then
+				self.open = true
+			else
+				self.open = false
 			end
 		end
 	end
@@ -516,7 +559,7 @@ function dropdown:new(n, id)
 		return self.pos.z
 	end
 	
-	function c.lerp(e,s,c)
+	function d.lerp(e,s,c)
 		return (1 - c) * e + c * s
 	end
 	

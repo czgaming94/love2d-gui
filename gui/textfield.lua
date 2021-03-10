@@ -30,7 +30,7 @@ local textfield = {}
 
 textfield.items = {}
 
-function textfield:new(n, id)
+function textfield:new(n, p)
 
 end
 

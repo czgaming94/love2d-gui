@@ -121,11 +121,9 @@ number | z | boolean | vertical
 ##### :getLabelPosition()
 > Get the label position of the current checkbox.
 ##### :setMoveable(boolean canMove)
-> Set whether an element is moveable.<br>
-> Currently unfunctional.
+> Set whether an element is moveable.
 ##### :getMoveable()
-> Get whether the element is moveable.<br>
-> Currently unfunctional.
+> Get whether the element is moveable.
 ##### :setOpacity(number opacity)
 > Set the opacity of the current element
 ##### :getOpacity()

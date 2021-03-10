@@ -36,8 +36,6 @@ checkbox.guis = {}
 
 function checkbox:new(n, p)
 	local c = {}
-	function c:__call(f, ...) f(self, args) end
-	setmetatable(c,c)
 	if not self.guis[p.id] then self.guis[p.id] = p end
 	c.name = n
 	c.id = #self.items + 1
@@ -82,6 +80,8 @@ function checkbox:new(n, p)
 	c.hollow = false
 	c.single = false
 	c.fixPadding = false
+	c.moveable = false
+	c.held = false
 	c.events = {}
 	c.options = {}
 	c.optionPaddingLeft = 0
@@ -304,6 +304,14 @@ function checkbox:new(n, p)
 				end
 			end
 		end
+		
+		if d.default then
+			for k,v in ipairs(self.options) do 
+				if v.text == d.default then
+					self.selected[k] = v
+				end 
+			end 
+		end
 		return self
 	end
 	
@@ -371,7 +379,7 @@ function checkbox:new(n, p)
 	
 	function c:fadeIn()
 		if self.events.beforeFadeIn then 
-			for _,v in ipairs(self.events.beforeFadeIn) do
+			for _,e in ipairs(self.events.beforeFadeIn) do
 				e.fn(e.target)
 			end
 		end
@@ -385,7 +393,7 @@ function checkbox:new(n, p)
 		self.faded = false
 		self.fadedByFunc = true
 		if self.events.onFadeIn then
-			for _,v in ipairs(self.events.onFadeIn) do
+			for _,e in ipairs(self.events.onFadeIn) do
 				e.fn(e.target)
 			end
 		end
@@ -393,7 +401,7 @@ function checkbox:new(n, p)
 	
 	function c:fadeOut(p, h)
 		if self.events.beforeFadeOut then
-			for _,v in ipairs(self.events.beforeFadeOut) do
+			for _,e in ipairs(self.events.beforeFadeOut) do
 				e.fn(e.target)
 			end
 		end
@@ -408,7 +416,7 @@ function checkbox:new(n, p)
 		end
 		self.fadedByFunc = true
 		if self.events.onFadeOut then
-			for _,v in ipairs(self.events.onFadeOut) do
+			for _,e in ipairs(self.events.onFadeOut) do
 				e.fn(e.target)
 			end
 		end

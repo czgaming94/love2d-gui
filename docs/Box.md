@@ -86,11 +86,9 @@ boolean | vertical
 ##### :isHovered()
 > Returns whether an element is hovered.
 ##### :setMoveable(boolean canMove)
-> Set whether an element is moveable.<br>
-> Currently unfunctional.
+> Set whether an element is moveable.
 ##### :getMoveable()
-> Get whether the element is moveable.<br>
-> Currently unfunctional.
+> Get whether the element is moveable.
 ##### :setOpacity(number opacity)
 > Set the opacity of the current element
 ##### :getOpacity()
