@@ -87,7 +87,8 @@ function love.load()
 		color = colors("yellow"), 
 		text = "Hello {c=red,d=1,f=myFont}World!{/}",
 		typewriter = true, speed = 0.5,
-		fonts = {myFont = myFont}
+		fonts = {myFont = myFont},
+		hollow = true, moveable = true
 	})
 	myCheckbox:setData({
 		w = 10, h = 10, x = 250, y = 150, z = 1, 
@@ -142,6 +143,12 @@ end
 
 function love.mousepressed(x, y, button, istouch, presses)
 	myGui:mousepressed(x, y, button, istouch, presses)
+	if button == 2 then
+		local clickTarget = myGui:getHeld()
+		if clickTarget then
+			clickTarget:disable()
+		end
+	end
 end
 
 function love.mousereleased(x, y, button, istouch, presses)

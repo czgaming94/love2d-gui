@@ -235,6 +235,8 @@ function text:new(n, p)
 			end
 		end
 		self.clickable = d.clickable and d.clickable or self.clickable
+		self.moveable = d.moveable and d.moveable or self.moveable
+		self.hollow = d.hollow and d.hollow or self.hollow
 		return self
 	end
 	

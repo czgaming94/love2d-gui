@@ -273,7 +273,11 @@ function gui:update(dt)
 				if i.type == "text" then
 					hover = (x >= i.pos.x and x <= i.pos.x + i.w) and (y >= i.pos.y and y <= i.pos.y + i.h)
 				elseif i.type == "dropdown" then
-					hover = i.open and (x >= i.pos.x and x <= i.pos.x + i.dW and y >= i.pos.y and y <= i.pos.y + i.h + i.dH) or (x >= i.pos.x and x <= i.pos.x + i.w and y >= i.pos.y and y <= i.pos.y + i.h)
+					if i.border then
+						hover = i.open and (x >= i.pos.x and x <= i.pos.x + i.dW + i.optionPaddingLeft + i.optionPaddingRight + 2 and y >= i.pos.y and y <= i.pos.y + i.h + i.dH) or (x >= i.pos.x and x <= i.pos.x + i.w and y >= i.pos.y and y <= i.pos.y + i.h)
+					else
+						hover = i.open and (x >= i.pos.x and x <= i.pos.x + i.dW + i.optionPaddingLeft + i.optionPaddingRight and y >= i.pos.y and y <= i.pos.y + i.h + i.dH) or (x >= i.pos.x and x <= i.pos.x + i.w and y >= i.pos.y and y <= i.pos.y + i.h)
+					end
 				end
 				if hover then
 					if i.hovered then
@@ -408,6 +412,14 @@ function gui:child(n)
 	return nil
 end
 
+function gui:getHeld()
+	for _,g in ipairs(items) do
+		for _,v in ipairs(g.items) do
+			if v.held then return v end
+		end
+	end
+end
+
 function gui:registerEvent(n, o, f, t)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:registerEvent() :: Missing param[name]")
@@ -440,8 +452,15 @@ function gui:mousemoved(x, y, dx, dy, istouch)
 			if not i.hidden then 
 				if i.mousemoved then i:mousemoved({x, y, dx, dy, istouch}) end
 				if i.held then
-					i.pos.x = i.pos.x + 1 * dx
-					i.pos.y = i.pos.y + 1 * dy
+					if i.type == "text" and i.typewriter then
+						for k,t in ipairs(i.typewriterText) do
+							t.x = t.x + 1 * dx
+							t.y = t.y + 1 * dy
+						end
+					else
+						i.pos.x = i.pos.x + 1 * dx
+						i.pos.y = i.pos.y + 1 * dy
+					end
 				end
 			end
 		end 
@@ -478,6 +497,13 @@ function gui:mousepressed(x, y, button, istouch, presses)
 				end
 				if not i.hollow then hitTarget = true end
 			end
+			if i.type == "dropdown" and i.open and not i.hovered then
+				local optionHit = false
+				for k,v in ipairs(i.options) do
+					if v.hovered then optionHit = true end
+				end
+				if not optionHit then i.open = false end
+			end
 		end
 		obj = nil
 	end
@@ -489,8 +515,7 @@ function gui:mousereleased(x, y, button, istouch, presses)
 	for _,v in ipairs(items) do
 		for _,i in ipairs(v.items) do
 			if i.held then 
-				i.held = false
-				return				
+				i.held = false				
 			end
 		end
 	end
