@@ -53,8 +53,9 @@ gui.z = 0
 gui.use255 = false
 gui.id = 1
 gui.enabled = true
-
+gui.held = nil
 gui.images = {}
+
 
 function gui.color(c)
 	assert(c, "FAILURE: gui:color() :: Missing param[name]")
@@ -80,7 +81,7 @@ function gui:copy(item, skip)
 			if skip and orig_key == skip then
 				c[orig_key] = {}
 			else
-				c[self:copy(orig_key, skip)] = self:copy(orig_value, skip)
+				c[orig_key] = self:copy(orig_value, skip)
 			end
 		end
     else
@@ -89,8 +90,21 @@ function gui:copy(item, skip)
     return c
 end
 
-function gui:duplicate(item, skip)
+function gui:duplicate(i)	
 	if not self.enabled then return false end
+	assert(i, "FAILURE: gui:duplicate() :: Missing param[item]")
+	assert(type(i) == "number" or type(i) == "string", "FAILURE: gui:duplicate() :: Incorrect param[item] - expecting boolean and got " .. type(i))
+	if type(i) == "string" then
+		return self:child(i)
+	else
+		for _,v in ipairs(items) do
+			for k,t in ipairs(v.items) do
+				if t.id == i then
+					return t
+				end
+			end
+		end
+	end
 end
 
 function gui:generate(item, copies, skip)
@@ -121,7 +135,7 @@ end
 function gui:setUse255(u)
 	if not self.enabled then return false end
 	assert(u ~= nil, "FAILURE: gui:setUse255() :: Missing param[use255]")
-	assert(type(o) == "boolean", "FAILURE: gui:setUse255() :: Incorrect param[use255] - expecting boolean and got " .. type(o))
+	assert(type(u) == "boolean", "FAILURE: gui:setUse255() :: Incorrect param[use255] - expecting boolean and got " .. type(u))
 	self.use255 = u
 end
 
@@ -419,38 +433,59 @@ function gui:child(n)
 end
 
 function gui:getHeld()
-	for _,g in ipairs(items) do
-		if g.enabled then
-			for _,v in ipairs(g.items) do
-				if v.held then return v end
-			end
-		end
-	end
+	if not self.enabled then return false end
+	return self.held
 end
 
-function gui:registerEvent(n, o, f, t)
+function gui:registerEvent(n, o, f, t, i)
 	if not self.enabled then return false end
-	assert(n, "FAILURE: gui:registerEvent() :: Missing param[name]")
-	assert(type(n) == "string", "FAILURE: gui:registerEvent() :: Incorrect param[name] - expecting string and got " .. type(n))
+	assert(n, "FAILURE: gui:registerEvent() :: Missing param[eventName]")
+	assert(type(n) == "string", "FAILURE: gui:registerEvent() :: Incorrect param[eventName] - expecting string and got " .. type(n))
 	assert(o, "FAILURE: gui:registerEvent() :: Missing param[object]")
 	assert(type(o) == "table", "FAILURE: gui:registerEvent() :: Incorrect param[object] - expecting GUI element table and got " .. type(o))
 	assert(f, "FAILURE: gui:registerEvent() :: Missing param[functiom]")
 	assert(type(f) == "function", "FAILURE: gui:registerEvent() :: Incorrect param[functiom] - expecting function and got " .. type(f))
-	return o:registerEvent(n, f, t)
+	return o:registerEvent(n, f, t, i)
 end
 
-function gui:registerGlobalEvent(n, o, f, t)
+function gui:removeEvent(n, o, i)
 	if not self.enabled then return false end
-	assert(n, "FAILURE: gui:registerEvent() :: Missing param[name]")
-	assert(type(n) == "string", "FAILURE: gui:registerEvent() :: Incorrect param[name] - expecting string and got " .. type(n))
+	assert(n, "FAILURE: gui:removeEvent() :: Missing param[eventName]")
+	assert(type(n) == "string", "FAILURE: gui:removeEvent() :: Incorrect param[eventName] - expecting string and got " .. type(n))
+	assert(o, "FAILURE: gui:removeEvent() :: Missing param[object]")
+	assert(type(o) == "table", "FAILURE: gui:removeEvent() :: Incorrect param[object] - expecting GUI element table and got " .. type(o))
+	assert(i, "FAILURE: gui:removeEvent() :: Missing param[name]")
+	assert(type(i) == "string", "FAILURE: gui:removeEvent() :: Incorrect param[name] - expecting string and got " .. type(i))
+	return o:removeEvent(n, o, i)
+end
+
+function gui:registerGlobalEvent(n, o, f, t, i)
+	if not self.enabled then return false end
+	assert(n, "FAILURE: gui:registerEvent() :: Missing param[eventName]")
+	assert(type(n) == "string", "FAILURE: gui:registerEvent() :: Incorrect param[eventName] - expecting string and got " .. type(n))
 	assert(o, "FAILURE: gui:registerEvent() :: Missing param[type]")
 	assert(type(o) == "string", "FAILURE: gui:registerEvent() :: Incorrect param[type] - expecting string and got " .. type(o))
-	assert(f, "FAILURE: gui:registerEvent() :: Missing param[functiom]")
-	assert(type(f) == "function", "FAILURE: gui:registerEvent() :: Incorrect param[functiom] - expecting function and got " .. type(f))
+	assert(f, "FAILURE: gui:registerEvent() :: Missing param[name]")
+	assert(type(f) == "function", "FAILURE: gui:registerEvent() :: Incorrect param[name] - expecting function and got " .. type(f))
 	if not events[n] then events[n] = {} end
 	local id = #events[n] + 1
-	events[n][id] = {id = id, o = o, fn = f, t = t}
+	events[n][id] = {id = id, o = o, fn = f, target = t, name = i}
 	return self
+end
+
+function gui:removeGlobalEvent(n, o, i)
+	if not self.enabled then return false end
+	assert(n, "FAILURE: gui:removeGlobalEvent() :: Missing param[eventName]")
+	assert(type(n) == "string", "FAILURE: gui:removeGlobalEvent() :: Incorrect param[eventName] - expecting string and got " .. type(n))
+	assert(o, "FAILURE: gui:registerEvent() :: Missing param[type]")
+	assert(type(o) == "string", "FAILURE: gui:registerEvent() :: Incorrect param[type] - expecting string and got " .. type(o))
+	assert(i, "FAILURE: gui:removeGlobalEvent() :: Missing param[name]")
+	assert(type(i) == "string", "FAILURE: gui:removeGlobalEvent() :: Incorrect param[name] - expecting string and got " .. type(i))
+	for k,e in ipairs(events[n]) do
+		if e.name == i and e.o == o then
+			table.remove(events[n], k)
+		end
+	end
 end
 
 function gui:mousemoved(x, y, dx, dy, istouch)
@@ -498,6 +533,7 @@ function gui:mousepressed(x, y, button, istouch, presses)
 				if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
 					if i.moveable then
 						i.held = true
+						self.held = i
 					end
 					if i.mousepressed then i:mousepressed(event) end
 					if i.events.onClick then 
@@ -588,6 +624,30 @@ function gui:touchpressed(event)
 	objs = nil
 end
 
+function gui:hardRemove(n)
+	if not self.enabled then return false end
+	assert(n, "FAILURE: gui:remove() :: Missing param[name]")
+	if type(n) ~= "string" and type(n) ~= "number" then
+		assert(type(n) == "string" or type(n) == "number", "FAILURE: gui:remove() :: Incorrect param[name] - expecting string or number and got " .. type(n))
+	end
+	
+	for _,v in ipairs(items) do
+		for _,e in ipairs(v.items) do
+			if type(n) == "number" then
+				if e.id == n then 
+					e = nil 
+					return
+				end
+			else
+				if e.name == n then 
+					e = nil
+					return
+				end
+			end
+		end
+	end
+end
+
 function gui:remove(n)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:remove() :: Missing param[name]")
@@ -596,12 +656,10 @@ function gui:remove(n)
 	end
 	
 	if type(n) == "string" then
-		for _,v in ipairs(items) do
-			for k,t in ipairs(v.items) do
-				if t.name == n then 
-					self.items[k] = nil
-					return
-				end
+		for k,t in ipairs(self.items) do
+			if t.name == n then 
+				self.items[k] = nil
+				return
 			end
 		end
 	else

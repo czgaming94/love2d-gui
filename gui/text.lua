@@ -460,11 +460,27 @@ function text:new(n, p)
 		return text.guis[self.parent]
 	end
 	
-	function t:registerEvent(n, f, t)
+	function t:registerEvent(n, f, t, i)
+		assert(n, "FAILURE: gui:registerEvent() :: Missing param[eventName]")
+		assert(type(n) == "string", "FAILURE: gui:registerEvent() :: Incorrect param[eventName] - expecting string and got " .. type(n))
+		assert(f, "FAILURE: gui:registerEvent() :: Missing param[functiom]")
+		assert(type(f) == "function", "FAILURE: gui:registerEvent() :: Incorrect param[functiom] - expecting function and got " .. type(f))
 		if not self.events[n] then self.events[n] = {} end
 		local id = #self.events[n] + 1
-		self.events[n][id] = {id = id, fn = f, target = t}
+		self.events[n][id] = {id = id, fn = f, target = t, name = i}
 		return self
+	end
+	
+	function t:removeEvent(n, i)
+		assert(n, "FAILURE: gui:removeGlobalEvent() :: Missing param[eventName]")
+		assert(type(n) == "string", "FAILURE: gui:removeGlobalEvent() :: Incorrect param[eventName] - expecting string and got " .. type(n))
+		assert(i, "FAILURE: gui:registerEvent() :: Missing param[name]")
+		assert(type(i) == "string", "FAILURE: gui:registerEvent() :: Incorrect param[name] - expecting string and got " .. type(i))
+		for k,e in ipairs(self.events[n]) do
+			if e.name == i then
+				table.remove(events[n], k)
+			end
+		end
 	end
 	
 	function t:touchmoved(id, x, y, dx, dy, pressure)
