@@ -50,6 +50,9 @@ function checkbox:new(n, p)
 		y = 0,
 		z = 0
 	}
+	c.x = c.pos.x
+	c.y = c.pos.y
+	c.z = c.pos.z
 	c.label = ""
 	c.labelColor = {1,1,1,1}
 	c.labelPosition = {
@@ -380,7 +383,7 @@ function checkbox:new(n, p)
 	function c:fadeIn()
 		if self.events.beforeFadeIn then 
 			for _,e in ipairs(self.events.beforeFadeIn) do
-				e.fn(e.target)
+				e.fn(self, e.target)
 			end
 		end
 		self.hidden = false
@@ -394,7 +397,7 @@ function checkbox:new(n, p)
 		self.fadedByFunc = true
 		if self.events.onFadeIn then
 			for _,e in ipairs(self.events.onFadeIn) do
-				e.fn(e.target)
+				e.fn(self, e.target)
 			end
 		end
 	end
@@ -402,7 +405,7 @@ function checkbox:new(n, p)
 	function c:fadeOut(p, h)
 		if self.events.beforeFadeOut then
 			for _,e in ipairs(self.events.beforeFadeOut) do
-				e.fn(e.target)
+				e.fn(self, e.target)
 			end
 		end
 		self:animateToOpacity(0)
@@ -417,7 +420,7 @@ function checkbox:new(n, p)
 		self.fadedByFunc = true
 		if self.events.onFadeOut then
 			for _,e in ipairs(self.events.onFadeOut) do
-				e.fn(e.target)
+				e.fn(self, e.target)
 			end
 		end
 	end
@@ -530,7 +533,7 @@ function checkbox:new(n, p)
 					end
 					if self.events.onOptionClick then 
 						for _,e in ipairs(self.events.onOptionClick) do
-							e.fn(self.options[k], e.t, {x=x, y=y, button=button, istouch=istouch, presses=presses})
+							e.fn(self, self.options[k], e.t, {x=x, y=y, button=button, istouch=istouch, presses=presses})
 						end
 					end
 				end

@@ -50,6 +50,9 @@ function dropdown:new(n, p)
 		y = 0,
 		z = 0
 	}
+	d.x = d.pos.x
+	d.y = d.pos.y
+	d.z = d.pos.z
 	d.label = ""
 	d.labelColor = {1,1,1,1}
 	d.labelPosition = {
@@ -384,7 +387,7 @@ function dropdown:new(n, p)
 	function d:fadeIn()
 		if self.events.beforeFadeIn then 
 			for _,r in ipairs(self.events.beforeFadeIn) do
-				e.fn(e.target)
+				e.fn(self, e.target)
 			end
 		end
 		self.hidden = false
@@ -398,7 +401,7 @@ function dropdown:new(n, p)
 		self.fadedByFunc = true
 		if self.events.onFadeIn then
 			for _,r in ipairs(self.events.onFadeIn) do
-				e.fn(e.target)
+				e.fn(self, e.target)
 			end
 		end
 	end
@@ -406,7 +409,7 @@ function dropdown:new(n, p)
 	function d:fadeOut(p, h)
 		if self.events.beforeFadeOut then
 			for _,r in ipairs(self.events.beforeFadeOut) do
-				e.fn(e.target)
+				e.fn(self, e.target)
 			end
 		end
 		self:animateToOpacity(0)
@@ -421,7 +424,7 @@ function dropdown:new(n, p)
 		self.fadedByFunc = true
 		if self.events.onFadeOut then
 			for _,r in ipairs(self.events.onFadeOut) do
-				e.fn(e.target)
+				e.fn(self, e.target)
 			end
 		end
 	end

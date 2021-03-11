@@ -57,6 +57,9 @@ function text:new(n, p)
 		y = 0,
 		z = 0
 	}
+	t.x = t.pos.x
+	t.y = t.pos.y
+	t.z = t.pos.z
 	t.timerEvent = nil
 	t.color = {1,1,1,1}
 	t.font = love.graphics.getFont()
@@ -287,7 +290,7 @@ function text:new(n, p)
 	function t:fadeIn()
 		if self.events.beforeFadeIn then 
 			for _,e in ipairs(self.events.beforeFadeIn) do
-				e.fn(e.target)
+				e.fn(self, e.target)
 			end
 		end
 		self.hidden = false
@@ -301,7 +304,7 @@ function text:new(n, p)
 		self.fadedByFunc = true
 		if self.events.onFadeIn then
 			for _,e in ipairs(self.events.onFadeIn) do
-				e.fn(e.target)
+				e.fn(self, e.target)
 			end
 		end
 	end
@@ -309,7 +312,7 @@ function text:new(n, p)
 	function t:fadeOut(p, h)
 		if self.events.beforeFadeOut then
 			for _,e in ipairs(self.events.beforeFadeOut) do
-				e.fn(e.target)
+				e.fn(self, e.target)
 			end
 		end
 		self:animateToOpacity(0)
@@ -324,7 +327,7 @@ function text:new(n, p)
 		self.fadedByFunc = true
 		if self.events.onFadeOut then
 			for _,e in ipairs(self.events.onFadeOut) do
-				e.fn(e.target)
+				e.fn(self, e.target)
 			end
 		end
 	end
@@ -407,7 +410,7 @@ function text:new(n, p)
 						if k == #self.typewriterText then
 							if self.events.onTypewriterFinish then
 								for _,e in ipairs(self.events.onTypewriterFinish) do
-									e.fn(e.target)
+									e.fn(self, e.target)
 								end
 							end
 							if self.typewriterRepeat then

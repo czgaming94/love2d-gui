@@ -283,14 +283,14 @@ function gui:update(dt)
 					if i.hovered then
 						if i.events.whileHovering then 
 							for _,v in ipairs(i.events.whileHovering) do	
-								v.f(v.t)
+								v.f(i, v.t)
 							end
 						end
 					end
 					if not i.hovered then
 						if i.events.onHoverEnter then 
 							for _,v in ipairs(i.events.onHoverEnter) do	
-								v.f(v.t)
+								v.f(i, v.t)
 							end
 						end
 						i.hovered = true 
@@ -299,7 +299,7 @@ function gui:update(dt)
 					if i.hovered then 
 						if i.events.onHoverExit then 
 							for _,v in ipairs(i.events.onHoverExit) do	
-								v.f(v.t)
+								v.f(i, v.t)
 							end
 						end
 						i.hovered = false 
@@ -447,6 +447,7 @@ end
 
 function gui:mousemoved(x, y, dx, dy, istouch)
 	if not self.enabled then return false end
+	local event = {x=x, y=y, dx=dx, dy=dy, istouch=istouch}
 	for _,v in ipairs(items) do 
 		for _,i in ipairs(v.items) do 
 			if not i.hidden then 
@@ -457,9 +458,14 @@ function gui:mousemoved(x, y, dx, dy, istouch)
 							t.x = t.x + 1 * dx
 							t.y = t.y + 1 * dy
 						end
-					else
-						i.pos.x = i.pos.x + 1 * dx
-						i.pos.y = i.pos.y + 1 * dy
+					end
+					i.pos.x = i.pos.x + 1 * dx
+					i.pos.y = i.pos.y + 1 * dy
+					i.x, i.y = i.pos.x, i.pos.y
+					if i.events.onMove then
+						for _,e in ipairs(i.events.onMove) do
+							e.fn(i, e.target, event)
+						end
 					end
 				end
 			end
@@ -485,7 +491,7 @@ function gui:mousepressed(x, y, button, istouch, presses)
 				if i.mousepressed then i:mousepressed(event) end
 				if i.events.onClick then 
 					for j,e in ipairs(i.events.onClick) do
-						e.fn(e.target, event)
+						e.fn(i, e.target, event)
 					end
 				end
 				if events.onClick then

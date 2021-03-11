@@ -12,29 +12,29 @@ This API brings several user defined callbacks which allow you to customize what
 Any callback with an `event` paramter has a table provided to it with data accessible to the user. You can easily define these<br>
 with 
 ```lua
-myBox:registerEvent("onClick", function(target, event)
+myBox:registerEvent("onClick", function(self, target, event)
   print(target.name, event.x, event.y) 
 end, yourTargetelement)
 ```
-##### :onClick(target, event) -- {x, y, button, istouch, presses}
+##### :onClick(self, target, event) -- {x, y, button, istouch, presses}
 > Triggered when a user clicks on the element.
-##### :onTouch(target, event) -- {id, x, y, dx, dy, pressure}
+##### :onTouch(self, target, event) -- {id, x, y, dx, dy, pressure}
 > Triggered when a user taps on the element on mobile.
-##### :onHoverEnter(target, event) -- {x, y}
+##### :onHoverEnter(self, target, event) -- {x, y}
 > Triggered when a user initially hovers over an element.
-##### :onHoverExit(target, event) -- {x, y}
+##### :onHoverExit(self, target, event) -- {x, y}
 > Triggered when a user initially stops hovering an element.
-##### :beforeFadeIn(target)
+##### :beforeFadeIn(self, target)
 > Triggered when an element is about to fade in.
-##### :onFadeIn(target)
+##### :onFadeIn(self, target)
 > Triggered when an element is fading in.
-##### :afterFadeIn(target)
+##### :afterFadeIn(self, target)
 > Triggered after an element fades in.
-##### :beforeFadeOut(target)
+##### :beforeFadeOut(self, target)
 > Triggered when an element is about to fade out.
-##### :onFadeOut(target)
+##### :onFadeOut(self, target)
 > Triggered when an element is fading out.
-##### :afterFadeOut(target)
+##### :afterFadeOut(self, target)
 > Triggered after an element fades out.
 ## Data Handling
 These functions provide the ability to directly modify many variables of your elements. The way these work currently may change.<br>

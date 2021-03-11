@@ -121,15 +121,16 @@ function love.load()
 	myGui2:setZ(1)
 	
 	-- You can define onClick callbacks for your GUI elements
-	myGui:registerGlobalEvent("onClick", "box", function(obj, target, evt) end)
-	myGui:child("myBox2"):registerEvent("onClick", function(a) a:fadeOut(true, true) end, myBox3)
-	myBox3:registerEvent("onFadeOut", function() print("Faded") end)
-	myGui:registerEvent("onClick", myGui:child("myBox2"), function() myGui:child("myBox2"):animateBorderToColor(colors("red")) end)
-	myGui:registerEvent("onClick", myGui:child("myBox2"), function() myGui:child("myBox2"):animateToColor(colors("black")) end)
+	myGui:registerGlobalEvent("onClick", "box", function(self, obj, target, evt) end)
+	myGui:child("myBox2"):registerEvent("onClick", function(self, a) a:fadeOut(true, true) end, myBox3)
+	myBox3:registerEvent("onFadeOut", function(self) print("Faded") end)
+	myBox3:registerEvent("onMove", function(self) print("x", self.x, "y", self.y) end)
+	myGui:registerEvent("onClick", myGui:child("myBox2"), function(self) myGui:child("myBox2"):animateBorderToColor(colors("red")) end)
+	myGui:registerEvent("onClick", myGui:child("myBox2"), function(self) myGui:child("myBox2"):animateToColor(colors("black")) end)
 	
 	
 	-- You can define onOptionClick callbacks for your checkbox elements
-	myCheckbox:registerEvent("onOptionClick", function(option, target, evt) myGui:child("myBox2"):setColor(colors(option.text:lower())) end)
+	myCheckbox:registerEvent("onOptionClick", function(self, option, target, evt) myGui:child("myBox2"):setColor(colors(option.text:lower())) end)
 end
 
 -- Use a single source for love callbacks

@@ -47,6 +47,9 @@ function box:new(n, p)
 		y = 0,
 		z = 0
 	}
+	b.x = b.pos.x
+	b.y = b.pos.y
+	b.z = b.pos.z
 	b.border = false
 	b.borderColor = {1,1,1,1}
 	b.color = {1,1,1,1}
@@ -257,7 +260,7 @@ function box:new(n, p)
 	function b:fadeIn()
 		if self.events.beforeFadeIn then 
 			for _,e in ipairs(self.events.beforeFadeIn) do
-				e.fn(e.target)
+				e.fn(self, e.target)
 			end
 		end
 		self.hidden = false
@@ -271,7 +274,7 @@ function box:new(n, p)
 		self.fadedByFunc = true
 		if self.events.onFadeIn then
 			for _,e in ipairs(self.events.onFadeIn) do
-				e.fn(e.target)
+				e.fn(self, e.target)
 			end
 		end
 	end
@@ -279,7 +282,7 @@ function box:new(n, p)
 	function b:fadeOut(p, h)
 		if self.events.beforeFadeOut then
 			for _,e in ipairs(self.events.beforeFadeOut) do
-				e.fn(e.target)
+				e.fn(self, e.target)
 			end
 		end
 		self:animateToOpacity(0)
@@ -294,7 +297,7 @@ function box:new(n, p)
 		self.fadedByFunc = true
 		if self.events.onFadeOut then
 			for _,e in ipairs(self.events.onFadeOut) do
-				e.fn(e.target)
+				e.fn(self, e.target)
 			end
 		end
 	end
