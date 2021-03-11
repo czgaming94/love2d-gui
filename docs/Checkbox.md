@@ -49,7 +49,7 @@ end, yourTargetelement)
 > Triggered when an element is fading out.
 ##### :afterFadeOut(self, target)
 > Triggered after an element fades out.
-##### :onOptionClick(option, target, event) -- {text, width, height, x, y}, target, {x, y, button, istouch, presses}
+##### :onOptionClick(self, option, target, event) -- {text, width, height, x, y}, target, {x, y, button, istouch, presses}
 > Triggered when a user clicks an option on a checkbox.
 ## Data Handling
 These functions provide the ability to directly modify many variables of your elements. The way these work currently may change.<br>

@@ -473,6 +473,11 @@ function dropdown:new(n, p)
 						if v.hovered then
 							self.selected = k
 							hitTarget = true
+							if self.events.onOptionClick then 
+								for _,e in ipairs(self.events.onOptionClick) do
+									e.fn(self, self.options[k], e.t, event)
+								end
+							end
 						end
 					end
 					if not hitTarget then
