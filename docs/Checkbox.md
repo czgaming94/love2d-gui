@@ -85,6 +85,8 @@ number | roundRadius / radius | boolean | singleSelection / single
 boolean | useBorder | number | width / w
 number | x | number | y
 number | z | boolean | vertical
+boolean | hidden | boolean | moveable
+string | default | | 
 ##### :fixPadding(boolean fix)
 > Adjusts padding to be ignored on the top of first line, and ignore left padding on first element.
 ##### :getFixPadding()

@@ -30,7 +30,7 @@ function love.load()
 	-- Add images to your box, easily.
 	-- image (userdata)
 	-- name (string)
-	-- default (boolean)
+	-- automatic (boolean)
 	myBox:addImage(lg.newImage("res/img/background.png"), "background")
 	
 	-- [PARAMS]
