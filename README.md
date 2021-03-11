@@ -21,9 +21,9 @@ selections, or be limited to a single selection.
 __Coming Soon__<br>
 The dropdown is just as it sounds; A menu of options that drops down when clicked on.<br>
 This is commonly used for toggling between user input options, form submissions, etc.
+### [Radials](https://github.com/czgaming94/love2d-gui/blob/main/docs/Radial.md)
+__Coming Soon__
 ### [Sliders](https://github.com/czgaming94/love2d-gui/blob/main/docs/Slider.md)
 __Coming Soon__
 ### [Textfields](https://github.com/czgaming94/love2d-gui/blob/main/docs/Textfield.md)
-__Coming Soon__
-### [Toggles](https://github.com/czgaming94/love2d-gui/blob/main/docs/Toggle.md)
 __Coming Soon__
