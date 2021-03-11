@@ -34,7 +34,8 @@ local prefixes = {
 	color = "c",
 	delay = "d",
 	font = "f",
-	time = "t"
+	time = "t",
+	offset = "o",
 }
 
 
@@ -266,7 +267,11 @@ function text:new(n, p)
 						if v.font ~= "default" then
 							lg.setFont(self.fonts[v.font])
 						end
-						lg.print(v.toShow, v.x, v.y)
+						if v.offset[1] then
+							lg.print(v.toShow, v.x + v.offset[1], v.y + v.offset[2])
+						else
+							lg.print(v.toShow, v.x, v.y)
+						end
 						lg.setColor(1,1,1,1)
 						lg.pop()
 						if not v.finished then break end
@@ -554,6 +559,7 @@ function text:split(s)
 			local id = #t + 1
 			t[id] = {}
 			t[id].text = {}
+			t[id].offset = {}
 			t[id].color = "white"
 			t[id].delay = 0
 			t[id].delayWaited = 0
@@ -565,22 +571,37 @@ function text:split(s)
 			t[id].textPos = 0
 			t[id].timeWaited = 0
 			t[id].toShow = ""
-			if string.match(b, "}") then
-				for o in string.gmatch(b, ".-}") do
+			if b:match("}") then
+				for o in b:gmatch(".-}") do
 					local d = o:gsub("}","")
-					for m in string.gmatch(d, "([^,]+)") do
-						if string.sub(m,1,1) == prefixes.color then
+					for m in d:gmatch("([^,]+)") do
+						local prefix = m:sub(1,1)
+						if prefix == prefixes.color then
 							t[id].color = m:gsub("^" .. prefixes.color .. "=", "")
 						end
-						if string.sub(m,1,1) == prefixes.delay then
+						if prefix == prefixes.delay then
 							t[id].delay = tonumber((m:gsub("^" .. prefixes.delay .. "=", "")))
 							t[id].needToWait = true
 						end
-						if string.sub(m,1,1) == prefixes.font then
+						if prefix == prefixes.font then
 							t[id].font = m:gsub("^" .. prefixes.font .. "=", "")
 						end
-						if string.sub(m,1,1) == prefixes.time then
-							t[id].time = m:gsub("^" .. prefixes.time .. "=", "")
+						if prefix == prefixes.time then
+							t[id].time = tonumber((m:gsub("^" .. prefixes.time .. "=", "")))
+						end
+						if prefix == prefixes.offset then
+							local offsets = {}
+							local o = m:gsub("^" .. prefixes.offset .. "=","")
+							if o:match("%(") and o:match("%)") then
+								o = o:gsub("%(",""):gsub("%)","")
+								for i in o:gmatch("-?[^%.]+") do
+									if i ~= "%." then
+										offsets[#offsets + 1] = tonumber(i) 
+									end
+								end
+								t[id].offset = offsets
+								print(offsets[1], offsets[2])
+							end
 						end
 					end
 				end

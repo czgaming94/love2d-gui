@@ -85,7 +85,7 @@ function love.load()
 		width = 115, height = 40,
 		x = 110, y = 490, z = 2, 
 		color = colors("yellow"), 
-		text = "Hello {c=red,d=1,f=myFont}World!{/}",
+		text = "{c=blue}Hello{/} {c=red,d=1,f=myFont,o=(5.-20),t=0.01}World!{/}",
 		typewriter = true, speed = 0.5,
 		fonts = {myFont = myFont},
 		hollow = true, moveable = true
