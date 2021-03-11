@@ -148,9 +148,8 @@ end
 function love.mousepressed(x, y, button, istouch, presses)
 	myGui:mousepressed(x, y, button, istouch, presses)
 	if button == 2 then
-		local clickTarget = myGui:getHeld()
-		if clickTarget then
-			clickTarget:disable()
+		for k,v in ipairs(myGui:getHeld()) do
+			v.obj:disable()
 		end
 	end
 end

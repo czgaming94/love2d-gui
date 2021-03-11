@@ -53,7 +53,7 @@ gui.z = 0
 gui.use255 = false
 gui.id = 1
 gui.enabled = true
-gui.held = nil
+gui.held = {}
 gui.images = {}
 
 
@@ -533,7 +533,8 @@ function gui:mousepressed(x, y, button, istouch, presses)
 				if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
 					if i.moveable then
 						i.held = true
-						self.held = i
+						local heldID = #self.held + 1
+						self.held[heldID] = {id = heldID, obj = i}
 					end
 					if i.mousepressed then i:mousepressed(event) end
 					if i.events.onClick then 
@@ -570,7 +571,12 @@ function gui:mousereleased(x, y, button, istouch, presses)
 		if v.enabled then
 			for _,i in ipairs(v.items) do
 				if i.held then 
-					i.held = false				
+					i.held = false
+					for k,h in ipairs(self.held) do
+						if h.obj == i then
+							self.held[h.id] = nil
+						end
+					end
 				end
 			end
 		end
